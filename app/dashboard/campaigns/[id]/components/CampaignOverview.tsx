@@ -1,0 +1,41 @@
+"use client";
+
+import PlatformIcons from "@/components/discover/PlatformIcons";
+import type { Platform } from "@/types";
+
+interface CampaignOverviewData {
+  description: string | null;
+  platforms: Platform[];
+  requirements: string[];
+}
+
+export default function CampaignOverview({ campaign }: { campaign: CampaignOverviewData }) {
+  return (
+    <div
+      className="bg-zinc-900 border border-white/10 p-5 text-sm text-zinc-300 space-y-4"
+      style={{ borderRadius: 24 }}
+    >
+      <p className="text-xs">{campaign?.description}</p>
+
+      <PlatformIcons platforms={campaign?.platforms} />
+
+      {campaign?.requirements?.length > 0 && (
+        <div className="pt-2">
+          <h3 className="text-white font-semibold mb-3">Requirements</h3>
+
+          <div className="space-y-3">
+            {campaign.requirements.map((req: string, index: number) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 text-sm text-zinc-300"
+              >
+                <div className="w-2 h-2 rounded-full bg-green-500 mt-2" />
+                <span>{req}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

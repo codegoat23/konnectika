@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "components/discover/spare codes/**",
+    "public/thumbnails/code to share/**",
   ]),
 ]);
 

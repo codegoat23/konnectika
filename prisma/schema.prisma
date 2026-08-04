@@ -1,0 +1,396 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+enum Role {
+  CREATOR
+  BRAND
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+
+  role      Role     @default(CREATOR)
+  onboardingStep Int @default(1)
+  onboardingDone Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creatorProfile  CreatorProfile?
+  businessProfile BusinessProfile?
+ notifications Notification[]
+}
+
+model CreatorProfile {
+  id            String   @id @default(cuid())
+
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  username      String?   @unique
+  displayName   String?
+
+  phone         String?
+  phoneVerified Boolean  @default(false)
+  earnings Earning[] 
+  submissions Submission[]
+  withdrawals Withdrawal[]
+  socialAccounts SocialAccount[]
+ applications  CampaignApplication[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([username])
+}
+
+model BusinessProfile {
+  id        String   @id @default(cuid())
+
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyName String? @unique
+  logo        String?
+  website     String?
+
+  industry    String?
+  description String?
+  socialAccounts SocialAccount[]
+
+  // 🔥 RELATION: business creates campaigns
+  campaigns   Campaign[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyName])
+}
+model SocialAccount {
+  id String @id @default(cuid())
+
+  creatorId String?
+  businessId String?
+
+  creator CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  business BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  platform SocialPlatform
+  handle String
+  url String?
+
+  followers Int @default(0)
+  verified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([creatorId, platform])
+  @@unique([businessId, platform])
+
+  @@index([creatorId])
+  @@index([businessId])
+}
+
+enum SocialPlatform {
+  TWITTER
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  FACEBOOK
+  LINKEDIN
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+
+  name        String
+  description String
+  category    String
+
+  campaignType CampaignTypeEnum
+  badge        BadgeType
+
+  thumbnailColor    String
+  thumbnailPic      String
+  thumbnailInitials String
+
+  paymentRate   Int
+  budgetFunded  Int   @default(0)
+  budgetTotal   Int
+
+  daysLeft      Int
+
+  contentFormat String
+  duration      String
+
+  applicationsClose DateTime
+
+  isOpenToAll   Boolean @default(true)
+  isFeatured    Boolean @default(false)
+
+  // ⭐ NEW FIELDS (from your frontend)
+  tags           String[]
+  requirements   String[]
+  creatorsJoined Int     @default(0)
+  brand          String?
+  status CampaignStatus @default(PENDING_REVIEW)
+
+  // relations
+  businessProfileId String
+  businessProfile   BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  platforms Platform[]
+  applications CampaignApplication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessProfileId])
+  @@index([status])
+}
+
+enum CampaignStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum BadgeType {
+  active
+  hot
+  new
+  featured
+}
+
+enum Platform {
+  instagram
+  tiktok
+  facebook
+  youtube
+  x
+}
+
+enum CampaignTypeEnum {
+  UGC
+  Sponsored
+  Affiliate
+  Ambassador
+}
+model CampaignApplication {
+  id          String   @id @default(cuid())
+
+  creatorId   String
+  campaignId  String
+
+  message     String?
+
+  status      ApplicationStatus @default(PENDING)
+
+  // optional but VERY useful (snapshot at time of apply)
+  instagramFollowers Int?
+  tiktokFollowers    Int?
+  youtubeFollowers   Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+   submission  Submission?
+
+  creator  CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  campaign Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, campaignId])
+  @@index([creatorId])
+  @@index([campaignId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ============================================================
+// ADD THIS TO YOUR EXISTING prisma/schema.prisma
+// Do not create a separate schema file — Prisma needs one file
+// (or use multi-file schemas if you're on Prisma 5.15+ with the
+// `prismaSchemaFolder` preview feature enabled).
+// ============================================================
+
+// --- 1. New enum: submission lifecycle -----------------------
+// Mirrors FLOW.md's verification step (SUBMITTED -> review -> done)
+// without colliding with your existing ApplicationStatus enum.
+enum SubmissionStatus {
+  SUBMITTED      // creator just submitted, nothing reviewed yet
+  UNDER_REVIEW   // brand has opened it / started reviewing
+  APPROVED       // brand approved -> can feed into payment stage later
+  CHANGES_REQUESTED // brand asked creator to fix/redo
+  REJECTED       // brand rejected outright
+}
+
+// --- 2. New model: Submission ---------------------------------
+model Submission {
+  id           String @id @default(cuid())
+
+  // Link back to the approved application this proof is for.
+  // We key off applicationId (not just campaignId + creatorId)
+  // because the application is the record that proves this
+  // creator was actually approved for this campaign.
+  applicationId String        @unique // one submission per application (see note below)
+  application   CampaignApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  // Denormalized for fast filtering/joins without always
+  // having to traverse application -> campaign / creator.
+  creatorId  String
+  creator    CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  // --- proof content ---
+  screenshots String[] // array of uploaded file URLs (S3 / Supabase Storage)
+  postLinks   String[] // array of live post URLs (Instagram/TikTok/etc.)
+  caption     String?  // optional note from creator describing the submission
+
+
+  earning Earning?
+  status        SubmissionStatus @default(SUBMITTED)
+  reviewNote    String?          // brand's feedback / reason for rejection or change request
+  reviewedAt    DateTime?
+  reviewedBy    String?          // userId of the brand/admin who reviewed it
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([campaignId])
+  @@index([status])
+}
+
+// --- 3. Relations you need to ADD to existing models -----------
+//
+// In model CreatorProfile, add:
+//   submissions Submission[]
+//
+// In model Campaign, add:
+//   submissions Submission[]
+//
+// In model CampaignApplication, add:
+//   submission  Submission?
+//
+// NOTE on "one submission per application":
+// applicationId is @unique above, which means a creator gets exactly
+// ONE submission row per approved application. If you want creators
+// to be able to submit multiple times (e.g. resubmit after
+// CHANGES_REQUESTED), remove the @unique constraint and instead treat
+// each resubmission as a NEW row, then always show the latest one in
+// the UI (order by createdAt desc, take the first). Given FLOW.md's
+// "Request changes 🔁" step, multiple submissions per application is
+// probably the more realistic long-term model — flagged here so you
+// can decide. The API code below is written to support EITHER choice
+// with a one-line change (see comment in app/api/submissions/route.ts).
+
+
+model Earning {
+  id String @id @default(cuid())
+
+  creatorId String
+  creator CreatorProfile @relation(fields:[creatorId],references:[id],onDelete:Cascade)
+
+  submissionId String @unique
+  submission Submission @relation(fields:[submissionId],references:[id],onDelete:Cascade)
+
+  // --- payment breakdown (gross / fee / net) ---
+  amount           Int // gross campaign payment
+  platformFeeRate  Int @default(0) // percent
+  platformFee      Int @default(0)
+  creatorAmount    Int @default(0) // net the creator earns
+
+  status EarningStatus @default(PENDING)
+
+  // --- settlement timeline ---
+  approvedAt  DateTime?
+  availableAt DateTime? // PENDING -> AVAILABLE once this passes
+  withdrawnAt DateTime?
+
+  // --- withdrawal linkage ---
+  withdrawalId String?
+  withdrawal   Withdrawal? @relation(fields:[withdrawalId],references:[id],onDelete:SetNull)
+
+  createdAt DateTime @default(now())
+  paidAt    DateTime? // kept for backwards compatibility / revenue chart
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([withdrawalId])
+}
+
+enum EarningStatus {
+  PENDING    // approved, waiting for the settlement period to end
+  AVAILABLE  // settlement passed, creator can withdraw
+  WITHDRAWN  // included in a successful withdrawal
+}
+
+model Withdrawal {
+  id String @id @default(cuid())
+
+  creatorId String
+  creator   CreatorProfile @relation(fields:[creatorId],references:[id],onDelete:Cascade)
+
+  amount Int // sum of linked earnings' creatorAmount
+
+  status WithdrawalStatus @default(PENDING)
+
+  requestedAt DateTime @default(now())
+  paidAt      DateTime?
+  rejectedAt  DateTime?
+
+  paymentMethod   String?
+  paymentReference String?
+
+  reviewedBy String? // admin userId
+  reviewedAt DateTime?
+
+  earnings Earning[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+enum WithdrawalStatus {
+  PENDING    // requested by creator, awaiting admin review
+  PROCESSING // admin picked it up / paying out
+  PAID       // admin marked it paid
+  REJECTED   // admin declined, funds returned to available
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean  @default(false)
+
+  userId      String
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
