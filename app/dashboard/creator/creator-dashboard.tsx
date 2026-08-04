@@ -24,7 +24,7 @@ function CreatorDashboard({campaigns,earnings}:DashboardProps) {
   const statCardsData: StatCardData[] = [
   {
   label: "Total Earnings",
-  value: `$${earnings.totalEarnings.toLocaleString()}`,
+  value: `TZS ${earnings.totalEarnings.toLocaleString()}`,
   
   trend: "up",
   footerTitle: "All-time revenue",
@@ -33,7 +33,7 @@ function CreatorDashboard({campaigns,earnings}:DashboardProps) {
 },
   {
     label: "Pending Earnings",
-    value: `$${earnings.pendingEarnings.toLocaleString()}`,
+    value: `TZS  ${earnings.pendingEarnings.toLocaleString()}`,
     trend: "up",
     footerTitle: "Awaiting payout",
     footerSubtitle: "Processing by platform",

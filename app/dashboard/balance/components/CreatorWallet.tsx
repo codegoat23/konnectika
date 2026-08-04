@@ -41,6 +41,11 @@ const WITHDRAWAL_STATUS_STYLES: Record<string, string> = {
   PAID: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   REJECTED: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
+const EARNING_STATUS_DOT: Record<string, string> = {
+  PENDING: "bg-amber-400",
+  AVAILABLE: "bg-blue-400",
+  WITHDRAWN: "bg-emerald-400",
+};
 
 const PAYMENT_METHODS = [
   "M-PESA",
@@ -65,20 +70,26 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
       <table className="w-full text-sm">
         <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
           <tr>
+            <th className="p-3 text-left">No.</th>
             <th className="p-3 text-left">Campaign</th>
             <th className="p-3 text-left">Gross Amount</th>
             <th className="p-3 text-left">Platform Fee</th>
-            <th className="p-3 text-left">Creator Earnings</th>
+            <th className="p-3 text-left">Earnings</th>
             <th className="p-3 text-left">Status</th>
             <th className="p-3 text-left">Available Date</th>
           </tr>
         </thead>
         <tbody>
-          {earnings.map((earning) => (
+          {earnings.map((earning, index) => (
             <tr
               key={earning.id}
               className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
             >
+                <td className="p-3 text-zinc-500">
+          <div className="flex justify-center items-center gap-2 border border-white/10 rounded-full px-2 py-2 text-xs font-medium text-zinc-400">
+{index + 1}
+          </div>
+          </td>
               <td className="p-3 text-white">
                 {earning.submission?.campaign?.name || "Unknown"}
               </td>
@@ -93,13 +104,14 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
                 TZS {formatTZS(earning.creatorAmount)}
               </td>
               <td className="p-3">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs border ${
-                    EARNING_STATUS_STYLES[earning.status] ?? ""
-                  }`}
-                >
-                  {earning.status}
-                </span>
+              <div className="flex items-center justify-center">
+  <span
+    className={`h-2.5 w-2.5 rounded-full ${
+      EARNING_STATUS_DOT[earning.status] ?? "bg-zinc-500"
+    }`}
+    title={earning.status}
+  />
+</div>
               </td>
               <td className="p-3 text-zinc-400">
                 {formatDate(earning.availableAt)}

@@ -100,55 +100,58 @@ export default function BrandBalance({ payments }: Props) {
               style={{ borderRadius: 24 }}
             >
               <table className="w-full text-sm">
-                <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
-                  <tr>
-                    <th className="p-3 text-left">Creator</th>
-                    <th className="p-3 text-left">Campaign</th>
-                    <th className="p-3 text-left">Gross Amount</th>
-                    <th className="p-3 text-left">Platform Fee</th>
-                    <th className="p-3 text-left">Creator Earnings</th>
-                    <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-left">Available</th>
-                  </tr>
-                </thead>
+  <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+    <tr>
+      <th className="p-3 text-left">No.</th>
+      <th className="p-3 text-left">Creator</th>
+      <th className="p-3 text-left">Campaign</th>
+      <th className="p-3 text-left">Gross Amount</th>
+      <th className="p-3 text-left">Status</th>
+      <th className="p-3 text-left">Available</th>
+    </tr>
+  </thead>
 
-                <tbody>
-                  {payments.map((payment) => (
-                    <tr
-                      key={payment.id}
-                      className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
-                    >
-                      <td className="p-3 text-white">
-                        {payment.creator?.username || "Unknown"}
-                      </td>
-                      <td className="p-3 text-zinc-400">
-                        {payment.submission?.campaign?.name || "—"}
-                      </td>
-                      <td className="p-3 text-zinc-400">
-                        TZS {formatTZS(payment.amount)}
-                      </td>
-                      <td className="p-3 text-zinc-500">
-                        TZS {formatTZS(payment.platformFee)}
-                      </td>
-                      <td className="p-3 text-white font-medium">
-                        TZS {formatTZS(payment.creatorAmount)}
-                      </td>
-                      <td className="p-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs border ${
-                            STATUS_STYLES[payment.status] ?? ""
-                          }`}
-                        >
-                          {payment.status}
-                        </span>
-                      </td>
-                      <td className="p-3 text-zinc-400">
-                        {formatDate(payment.availableAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+  <tbody>
+    {payments.map((payment, index) => (
+      <tr
+        key={payment.id}
+        className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
+      >
+        <td className="p-3 text-zinc-500">
+          <div className="flex justify-center items-center gap-2 border border-white/10 rounded-full px-2 py-2 text-xs font-medium text-zinc-400">
+{index + 1}
+          </div>
+          </td>
+
+        <td className="p-3 text-white">
+          {payment.creator?.username || "Unknown"}
+        </td>
+
+        <td className="p-3 text-zinc-400">
+          {payment.submission?.campaign?.name || "—"}
+        </td>
+
+        <td className="p-3 text-zinc-400">
+          TZS {formatTZS(payment.amount)}
+        </td>
+
+        <td className="p-3">
+          <span
+            className={`px-2 py-1 rounded-full text-xs border ${
+              STATUS_STYLES[payment.status] ?? ""
+            }`}
+          >
+            {payment.status}
+          </span>
+        </td>
+
+        <td className="p-3 text-zinc-400">
+          {formatDate(payment.availableAt)}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
             </div>
           )}
         </div>
