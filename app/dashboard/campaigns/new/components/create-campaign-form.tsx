@@ -11,6 +11,7 @@ import {
 import { SiTiktok } from "react-icons/si";
 import type { Prisma, CampaignTypeEnum } from "@prisma/client";
 import type { IconType } from "react-icons";
+import CoverImageUploader from "@/components/CoverImageUploader";
 
 type CampaignFormProps = {
   mode?: "create" | "edit";
@@ -379,14 +380,13 @@ export default function CampaignForm({
       </Section>
 
       {/* Media */}
-      <Section title="Media">
+      <Section title="Cover Image">
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">Thumbnail URL</label>
-          <Input
-            placeholder="Paste image URL..."
+          <label className="text-sm text-zinc-400">Cover Image</label>
+          <CoverImageUploader
             value={form.thumbnailPic}
-            onChange={(e) =>
-              setForm({ ...form, thumbnailPic: e.target.value })
+            onChange={(url) =>
+              setForm({ ...form, thumbnailPic: url })
             }
           />
         </div>

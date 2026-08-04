@@ -51,6 +51,44 @@ export const ourFileRouter = {
 
   }),
 
+  campaignCover: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+
+  .middleware(async () => {
+
+    const user = await getSessionUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    if (user.role !== "BRAND") {
+      throw new Error("Only brands can upload cover images");
+    }
+
+    return {
+      brandId: user.businessProfileId,
+    };
+
+  })
+
+  .onUploadComplete(async ({ metadata, file }) => {
+
+    console.log("Cover image uploaded", {
+      brandId: metadata.brandId,
+      url: file.url,
+    });
+
+    return {
+      uploadedBy: metadata.brandId,
+      url: file.url,
+    };
+
+  }),
 
 } satisfies FileRouter;
 
