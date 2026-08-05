@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, MessageSquareMore, Users } from "lucide-react";
+import { Check, ChevronRight, MessageSquareMore, Users, X } from "lucide-react";
 
 import {
   FaInstagram,
@@ -96,9 +96,19 @@ if (!res.ok) {
   return;
 }
 
-await onActionComplete();
+const data = await res.json().catch(() => null);
 
-setOpen(false);
+setSelectedApp((prev) =>
+  prev
+    ? {
+        ...prev,
+        status:
+          data?.status ?? (status as "PENDING" | "APPROVED" | "REJECTED"),
+      }
+    : prev
+);
+
+await onActionComplete();
 
 
 } catch (err) {
@@ -193,7 +203,7 @@ campaign={campaign}
       </p>
     </div>
   ) : (
-    <div className="overflow-y-auto flex-1 p-3">
+    <div className="overflow-y-auto flex-1 p-3 rounded-t-[24] *:scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent ">
       <table className="w-full text-sm table-fixed rounded-t-[10]">
 
         <thead className="bg-zinc-900 text-zinc-400 text-xs sticky top-0 z-10 rounded-t-[10]">
@@ -652,9 +662,57 @@ campaign={campaign}
 
 
 
-
-
             {/* ACTIONS */}
+
+            {
+              selectedApp.status === "APPROVED" ||
+              selectedApp.status === "REJECTED"
+              ? (
+
+                <div
+                  className={`
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  py-3
+                  rounded-xl
+                  border
+                  text-sm
+                  font-medium
+                  ${
+                    selectedApp.status === "APPROVED"
+                    ?
+                    "bg-green-500/10 text-green-400 border-green-500/20"
+                    :
+                    "bg-red-500/10 text-red-400 border-red-500/20"
+                  }
+                  `}
+                >
+
+                  {
+                    selectedApp.status === "APPROVED"
+                    ?
+                    <Check size={16}/>
+                    :
+                    <X size={16}/>
+                  }
+
+                  Application
+                  {" "}
+                  {
+                    selectedApp.status === "APPROVED"
+                    ?
+                    "Approved"
+                    :
+                    "Rejected"
+                  }
+
+                </div>
+
+              )
+              :
+              (
 
             <div className="flex gap-3 pt-2">
 
@@ -715,11 +773,13 @@ campaign={campaign}
 
 
 
-
               
 
 
             </div>
+
+              )
+            }
 
 
           </div>

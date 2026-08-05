@@ -104,7 +104,13 @@ export default function CampaignDetailPage() {
       <div className="max-w-5xl px-4 space-y-6">
         {role === "ADMIN" ? (
         
-          <AdminCampaignReview campaign={campaign} />
+          <AdminCampaignReview
+            campaign={campaign}
+            applications={applications}
+            page={page}
+            totalPages={data?.totalPages ?? 1}
+            onPageChange={setPage}
+          />
         ) : (
           <>
            

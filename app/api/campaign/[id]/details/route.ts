@@ -152,9 +152,47 @@ if (user.role === "ADMIN") {
     );
   }
 
+  const { searchParams } = new URL(req.url);
+  const page = Number(searchParams.get("page") ?? "1");
+  const skip = (page - 1) * LIMIT;
+
+  const [applications, totalApplications] =
+    await Promise.all([
+      prisma.campaignApplication.findMany({
+        where: {
+          campaignId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: LIMIT,
+        skip,
+        include: {
+          creator: {
+            include: {
+              socialAccounts: true,
+            },
+          },
+          submission: true,
+        },
+      }),
+
+      prisma.campaignApplication.count({
+        where: {
+          campaignId,
+        },
+      }),
+    ]);
+
   return Response.json({
     role: "ADMIN",
     campaign,
+    applications,
+    page,
+    totalApplications,
+    totalPages: Math.ceil(
+      totalApplications / LIMIT
+    ),
   });
 }
 }

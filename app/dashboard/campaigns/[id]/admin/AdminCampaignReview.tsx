@@ -13,11 +13,19 @@ import {
 import type { Prisma } from "@prisma/client";
 import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { SiTicktick } from "react-icons/si";
+import AdminApplications from "./AdminApplications";
 
 type CampaignDetails = Prisma.CampaignGetPayload<{
   include: {
     businessProfile: true;
     _count: { select: { applications: true } };
+  };
+}>;
+
+type AdminApplicationDetails = Prisma.CampaignApplicationGetPayload<{
+  include: {
+    creator: { include: { socialAccounts: true } };
+    submission: true;
   };
 }>;
 
@@ -30,8 +38,16 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function AdminCampaignReview({
   campaign,
+  applications,
+  page,
+  totalPages,
+  onPageChange,
 }: {
   campaign: CampaignDetails;
+  applications: AdminApplicationDetails[];
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }) {
   const [status, setStatus] = useState<CampaignDetails["status"]>(
     campaign.status
@@ -263,6 +279,14 @@ export default function AdminCampaignReview({
           {status.replace("_", " ")}
         </div>
       </div>
+
+      {/* APPLICATIONS */}
+      <AdminApplications
+        applications={applications}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
 
       {/* REVIEW CONFIRMATION MODAL */}
       <Dialog open={confirmOpen} onOpenChange={(open) => !open && closeReview()}>
