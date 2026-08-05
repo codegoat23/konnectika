@@ -44,7 +44,8 @@ model CreatorProfile {
   submissions Submission[]
   withdrawals Withdrawal[]
   socialAccounts SocialAccount[]
- applications  CampaignApplication[]
+  applications  CampaignApplication[]
+  platformRevenue PlatformRevenue[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -61,14 +62,15 @@ model BusinessProfile {
   logo        String?
   website     String?
 
-  industry    String?
-  description String?
-  socialAccounts SocialAccount[]
+    industry    String?
+    description String?
+    socialAccounts SocialAccount[]
 
-  // 🔥 RELATION: business creates campaigns
-  campaigns   Campaign[]
+    // 🔥 RELATION: business creates campaigns
+    campaigns   Campaign[]
+    platformRevenue PlatformRevenue[]
 
-  createdAt DateTime @default(now())
+    createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([companyName])
@@ -149,6 +151,7 @@ model Campaign {
   submissions Submission[]
   platforms Platform[]
   applications CampaignApplication[]
+  platformRevenue PlatformRevenue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -325,6 +328,9 @@ model Earning {
   withdrawalId String?
   withdrawal   Withdrawal? @relation(fields:[withdrawalId],references:[id],onDelete:SetNull)
 
+  // --- platform revenue linkage (CREATOR_FEE deducted from this earning) ---
+  platformRevenue PlatformRevenue?
+
   createdAt DateTime @default(now())
   paidAt    DateTime? // kept for backwards compatibility / revenue chart
 
@@ -393,4 +399,65 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
+}
+
+// ============================================================
+// PLATFORM REVENUE
+// Immutable, auditable records of money earned by the platform.
+// Every row snapshots the fee rate and amounts in effect at the
+// time of the underlying money event, so later config changes
+// never alter historical records.
+// ============================================================
+
+enum PlatformRevenueType {
+  CREATOR_FEE // 10% (configurable) deducted from a creator's gross earning
+  BRAND_FEE   // 5%  (configurable) charged to a brand on campaign creation
+}
+
+enum PlatformRevenueStatus {
+  ACCRUED // recorded when the underlying money event happens
+  PAID    // funds actually received by the platform
+}
+
+model PlatformRevenue {
+  id        String                @id @default(cuid())
+
+  type      PlatformRevenueType
+  status    PlatformRevenueStatus @default(ACCRUED)
+
+  // snapshot of the fee configuration at record time
+  feeRate     Int // percent
+  grossAmount Int // amount the fee was computed against
+  feeAmount   Int // money the platform keeps (grossAmount * feeRate / 100)
+
+  // optional external payment reference / invoice number
+  paymentReference String?
+
+  // links
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+
+  creatorId  String? // set for CREATOR_FEE
+  creator    CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+
+  businessId String? // set for BRAND_FEE
+  business   BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  earningId  String? @unique // set for CREATOR_FEE -> the earning the fee was deducted from
+  earning    Earning? @relation(fields: [earningId], references: [id], onDelete: Restrict)
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  // Idempotency: a retried money event cannot create a duplicate revenue row.
+  // (earningId is @unique, so an earning can fund at most one CREATOR_FEE.)
+  @@unique([campaignId, type])
+
+  @@index([campaignId])
+  @@index([creatorId])
+  @@index([businessId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
 }

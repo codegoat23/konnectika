@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { notify, NotifyAdmin, Notifycreators } from "@/lib/notification";
+import { NotifyAdmin, Notifycreators } from "@/lib/notification";
+import { computeBrandFee } from "@/lib/pricing";
+import { recordBrandFee } from "@/lib/platform-revenue";
 
 
 export async function GET() {
@@ -85,68 +87,85 @@ export async function POST(req: Request) {
       );
     }
 
-    const campaign = await prisma.campaign.create({
-      data: {
-        name: body.name,
-        description: body.description,
-        category: body.category,
+    const campaign = await prisma.$transaction(async (tx) => {
+      const created = await tx.campaign.create({
+        data: {
+          name: body.name,
+          description: body.description,
+          category: body.category,
 
-        campaignType: body.campaignType,
-        badge: body.badge ?? "new",
+          campaignType: body.campaignType,
+          badge: body.badge ?? "new",
 
-        thumbnailColor:
-          body.thumbnailColor ?? "#18181b",
+          thumbnailColor:
+            body.thumbnailColor ?? "#18181b",
 
-        thumbnailPic:
-          body.thumbnailPic ?? "",
+          thumbnailPic:
+            body.thumbnailPic ?? "",
 
-        thumbnailInitials:
-          body.thumbnailInitials ??
-          body.name
-            .split(" ")
-            .map((w: string) => w[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase(),
+          thumbnailInitials:
+            body.thumbnailInitials ??
+            body.name
+              .split(" ")
+              .map((w: string) => w[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
 
-        paymentRate,
+          paymentRate,
 
-        budgetFunded: 0,
-        budgetTotal,
+          budgetFunded: 0,
+          budgetTotal,
 
-        daysLeft: Number(body.daysLeft) || 0,
+          daysLeft: Number(body.daysLeft) || 0,
 
-        contentFormat: body.contentFormat,
-        duration: body.duration,
+          contentFormat: body.contentFormat,
+          duration: body.duration,
 
-        applicationsClose,
+          applicationsClose,
 
-        isOpenToAll:
-          body.isOpenToAll ?? true,
+          isOpenToAll:
+            body.isOpenToAll ?? true,
 
-        isFeatured:
-          body.isFeatured ?? false,
+          isFeatured:
+            body.isFeatured ?? false,
 
-        tags: body.tags ?? [],
+          tags: body.tags ?? [],
 
-        requirements:
-          body.requirements ?? [],
+          requirements:
+            body.requirements ?? [],
 
-        creatorsJoined: 0,
+          creatorsJoined: 0,
 
-        brand:
-          body.brand ??
-          business.companyName,
+          brand:
+            body.brand ??
+            business.companyName,
 
-        platforms:
-          body.platforms ?? [],
+          platforms:
+            body.platforms ?? [],
 
-        businessProfileId: business.id,
-      },
+          businessProfileId: business.id,
+        },
 
-      include: {
-        businessProfile: true,
-      },
+        include: {
+          businessProfile: true,
+        },
+      });
+
+      // 💰 Brand platform fee: charged on top of the campaign budget. It
+      // belongs to the platform and never reduces creator payouts. The rate
+      // is snapshotted onto the revenue row, and the row upserts on
+      // (campaignId, BRAND_FEE) so a retried request cannot duplicate it.
+      const brandFee = computeBrandFee(budgetTotal);
+      await recordBrandFee(tx, {
+        campaignId: created.id,
+        businessId: business.id,
+        grossAmount: brandFee.budget,
+        feeRate: brandFee.feeRate,
+        feeAmount: brandFee.feeAmount,
+      });
+
+      return created;
     });
 
 

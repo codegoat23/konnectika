@@ -4,9 +4,10 @@ import type { Prisma } from "@prisma/client";
 // ---------------------------------------------------------------------------
 // Wallet business logic. API routes only handle the request/response; all
 // settlement, aggregation and withdrawal mutations live here.
+//
+// Fee percentages/math live in lib/pricing.ts (single source of truth).
 // ---------------------------------------------------------------------------
 
-export const PLATFORM_FEE_PERCENT = 10;
 export const SETTLEMENT_PERIOD_DAYS = 7;
 
 export function addDays(date: Date, days: number): Date {
@@ -15,15 +16,7 @@ export function addDays(date: Date, days: number): Date {
   return d;
 }
 
-export function computeFeeSplit(gross: number) {
-  const platformFee = Math.round((gross * PLATFORM_FEE_PERCENT) / 100);
-  return {
-    amount: gross,
-    platformFeeRate: PLATFORM_FEE_PERCENT,
-    platformFee,
-    creatorAmount: gross - platformFee,
-  };
-}
+export { computeCreatorFeeSplit } from "@/lib/pricing";
 
 // Flip PENDING earnings whose settlement period has passed into AVAILABLE.
 // Scoped to a creator when provided, otherwise settles everyone.

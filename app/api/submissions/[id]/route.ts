@@ -8,11 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/getSessionUser";
 import { z } from "zod";
-import {
-  SETTLEMENT_PERIOD_DAYS,
-  addDays,
-  computeFeeSplit,
-} from "@/lib/wallet";
+import { SETTLEMENT_PERIOD_DAYS, addDays } from "@/lib/wallet";
+import { computeCreatorFeeSplit } from "@/lib/pricing";
+import { recordCreatorFee } from "@/lib/platform-revenue";
 
 async function loadSubmissionWithAccessCheck(
   id: string,
@@ -174,51 +172,62 @@ export async function PATCH(
     );
   }
 
-  const updated = await prisma.submission.update({
-    where: {
-      id,
-    },
-    data: {
-      status: parsed.data.status,
-      reviewNote: parsed.data.reviewNote,
-      reviewedAt: new Date(),
-      reviewedBy: user.id,
-    },
-    include: {
-      creator: true,
-      campaign: true,
-      application: true,
-    },
-  });
-
-
-  // 💰 CREATE CREATOR EARNING AFTER BRAND APPROVAL
-  if (parsed.data.status === "APPROVED") {
-
-    const existingEarning = await prisma.earning.findUnique({
+  const updated = await prisma.$transaction(async (tx) => {
+    const updated = await tx.submission.update({
       where: {
-        submissionId: updated.id,
+        id,
+      },
+      data: {
+        status: parsed.data.status,
+        reviewNote: parsed.data.reviewNote,
+        reviewedAt: new Date(),
+        reviewedBy: user.id,
+      },
+      include: {
+        creator: true,
+        campaign: true,
+        application: true,
       },
     });
 
-
-    if (!existingEarning) {
-      const approvedAt = new Date();
-      const split = computeFeeSplit(updated.campaign.paymentRate);
-
-      await prisma.earning.create({
-        data: {
+    // 💰 CREATE CREATOR EARNING + PLATFORM REVENUE AFTER BRAND APPROVAL
+    if (parsed.data.status === "APPROVED") {
+      const existingEarning = await tx.earning.findUnique({
+        where: {
           submissionId: updated.id,
-          creatorId: updated.creatorId,
-          ...split,
-          status: "PENDING",
-          approvedAt,
-          availableAt: addDays(approvedAt, SETTLEMENT_PERIOD_DAYS),
         },
       });
-    }
-  }
 
+      if (!existingEarning) {
+        const approvedAt = new Date();
+        const split = computeCreatorFeeSplit(updated.campaign.paymentRate);
+
+        const earning = await tx.earning.create({
+          data: {
+            submissionId: updated.id,
+            creatorId: updated.creatorId,
+            ...split,
+            status: "PENDING",
+            approvedAt,
+            availableAt: addDays(approvedAt, SETTLEMENT_PERIOD_DAYS),
+          },
+        });
+
+        // Permanent, immutable record of the platform's cut from this earning.
+        // Upserts on (earningId, CREATOR_FEE) so retries cannot duplicate it.
+        await recordCreatorFee(tx, {
+          earningId: earning.id,
+          creatorId: earning.creatorId,
+          campaignId: updated.campaignId,
+          grossAmount: split.amount,
+          feeRate: split.platformFeeRate,
+          feeAmount: split.platformFee,
+        });
+      }
+    }
+
+    return updated;
+  });
 
   return NextResponse.json({
     submission: updated,

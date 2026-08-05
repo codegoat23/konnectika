@@ -20,7 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, Megaphone, Send, WalletIcon } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, Megaphone, Send, WalletIcon, Landmark } from "lucide-react"
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
 import { GoHome } from "react-icons/go";
 
@@ -197,6 +197,27 @@ const user = {
   avatar: "ES"
 }
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [isAdmin, setIsAdmin] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch("/api/user")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setIsAdmin(data?.User?.role === "ADMIN"))
+      .catch(() => {});
+  }, []);
+
+  const navMain = React.useMemo(() => {
+    if (!isAdmin) return data.navMain;
+    return [
+      ...data.navMain,
+      {
+        title: "Revenue",
+        url: "/dashboard/revenue",
+        icon: <Landmark />,
+      },
+    ];
+  }, [isAdmin]);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -222,7 +243,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain}  />
+        <NavMain items={navMain}  />
         
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>

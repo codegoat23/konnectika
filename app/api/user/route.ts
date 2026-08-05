@@ -21,10 +21,11 @@ export async function GET() {
     
     const name = person?.creatorProfile?.username ?? person?.businessProfile?.companyName;
       
-  
+    
     const User = {
         name,
         email: person?.email,
+        role: person?.role,
         avatar: "/thumbnails/vodacom.webp"
     }
     console.log(User)
