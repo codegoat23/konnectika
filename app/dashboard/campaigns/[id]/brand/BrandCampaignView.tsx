@@ -18,6 +18,7 @@ import CampaignOverview from "../components/CampaignOverview";
 import CampaignAnalytics from "../components/CampaignAnalytics";
 import CampaignBudget from "../components/CampaignBudget";
 import CampaignHeader from "../components/CampaignHeader";
+import PaymentBreakdown from "../../components/PaymentBreakdown";
 import { useParams, useRouter } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import type { IconType } from "react-icons";
@@ -168,6 +169,16 @@ applicantsCount={applications.length}
 
 campaign={campaign}
 
+/>
+
+<PaymentBreakdown
+  budget={campaign.budgetTotal}
+  feeRate={campaign.platformFeeRate}
+  fee={campaign.platformFee}
+  total={campaign.totalCharge}
+  paymentStatus={campaign.paymentStatus}
+  showStatus
+  title="Payment"
 />
 
 

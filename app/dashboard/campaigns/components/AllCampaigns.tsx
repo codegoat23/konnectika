@@ -58,6 +58,15 @@ export default function AllCampaigns({
 
             <div className="flex flex-col items-end gap-1.5 shrink-0 ml-4">
               <span
+                className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap border ${
+                  campaign.paymentStatus === "PAID"
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                }`}
+              >
+                {campaign.paymentStatus === "PAID" ? "Paid" : "Unpaid"}
+              </span>
+              <span
                 className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
                   BADGE_STYLES[campaign.badge] ??
                   "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"

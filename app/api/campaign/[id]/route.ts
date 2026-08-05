@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { computeBrandFee } from "@/lib/pricing";
 
 export async function GET(
   req: Request,
@@ -92,6 +93,12 @@ export async function PATCH(
       );
     }
 
+    // Keep the payment snapshot in sync with the (possibly edited) budget.
+    // The historical BRAND_FEE PlatformRevenue row is intentionally left
+    // untouched — it is an immutable audit record of what was charged at
+    // creation time.
+    const brandFee = computeBrandFee(budgetTotal);
+
     const updated = await prisma.campaign.update({
       where: { id },
       data: {
@@ -103,6 +110,10 @@ export async function PATCH(
 
         paymentRate,
         budgetTotal,
+
+        platformFeeRate: brandFee.feeRate,
+        platformFee: brandFee.feeAmount,
+        totalCharge: brandFee.totalCharge,
 
         contentFormat: body.contentFormat,
         duration: body.duration,

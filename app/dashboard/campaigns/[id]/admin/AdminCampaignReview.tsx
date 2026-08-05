@@ -14,6 +14,7 @@ import type { Prisma } from "@prisma/client";
 import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { SiTicktick } from "react-icons/si";
 import AdminApplications from "./AdminApplications";
+import PaymentBreakdown from "../../components/PaymentBreakdown";
 
 type CampaignDetails = Prisma.CampaignGetPayload<{
   include: {
@@ -216,6 +217,20 @@ export default function AdminCampaignReview({
               </p>
             </div>
           </div>
+
+          {/* Payment breakdown + status */}
+          <div className="mt-4">
+            <PaymentBreakdown
+              budget={campaign.budgetTotal}
+              feeRate={campaign.platformFeeRate}
+              fee={campaign.platformFee}
+              total={campaign.totalCharge}
+              paymentStatus={campaign.paymentStatus}
+              showStatus
+              title="Payment"
+              showNote={false}
+            />
+          </div>
         </div>
       </div>
 
@@ -304,7 +319,7 @@ export default function AdminCampaignReview({
                 </DialogTitle>
                 <DialogDescription>
                   {result === "APPROVED"
-                    ? `${campaign.name} has been approved and is now visible to creators.`
+                    ? `${campaign.name} has been approved, payment confirmed, and is now visible to creators.`
                     : `${campaign.name} has been rejected and will not be shown to creators.`}
                 </DialogDescription>
               </>
@@ -316,11 +331,11 @@ export default function AdminCampaignReview({
                   <XCircle className="h-10 w-10 text-red-400" />
                 )}
                 <DialogTitle className="text-lg font-semibold">
-                  {approved ? "Approve Campaign?" : "Reject Campaign?"}
+                  {approved ? "Approve & Confirm Payment?" : "Reject Campaign?"}
                 </DialogTitle>
                 <DialogDescription>
                   {approved
-                    ? `${campaign.name} will be marked as Approved and become visible to creators.`
+                    ? `Approving "${campaign.name}" confirms the brand's manual payment has been received. It will be marked as PAID and become visible to creators.`
                     : `${campaign.name} will be marked as Rejected and will not be shown to creators.`}
                 </DialogDescription>
               </>
@@ -357,7 +372,7 @@ export default function AdminCampaignReview({
                 {submitting
                   ? "Updating..."
                   : approved
-                    ? "Approve"
+                    ? "Approve & Mark Paid"
                     : "Reject"}
               </button>
             </DialogFooter>

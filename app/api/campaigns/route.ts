@@ -87,6 +87,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // 💰 Brand platform fee: charged on top of the campaign budget. It
+    // belongs to the platform and never reduces creator payouts. The rate
+    // is snapshotted onto the revenue row, and the row upserts on
+    // (campaignId, BRAND_FEE) so a retried request cannot duplicate it.
+    // Computed ONCE here and reused for both the campaign snapshot and the
+    // revenue row so frontend preview and stored amounts always agree.
+    const brandFee = computeBrandFee(budgetTotal);
+
     const campaign = await prisma.$transaction(async (tx) => {
       const created = await tx.campaign.create({
         data: {
@@ -116,6 +124,13 @@ export async function POST(req: Request) {
 
           budgetFunded: 0,
           budgetTotal,
+
+          // Payment is manual: the campaign is created UNPAID and only
+          // marked PAID when an admin approves (i.e. confirms funds).
+          paymentStatus: "UNPAID",
+          platformFeeRate: brandFee.feeRate,
+          platformFee: brandFee.feeAmount,
+          totalCharge: brandFee.totalCharge,
 
           daysLeft: Number(body.daysLeft) || 0,
 
@@ -152,11 +167,6 @@ export async function POST(req: Request) {
         },
       });
 
-      // 💰 Brand platform fee: charged on top of the campaign budget. It
-      // belongs to the platform and never reduces creator payouts. The rate
-      // is snapshotted onto the revenue row, and the row upserts on
-      // (campaignId, BRAND_FEE) so a retried request cannot duplicate it.
-      const brandFee = computeBrandFee(budgetTotal);
       await recordBrandFee(tx, {
         campaignId: created.id,
         businessId: business.id,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaInstagram,
@@ -12,6 +12,7 @@ import { SiTiktok } from "react-icons/si";
 import type { Prisma, CampaignTypeEnum } from "@prisma/client";
 import type { IconType } from "react-icons";
 import CoverImageUploader from "@/components/CoverImageUploader";
+import PaymentBreakdown from "../../components/PaymentBreakdown";
 
 type CampaignFormProps = {
   mode?: "create" | "edit";
@@ -73,6 +74,28 @@ export default function CampaignForm({
 
   const [loading, setLoading] = useState(false);
 
+  // Brand platform fee percent, fetched from the backend so the live payment
+  // summary always matches the authoritative rate (lib/pricing.ts).
+  const [brandFeePercent, setBrandFeePercent] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/platform/pricing");
+        const data = await res.json();
+        if (!cancelled && typeof data?.brandFeePercent === "number") {
+          setBrandFeePercent(data.brandFeePercent);
+        }
+      } catch {
+        // leave null; the summary just won't render
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const [form, setForm] = useState({
     name: initialData?.name ?? "",
     description: initialData?.description ?? "",
@@ -92,6 +115,14 @@ export default function CampaignForm({
     requirements: initialData?.requirements?.join("\n") ?? "",
     platforms: (initialData?.platforms ?? []) as string[],
   });
+
+  // Live payment preview (display only — final amounts are computed and
+  // stored by the backend on submit).
+  const rawBudget = Number(form.budgetTotal);
+  const budget = Number.isFinite(rawBudget) && rawBudget > 0 ? rawBudget : 0;
+  const rate = brandFeePercent ?? 0;
+  const platformFee = Math.round((budget * rate) / 100);
+  const totalCharge = budget + platformFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,6 +467,16 @@ export default function CampaignForm({
           />
         </div>
       </Section>
+
+      {/* Payment summary */}
+      {mode === "create" && brandFeePercent !== null && (
+        <PaymentBreakdown
+          budget={budget}
+          feeRate={rate}
+          fee={platformFee}
+          total={totalCharge}
+        />
+      )}
 
       {/* Submit */}
       <button
