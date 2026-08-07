@@ -121,13 +121,13 @@ export default function SubmitProofForm({
       {/* 🔙 header action */}
       <button
         onClick={() => router.back()}
-        className="text-sm text-zinc-400 hover:text-white transition"
+        className="text-sm text-muted-foreground hover:text-foreground transition"
       >
         ← Back
       </button>
 
       {/* 🖼️ CAMPAIGN HEADER (modal style but page embedded) */}
-      <div className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 w-full"
+      <div className="rounded-2xl overflow-hidden border border-border bg-card w-full"
       style={
         {
           borderRadius:30,
@@ -152,10 +152,10 @@ export default function SubmitProofForm({
         <div className="p-5 space-y-4">
 
           <div>
-            <h3 className="text-zinc-400 text-xs uppercase mb-1">
+            <h3 className="text-muted-foreground text-xs uppercase mb-1">
               About Campaign
             </h3>
-            <p className="text-zinc-300 text-sm">{c.description}</p>
+            <p className="text-muted-foreground text-sm">{c.description}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -171,7 +171,7 @@ export default function SubmitProofForm({
         onSubmit={handleSubmit}
         className="p-5 space-y-4"
       >
-        <h2 className="text-white font-semibold text-lg">
+        <h2 className="text-foreground font-semibold text-lg">
           Submit Proof
         </h2>
 
@@ -180,14 +180,14 @@ export default function SubmitProofForm({
         )}
 
         <div>
-          <label className="text-xs text-zinc-400">Screenshots</label>
+          <label className="text-xs text-muted-foreground">Screenshots</label>
           <div className="grid grid-cols-3 gap-3 mt-4">
   {screenshots.map((url) => (
     <img
       key={url}
       src={url}
       alt="Screenshot"
-      className="rounded-lg border border-zinc-700"
+      className="rounded-lg border border-border"
     />
   ))}
 </div>
@@ -199,28 +199,28 @@ export default function SubmitProofForm({
         </div>
 
         <div>
-          <label className="text-xs text-zinc-400">Post Links</label>
+          <label className="text-xs text-muted-foreground">Post Links</label>
           <textarea
             value={postLinksText}
             onChange={(e) => setPostLinksText(e.target.value)}
             rows={3}
-            className="w-full mt-1 p-2 rounded-lg bg-zinc-800 border border-white/10 text-sm text-white"
+            className="w-full mt-1 p-2 rounded-lg bg-muted border border-border text-sm text-foreground"
           />
         </div>
 
         <div>
-          <label className="text-xs text-zinc-400">Note</label>
+          <label className="text-xs text-muted-foreground">Note</label>
           <textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             rows={2}
-            className="w-full mt-1 p-2 rounded-lg bg-zinc-800 border border-white/10 text-sm text-white"
+            className="w-full mt-1 p-2 rounded-lg bg-muted border border-border text-sm text-foreground"
           />
         </div>
 
         <button
           disabled={submitting}
-          className="w-full py-3 rounded-full bg-white text-black font-medium hover:bg-zinc-200 transition"
+          className="w-full py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-400 transition"
         >
           {submitting ? "Submitting..." : "Submit Proof"}
         </button>
@@ -232,9 +232,9 @@ export default function SubmitProofForm({
 function Skeleton() {
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-3">
-      <div className="h-44 bg-zinc-800 rounded-2xl animate-pulse" />
-      <div className="h-6 bg-zinc-800 rounded w-1/2 animate-pulse" />
-      <div className="h-32 bg-zinc-800 rounded animate-pulse" />
+      <div className="h-44 bg-muted rounded-2xl animate-pulse" />
+      <div className="h-6 bg-muted rounded w-1/2 animate-pulse" />
+      <div className="h-32 bg-muted rounded animate-pulse" />
     </div>
   );
 }

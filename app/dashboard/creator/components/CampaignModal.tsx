@@ -30,7 +30,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
       style={{ backdropFilter: "blur(8px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-custom "
+      <div className="relative bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-custom "
       style={{
         borderRadius: "24px"
       }}
@@ -47,7 +47,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
        
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 p-1.5 rounded-full bg-black/50 text-zinc-400 hover:text-white border border-white/10 transition-colors"
+            className="absolute top-3 right-3 p-1.5 rounded-full bg-black/50 text-zinc-400 hover:text-zinc-100 border border-border transition-colors"
           >
             <X size={16} />
           </button>
@@ -56,10 +56,10 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
         <div className="p-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-white text-xl font-bold leading-tight">{campaign.name}</h2>
+              <h2 className="text-foreground text-xl font-bold leading-tight">{campaign.name}</h2>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-zinc-400 text-sm">{campaign.brand}</span>
-                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-muted-foreground text-sm">{campaign.brand}</span>
+                <span className="w-2 h-2 rounded-full bg-orange-500" />
               </div>
             </div>
           </div>
@@ -67,28 +67,28 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
           <PlatformIcons platforms={campaign.platforms} size="md" />
 
           <div className="mt-4">
-            <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-2">
+            <h4 className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-2">
               About Campaign
             </h4>
-            <p className="text-zinc-300 text-sm leading-relaxed">{campaign.description}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">{campaign.description}</p>
           </div>
 
           <div className="mt-4">
-            <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-2">
+            <h4 className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-2">
               What You&apos;ll Do
             </h4>
             <ul className="space-y-2">
               {campaign.requirements.map((req, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <Check size={14} className="text-green-400 mt-0.5 shrink-0" />
+                <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Check size={14} className="text-orange-500 mt-0.5 shrink-0" />
                   {req}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="mt-5 border border-white/5 rounded-xl overflow-hidden">
-            <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider px-4 pt-4 pb-2">
+          <div className="mt-5 border border-border rounded-xl overflow-hidden">
+            <h4 className="text-muted-foreground text-xs font-medium uppercase tracking-wider px-4 pt-4 pb-2">
               Campaign Details
             </h4>
             <table className="w-full text-sm">
@@ -100,7 +100,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
                   {
                     label: "Remaining Budget",
                     value: `TZS ${formatTZS(remaining)}`,
-                    valueClass: "text-red-400",
+                    valueClass: "text-muted-foreground",
                   },
                   { label: "Payment Rate", value: `TZS ${formatTZS(campaign.paymentRate)} per approved post` },
                   {
@@ -118,9 +118,9 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
                     value: campaign.isOpenToAll ? "Open to all creators" : "Invite only",
                   },
                 ].map((row) => (
-                  <tr key={row.label} className="border-t border-white/5">
-                    <td className="px-4 py-2.5 text-zinc-500 text-xs w-2/5">{row.label}</td>
-                    <td className={`px-4 py-2.5 text-xs ${row.valueClass ?? "text-zinc-200"}`}>
+                  <tr key={row.label} className="border-t border-border">
+                    <td className="px-4 py-2.5 text-muted-foreground text-xs w-2/5">{row.label}</td>
+                    <td className={`px-4 py-2.5 text-xs ${row.valueClass ?? "text-foreground"}`}>
                       {row.value}
                     </td>
                   </tr>
@@ -130,30 +130,30 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
           </div>
 
           <div className="mt-4">
-            <div className="flex justify-between text-xs text-zinc-500 mb-1.5">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
               <span>Budget progress</span>
               <span>{progress}%</span>
             </div>
-            <div className="w-full bg-zinc-800 rounded-full h-1.5">
+            <div className="w-full bg-muted rounded-full h-1.5">
               <div
-                className="h-1.5 rounded-full bg-white"
+                className="h-1.5 rounded-full bg-orange-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-zinc-800/60 rounded-xl border border-white/5">
-            <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-2">
+          <div className="mt-4 p-3 bg-muted/60 rounded-xl border border-border">
+            <h4 className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-2">
               Terms &amp; Conditions
             </h4>
-            <p className="text-zinc-400 text-xs leading-relaxed">
+            <p className="text-muted-foreground text-xs leading-relaxed">
               Content must be original and comply with the brand guidelines. AI-generated content
               is not allowed. Payment will be made within 7 days after content approval.
             </p>
           </div>
 
           <div className="flex gap-3 mt-5">
-            <button className="flex-1 bg-white hover:bg-transparent hover:border  hover:text-white text-sm font-medium py-3  transition-colors"
+            <button className="flex-1 bg-orange-500 hover:bg-orange-400 text-white text-sm font-medium py-3  transition-colors"
             style={{
               borderRadius: "9999px",
               
@@ -162,7 +162,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
             >
               Join Campaign
             </button>
-            <button className="p-3  border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-colors" 
+            <button className="p-3  border border-border text-muted-foreground hover:text-foreground hover:border-border transition-colors" 
             style={{
               borderRadius: "9999px"
             }}

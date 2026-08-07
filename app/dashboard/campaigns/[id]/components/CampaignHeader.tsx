@@ -33,7 +33,7 @@ export default function CampaignHeader({
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="text-sm text-zinc-400 hover:text-white"
+          className="text-sm text-muted-foreground hover:text-foreground"
         >
           ← Back
         </button>
@@ -41,7 +41,7 @@ export default function CampaignHeader({
         {role === "BRAND" ? (
           <button
             onClick={onEdit}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-medium"
           >
             <Edit size={14} />
             Edit Campaign
@@ -50,7 +50,7 @@ export default function CampaignHeader({
           <div
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               creatorStatusStyles[creatorStatus || ""] ||
-              "bg-blue-500/10 text-blue-400"
+              "bg-amber-500/10 text-amber-400"
             }`}
           >
             {creatorStatus || "PENDING"}
@@ -60,7 +60,7 @@ export default function CampaignHeader({
 
       {/* CAMPAIGN HERO CARD */}
   <div
-  className="rounded-3xl overflow-hidden border border-white/10 bg-zinc-900"
+  className="rounded-3xl overflow-hidden border border-border bg-card"
   style={{ borderRadius: 24 }}
 >
   <div

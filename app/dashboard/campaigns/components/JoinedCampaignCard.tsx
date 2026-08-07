@@ -6,7 +6,7 @@ import PlatformIcons from "@/app/dashboard/creator/components/PlatformIcons";
 import { getProgressPercent, getDaysLeftColor } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-yellow-400/50 text-yellow-400 border border-yellow-400/10 ",
+  PENDING: "bg-amber-400/50 text-amber-400 border border-amber-400/10 ",
   APPROVED: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   REJECTED: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
@@ -33,7 +33,7 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
         ease-out
         overflow-hidden
         cursor-pointer
-        border border-white/10
+        border border-border
       "
       style={{ borderRadius: "20px" }}
     >
@@ -92,7 +92,7 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
           {campaign.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="px-2 py-1 rounded-full bg-white/10 text-[10px] text-white"
+              className="px-2 py-1 rounded-full bg-orange-500/10 text-[10px] text-orange-400"
             >
               {tag}
             </span>
@@ -101,8 +101,8 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10">
-        <div className="h-full bg-white" style={{ width: `${progress}%` }} />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-muted">
+        <div className="h-full bg-orange-500" style={{ width: `${progress}%` }} />
       </div>
     </div>
   );

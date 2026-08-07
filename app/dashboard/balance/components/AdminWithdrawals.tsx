@@ -20,7 +20,7 @@ import { Loader2Icon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  PROCESSING: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  PROCESSING: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
   PAID: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   REJECTED: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
@@ -101,10 +101,10 @@ export default function AdminWithdrawals({
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(totalVolume)}
           </div>
-          <div className="text-[11px] text-white/80">All withdrawal requests</div>
+          <div className="text-[11px] text-muted-foreground">All withdrawal requests</div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Awaiting Payout
           </div>
@@ -116,7 +116,7 @@ export default function AdminWithdrawals({
           </div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Total Paid Out
           </div>
@@ -135,14 +135,14 @@ export default function AdminWithdrawals({
 
           {withdrawals.length === 0 ? (
             <div
-              className="mt-5 flex flex-col items-center justify-center border border-white/10 bg-zinc-900/40 py-20"
+              className="mt-5 flex flex-col items-center justify-center border border-border bg-card/40 py-20"
               style={{ borderRadius: 24 }}
             >
               <div className="text-4xl mb-4">🏦</div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-foreground">
                 No withdrawal requests
               </h3>
-              <p className="mt-2 max-w-sm text-center text-sm text-zinc-400">
+              <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
                 Withdrawal requests from creators will appear here once their
                 earnings become available.
               </p>
@@ -150,11 +150,11 @@ export default function AdminWithdrawals({
           ) : (
             <div className="mt-5">
               <div
-                className="border border-white/10 overflow-hidden"
+                className="border border-border overflow-hidden"
                 style={{ borderRadius: 24 }}
               >
                 <table className="w-full text-sm">
-                  <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+                  <thead className="bg-card text-muted-foreground text-xs tracking-wider">
                     <tr>
                       <th className="p-3 text-left">Creator</th>
                       <th className="p-3 text-left">Amount</th>
@@ -171,7 +171,7 @@ export default function AdminWithdrawals({
                         <Fragment key={withdrawal.id}>
                           <tr
                             key={`${withdrawal.id}-row`}
-                            className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60 cursor-pointer"
+                            className="group border-t border-border transition-all duration-200 hover:bg-card/60 cursor-pointer"
                             onClick={() =>
                               setExpandedId(isExpanded ? null : withdrawal.id)
                             }
@@ -179,22 +179,22 @@ export default function AdminWithdrawals({
                             <td className="p-3">
                               <div className="flex items-center gap-1.5">
                                 {isExpanded ? (
-                                  <ChevronDownIcon className="size-3.5 text-zinc-500" />
+                                  <ChevronDownIcon className="size-3.5 text-muted-foreground" />
                                 ) : (
-                                  <ChevronRightIcon className="size-3.5 text-zinc-500" />
+                                  <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 )}
-                                <span className="text-white">
+                                <span className="text-foreground">
                                   {creatorName(withdrawal)}
                                 </span>
                               </div>
                             </td>
-                            <td className="p-3 text-white font-medium">
+                            <td className="p-3 text-foreground font-medium">
                               TZS {formatTZS(withdrawal.amount)}
                             </td>
-                            <td className="p-3 text-zinc-400">
+                            <td className="p-3 text-muted-foreground">
                               {withdrawal.paymentMethod || "—"}
                             </td>
-                            <td className="p-3 text-zinc-400">
+                            <td className="p-3 text-muted-foreground">
                               {formatDate(withdrawal.requestedAt)}
                             </td>
                             <td className="p-3">
@@ -214,7 +214,7 @@ export default function AdminWithdrawals({
                                 <div className="flex items-center justify-end gap-2">
                                   <Button
                                     size="sm"
-                                    className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                                    className="bg-orange-500 hover:bg-orange-600 cursor-pointer"
                                     disabled={loading}
                                     onClick={() => updateStatus(withdrawal.id, "PROCESSING")}
                                   >
@@ -254,7 +254,7 @@ export default function AdminWithdrawals({
                               )}
                               {(withdrawal.status === "PAID" ||
                                 withdrawal.status === "REJECTED") && (
-                                <span className="text-xs text-zinc-500">
+                                <span className="text-xs text-muted-foreground">
                                   {withdrawal.status === "PAID"
                                     ? `Paid ${formatDate(withdrawal.paidAt)}`
                                     : "Rejected"}
@@ -264,14 +264,14 @@ export default function AdminWithdrawals({
                           </tr>
 
                           {isExpanded && (
-                            <tr key={`${withdrawal.id}-breakdown`} className="border-t border-white/5 bg-zinc-950/60">                              <td colSpan={6} className="p-3">
-                                <div className="rounded-[14] border border-white/10 bg-zinc-900/40 p-3">
-                                  <p className="mb-2 text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                            <tr key={`${withdrawal.id}-breakdown`} className="border-t border-border bg-background/60">                              <td colSpan={6} className="p-3">
+                                <div className="rounded-[14] border border-border bg-card/40 p-3">
+                                  <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                     Payout Breakdown
                                   </p>
                                   <div className="space-y-1.5">
                                     {withdrawal.earnings.length === 0 ? (
-                                      <p className="text-sm text-zinc-500">
+                                      <p className="text-sm text-muted-foreground">
                                         No linked earnings.
                                       </p>
                                     ) : (
@@ -280,19 +280,19 @@ export default function AdminWithdrawals({
                                           key={earning.id}
                                           className="flex items-center justify-between text-sm"
                                         >
-                                          <span className="text-zinc-300">
+                                          <span className="text-muted-foreground">
                                             {earning.submission?.campaign?.name ||
                                               "Unknown campaign"}
                                           </span>
-                                          <span className="text-white font-medium">
+                                          <span className="text-foreground font-medium">
                                             TZS {formatTZS(earning.creatorAmount)}
                                           </span>
                                         </div>
                                       ))
                                     )}
-                                    <div className="flex items-center justify-between border-t border-white/10 pt-2 text-sm">
-                                      <span className="text-zinc-400">Total</span>
-                                      <span className="text-white font-semibold">
+                                    <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
+                                      <span className="text-muted-foreground">Total</span>
+                                      <span className="text-foreground font-semibold">
                                         TZS {formatTZS(withdrawal.amount)}
                                       </span>
                                     </div>
@@ -336,7 +336,7 @@ export default function AdminWithdrawals({
           </DialogHeader>
 
           <div className="space-y-2">
-            <label className="text-xs text-zinc-400">Payment Reference</label>
+            <label className="text-xs text-muted-foreground">Payment Reference</label>
             <Input
               value={paymentReference}
               onChange={(e) => setPaymentReference(e.target.value)}

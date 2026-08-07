@@ -48,12 +48,12 @@ export default function CreatorCampaignView({
       {/* LEFT: CREATOR APPLICATION */}
 
       <div
-        className="bg-zinc-900 border border-white/10 p-5"
+        className="bg-card border border-border p-5"
         style={{borderRadius:24}}
       >
 
 
-        <h3 className="text-white font-semibold mb-4">
+        <h3 className="text-foreground font-semibold mb-4">
           Your Application
         </h3>
 
@@ -62,11 +62,11 @@ export default function CreatorCampaignView({
         <div className="space-y-3 text-sm">
 
 
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
 
             Status:
 
-            <span className="ml-2 text-white">
+            <span className="ml-2 text-foreground">
               {creatorStatus}
             </span>
 
@@ -74,11 +74,11 @@ export default function CreatorCampaignView({
 
 
 
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
 
             Applied:
 
-            <span className="ml-2 text-white">
+            <span className="ml-2 text-foreground">
 
               {
                 new Date(
@@ -98,12 +98,12 @@ export default function CreatorCampaignView({
 
               <div className="mt-4">
 
-                <p className="text-zinc-500 text-xs">
+                <p className="text-muted-foreground text-xs">
                   Your Message
                 </p>
 
 
-                <p className="text-zinc-300 mt-1">
+                <p className="text-muted-foreground mt-1">
                   {application.message}
                 </p>
 
@@ -121,20 +121,20 @@ export default function CreatorCampaignView({
               <div
                 className="
                 mt-5
-                bg-zinc-800/40
+                bg-muted/40
                 border
-                border-white/10
+                border-border
                 p-4
                 "
                 style={{borderRadius:16}}
               >
 
-                <h4 className="text-white font-medium mb-3">
+                <h4 className="text-foreground font-medium mb-3">
                   Submission
                 </h4>
 
 
-                <div className="space-y-2 text-sm text-zinc-300">
+                <div className="space-y-2 text-sm text-muted-foreground">
 
 
                   <p>
@@ -160,7 +160,7 @@ export default function CreatorCampaignView({
                   {
                     application.submission.caption && (
 
-                      <p className="text-zinc-400">
+                      <p className="text-muted-foreground">
                         &quot;{application.submission.caption}&quot;
                       </p>
 

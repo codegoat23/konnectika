@@ -52,7 +52,7 @@ export  function NavUser({
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-white/50 font-light">
+                <span className="truncate text-xs text-muted-foreground font-light">
                   {user.email}
                 </span>
               </div>
@@ -60,7 +60,7 @@ export  function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-[14] bg-black/90 border-white/20 outline-none"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-[14] bg-popover border-border outline-none"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -73,7 +73,7 @@ export  function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs text-white/50 font-light">
+                  <span className="truncate text-xs text-muted-foreground font-light">
                     {user.email}
                   </span>
                 </div>

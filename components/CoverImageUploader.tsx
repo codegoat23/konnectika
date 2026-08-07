@@ -20,7 +20,7 @@ export default function CoverImageUploader({
   return (
     <div className="space-y-3">
       {preview ? (
-        <div className="group relative overflow-hidden rounded-[14px] border border-zinc-800 bg-zinc-950">
+        <div className="group relative overflow-hidden rounded-[14px] border border-border bg-background">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
@@ -40,7 +40,7 @@ export default function CoverImageUploader({
           </button>
         </div>
       ) : (
-        <div className="flex h-44 w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-zinc-800 bg-zinc-950 text-zinc-500">
+        <div className="flex h-44 w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border bg-background text-muted-foreground">
           <ImagePlus size={28} />
           <span className="text-sm">No cover image</span>
         </div>

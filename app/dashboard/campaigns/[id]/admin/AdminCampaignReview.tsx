@@ -34,7 +34,7 @@ const STATUS_STYLES: Record<string, string> = {
   PENDING_REVIEW: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   APPROVED: "bg-green-500/10 text-green-400 border-green-500/20",
   REJECTED: "bg-red-500/10 text-red-400 border-red-500/20",
-  COMPLETED: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  COMPLETED: "bg-orange-500/10 text-orange-400 border-orange-500/20",
 };
 
 export default function AdminCampaignReview({
@@ -153,7 +153,7 @@ export default function AdminCampaignReview({
 
       {/* CAMPAIGN CARD */}
       <div
-        className="rounded-3xl overflow-hidden border border-white/10 bg-zinc-900"
+        className="rounded-3xl overflow-hidden border border-border bg-card"
         style={{ borderRadius: 24 }}
       >
         <div
@@ -163,8 +163,8 @@ export default function AdminCampaignReview({
           }}
         >
           {featured && (
-            <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-400">
-              <Star className="h-3.5 w-3.5 fill-amber-400" />
+            <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/15 px-3 py-1 text-xs font-medium text-orange-400">
+              <Star className="h-3.5 w-3.5 fill-orange-400" />
               Featured
             </div>
           )}
@@ -178,7 +178,7 @@ export default function AdminCampaignReview({
           </div>
         </div>
 
-        <div className="p-5 text-sm text-zinc-300 space-y-4">
+        <div className="p-5 text-sm text-muted-foreground space-y-4">
           <p>{campaign.description}</p>
 
           <PlatformIcons platforms={campaign.platforms} />
@@ -186,30 +186,30 @@ export default function AdminCampaignReview({
           {/* Budget Stats */}
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div
-              className="bg-zinc-800/50 border border-white/10 p-3 rounded-xl"
+              className="bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
-              <p className="text-xs text-zinc-500">Total Budget</p>
-              <p className="text-white font-semibold">
+              <p className="text-xs text-muted-foreground">Total Budget</p>
+              <p className="text-foreground font-semibold">
                 TZS {campaign.budgetTotal.toLocaleString()}
               </p>
             </div>
 
             <div
-              className="bg-zinc-800/50 border border-white/10 p-3 rounded-xl"
+              className="bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
-              <p className="text-xs text-zinc-500">Funded</p>
+              <p className="text-xs text-muted-foreground">Funded</p>
               <p className="text-emerald-400 font-semibold">
                 TZS {campaign.budgetFunded.toLocaleString()}
               </p>
             </div>
 
             <div
-              className="bg-zinc-800/50 border border-white/10 p-3 rounded-xl"
+              className="bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
-              <p className="text-xs text-zinc-500">Remaining</p>
+              <p className="text-xs text-muted-foreground">Remaining</p>
               <p className="text-amber-400 font-semibold">
                 TZS {(
                   campaign.budgetTotal - campaign.budgetFunded
@@ -241,8 +241,8 @@ export default function AdminCampaignReview({
           disabled={savingFeatured}
           className={`px-5 py-3 rounded-[10] text-sm border border-orange-500 text-orange-500 font-medium transition ${
             featured
-              ? " text-black hover:bg-amber-400"
-              : "bg-zinc-800 text-zinc-200 border border-white/10 hover:bg-zinc-700"
+              ? "bg-orange-500 text-white hover:bg-orange-400"
+              : "bg-muted text-foreground border border-border hover:bg-muted"
           } disabled:opacity-50`}
         >
           <span className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export default function AdminCampaignReview({
           <>
             <button
               onClick={() => openReview("APPROVED")}
-              className="bg-green-500 px-5 py-3 rounded-xl text-sm font-medium text-black hover:bg-green-400"
+              className="bg-green-500 px-5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-green-400"
             >
               Approve
             </button>
@@ -272,7 +272,7 @@ export default function AdminCampaignReview({
         {status === "APPROVED" && (
           <button
             onClick={() => updateStatus("COMPLETED")}
-            className="bg-white px-5 py-3  text-sm font-medium text-black hover:bg-zinc-200 rounded-[10]"
+            className="bg-orange-500 px-5 py-3  text-sm font-medium text-white hover:bg-orange-400 rounded-[10]"
           >
             Complete
           </button>
@@ -346,7 +346,7 @@ export default function AdminCampaignReview({
             <DialogFooter>
               <button
                 onClick={closeReview}
-                className="px-5 py-2.5 rounded-xl bg-zinc-800 text-sm font-medium text-white hover:bg-zinc-700"
+                className="px-5 py-2.5 rounded-xl bg-muted text-sm font-medium text-foreground hover:bg-muted"
               >
                 Done
               </button>
@@ -356,7 +356,7 @@ export default function AdminCampaignReview({
               <button
                 onClick={closeReview}
                 disabled={submitting}
-                className="px-5 py-2.5 rounded-xl bg-zinc-800 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-muted text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -365,7 +365,7 @@ export default function AdminCampaignReview({
                 disabled={submitting}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white disabled:opacity-50 ${
                   approved
-                    ? "bg-green-500 text-black hover:bg-green-400"
+                    ? "bg-green-500 text-white hover:bg-green-400"
                     : "bg-red-500 hover:bg-red-400"
                 }`}
               >

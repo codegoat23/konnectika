@@ -30,7 +30,7 @@ type Submission = {
 };
 
 const STATUS_STYLES: Record<Submission["status"], string> = {
-  SUBMITTED: "bg-blue-500/20 text-blue-700 border-blue-500/20",
+  SUBMITTED: "bg-orange-500/10 text-orange-400 border-orange-500/20",
   UNDER_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
   APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
   CHANGES_REQUESTED: "bg-orange-50 text-orange-700 border-orange-200",
@@ -112,15 +112,15 @@ export default function BrandSubmissionView() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Submissions</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-semibold text-foreground">Submissions</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Proof submitted by creators across your campaigns.
           </p>
         </div>
         <select
           value={campaignFilter}
           onChange={(e) => setCampaignFilter(e.target.value)}
-          className="rounded-[14] border border-white/20 px-3 py-1.5 text-sm"
+          className="rounded-[14] border border-border bg-background px-3 py-1.5 text-sm text-foreground"
         >
           <option value="all">All campaigns</option>
           {campaigns.map(([id, name]) => (
@@ -139,21 +139,21 @@ export default function BrandSubmissionView() {
       )}
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-gray-500">No submissions yet for this view.</p>
+        <p className="text-sm text-muted-foreground">No submissions yet for this view.</p>
       ) : (
         <ul className="space-y-4">
           {filtered.map((s) => (
-            <li key={s.id} className="rounded-[24] border border-white/10 bg-white/10 p-4">
+            <li key={s.id} className="rounded-[24] border border-border bg-card p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium text-foreground">
                     {s.creator.displayName ?? s.creator.username ?? "Unnamed creator"}
                   </p>
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-muted-foreground">
                     @{s.creator.username ?? "unknown"} · {s.campaign.name}
                   </p>
                   {s.creator.socialAccounts.length > 0 && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {s.creator.socialAccounts
                         .map((a) => `${a.platform} (${a.followers ?? 0})`)
                         .join(" · ")}
@@ -167,7 +167,7 @@ export default function BrandSubmissionView() {
                 </span>
               </div>
 
-              {s.caption && <p className="mt-3 text-sm text-gray-700">{s.caption}</p>}
+              {s.caption && <p className="mt-3 text-sm text-muted-foreground">{s.caption}</p>}
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {s.screenshots.map((url, i) => (
@@ -175,13 +175,13 @@ export default function BrandSubmissionView() {
                     <img
                       src={url}
                       alt={`Screenshot ${i + 1}`}
-                      className="h-20 w-20 rounded-[14] border border-gray-200 object-cover"
+                      className="h-20 w-20 rounded-[14] border border-border object-cover"
                     />
                   </a>
                 ))}
               </div>
 
-              <ul className="mt-6 space-y-1 border border-white/10 bg-black/20 p-2 rounded-[14]">
+              <ul className="mt-6 space-y-1 border border-border bg-black/20 p-2 rounded-[14]">
                 {s.postLinks.map((link, i) => (
                   <li key={i} className="flex flex-row gap-3 items-center px-1">
                     <FiLink2 />
@@ -189,7 +189,7 @@ export default function BrandSubmissionView() {
                       href={link}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-white/40 underline"
+                      className="text-sm text-muted-foreground underline"
                     >
                       {link}
                     </a>
@@ -230,7 +230,7 @@ export default function BrandSubmissionView() {
               )}
 
               {s.reviewNote && (
-                <p className="mt-3 text-sm text-gray-600">Your note: {s.reviewNote}</p>
+                <p className="mt-3 text-sm text-muted-foreground">Your note: {s.reviewNote}</p>
               )}
             </li>
           ))}
@@ -243,9 +243,9 @@ export default function BrandSubmissionView() {
 function PageSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
-      <div className="h-32 w-full animate-pulse rounded bg-gray-100" />
-      <div className="h-32 w-full animate-pulse rounded bg-gray-100" />
+      <div className="h-7 w-48 animate-pulse rounded bg-muted" />
+      <div className="h-32 w-full animate-pulse rounded bg-muted" />
+      <div className="h-32 w-full animate-pulse rounded bg-muted" />
     </div>
   );
 }

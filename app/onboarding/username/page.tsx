@@ -91,7 +91,7 @@ export default function UsernamePage() {
       ? "border-green-500 focus:ring-green-500"
       : validation === "taken"
       ? "border-red-400 focus:ring-red-400"
-      : "border-gray-200 focus:ring-black";
+      : "border-border focus:ring-orange-500/30";
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -99,14 +99,14 @@ export default function UsernamePage() {
 <LogoutButton/>
         {/* Icon */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center">
-            <AtSign size={28} className="text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center">
+            <AtSign size={28} className="text-orange-500" />
           </div>
         </div>
 
         {/* Heading */}
         <h1 className="text-3xl font-bold text-center">Choose a username</h1>
-        <p className="text-gray-500 text-center mt-2 text-sm">
+        <p className="text-muted-foreground text-center mt-2 text-sm">
           This will be your public identity on Konnectika.
         </p>
 
@@ -114,8 +114,8 @@ export default function UsernamePage() {
 
           {/* Input */}
           <div className="relative">
-            <div className="flex items-center border rounded-xl overflow-hidden focus-within:ring-2 transition-all border-white/10">
-              <span className="pl-4 text-gray-400 text-sm select-none">@</span>
+            <div className="flex items-center border rounded-xl overflow-hidden focus-within:ring-2 transition-all border-border">
+              <span className="pl-4 text-muted-foreground text-sm select-none">@</span>
               <input
                 value={username}
                 onChange={handleChange}
@@ -127,7 +127,7 @@ export default function UsernamePage() {
               {/* Validation icon */}
               <div className="pr-4">
                 {validation === "checking" && (
-                  <Loader2 size={16} className="animate-spin text-gray-400" />
+                  <Loader2 size={16} className="animate-spin text-muted-foreground" />
                 )}
                 {validation === "available" && (
                   <CheckCircle2 size={16} className="text-green-500" />
@@ -140,7 +140,7 @@ export default function UsernamePage() {
 
             {/* Character count */}
             {username.length > 0 && (
-              <p className="text-xs text-gray-400 mt-1 text-right">
+              <p className="text-xs text-muted-foreground mt-1 text-right">
                 {username.length}/30
               </p>
             )}
@@ -155,7 +155,7 @@ export default function UsernamePage() {
           )}
 
           {/* Rules hint */}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Only lowercase letters, numbers, and underscores. Min 3 characters.
           </p>
 
@@ -166,7 +166,7 @@ export default function UsernamePage() {
           <button
             type="submit"
             disabled={loading || validation === "taken" || validation === "checking"}
-            className="w-full bg-black text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity"
+            className="w-full bg-orange-500 text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity hover:bg-orange-400"
           >
             {loading ? (
               <>
@@ -188,13 +188,13 @@ export default function UsernamePage() {
             <div
               key={step}
               className={`h-1.5 rounded-full transition-all ${
-                step === 1 ? "w-6 bg-black" : "w-3 bg-gray-200"
+                step === 1 ? "w-6 bg-orange-500" : "w-3 bg-muted"
               }`}
             />
           ))}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">Step 1 of 4</p>
+        <p className="text-center text-xs text-muted-foreground mt-4">Step 1 of 4</p>
       </div>
     </div>
   );

@@ -164,14 +164,14 @@ export default function OtpOnboardingPage() {
 
         {/* Icon */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center">
-            <ShieldCheck size={28} className="text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center">
+            <ShieldCheck size={28} className="text-orange-500" />
           </div>
         </div>
 
         {/* Heading */}
         <h1 className="text-3xl font-bold text-center">Verify your number</h1>
-        <p className="text-gray-500 text-center mt-2 text-sm">
+        <p className="text-muted-foreground text-center mt-2 text-sm">
           We sent a 6-digit code to your phone.{" "}
           <br className="hidden sm:block" />
           Enter it below to continue.
@@ -193,8 +193,8 @@ export default function OtpOnboardingPage() {
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
               className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl outline-none transition-all
-                ${digit ? "border-black " : "border-white/10 "}
-                focus:border-white/20 focus:ring-2 focus:ring-white/10
+                ${digit ? "border-orange-500 " : "border-border "}
+                focus:border-orange-500/20 focus:ring-2 focus:ring-orange-500/30
                 ${error ? "border-red-400 bg-red-50" : ""}
               `}
             />
@@ -210,7 +210,7 @@ export default function OtpOnboardingPage() {
         <button
           onClick={handleSubmit}
           disabled={loading || !isFilled}
-          className="mt-6 w-full bg-black text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity"
+          className="mt-6 w-full bg-orange-500 text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity hover:bg-orange-400"
         >
           {loading ? (
             <>
@@ -231,7 +231,7 @@ export default function OtpOnboardingPage() {
             <button
               onClick={handleResend}
               disabled={resending}
-              className="flex items-center gap-1.5 text-sm text-black font-medium hover:underline disabled:opacity-50"
+              className="flex items-center gap-1.5 text-sm text-orange-500 font-medium hover:underline disabled:opacity-50"
             >
               {resending ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -241,9 +241,9 @@ export default function OtpOnboardingPage() {
               Resend code
             </button>
           ) : (
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Resend code in{" "}
-              <span className="font-medium text-gray-600">
+              <span className="font-medium text-muted-foreground">
                 {resendCooldown}s
               </span>
             </p>
@@ -256,13 +256,13 @@ export default function OtpOnboardingPage() {
             <div
               key={step}
               className={`h-1.5 rounded-full transition-all ${
-                step === 4 ? "w-6 bg-black" : "w-3 bg-gray-200"
+                step === 4 ? "w-6 bg-orange-500" : "w-3 bg-muted"
               }`}
             />
           ))}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">Step 4 of 4</p>
+        <p className="text-center text-xs text-muted-foreground mt-4">Step 4 of 4</p>
       </div>
     </div>
   );

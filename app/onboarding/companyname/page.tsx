@@ -93,7 +93,7 @@ export default function CompanyNamePage() {
       ? "border-green-500 focus:ring-green-500"
       : validation === "taken"
       ? "border-red-400 focus:ring-red-400"
-      : "border-gray-200 focus:ring-black";
+      : "border-border focus:ring-orange-500/30";
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -117,7 +117,7 @@ export default function CompanyNamePage() {
 
         {/* Heading */}
         <h1 className="text-3xl font-bold text-center">Enter your Brand Name</h1>
-        <p className="text-gray-500 text-center mt-2 text-sm">
+        <p className="text-muted-foreground text-center mt-2 text-sm">
           This will be your public identity on Konnectika.
         </p>
 
@@ -125,8 +125,8 @@ export default function CompanyNamePage() {
 
           {/* Input */}
           <div className="relative">
-            <div className="flex items-center border rounded-xl overflow-hidden focus-within:ring-2 transition-all border-white/10">
-              <span className="pl-4 text-gray-400 text-sm select-none">@</span>
+            <div className="flex items-center border rounded-xl overflow-hidden focus-within:ring-2 transition-all border-border">
+              <span className="pl-4 text-muted-foreground text-sm select-none">@</span>
               <input
                 value={companyName}
                 onChange={handleChange}
@@ -138,7 +138,7 @@ export default function CompanyNamePage() {
               {/* Validation icon */}
               <div className="pr-4">
                 {validation === "checking" && (
-                  <Loader2 size={16} className="animate-spin text-gray-400" />
+                  <Loader2 size={16} className="animate-spin text-muted-foreground" />
                 )}
                 {validation === "available" && (
                   <CheckCircle2 size={16} className="text-green-500" />
@@ -151,7 +151,7 @@ export default function CompanyNamePage() {
 
             {/* Character count */}
             {companyName.length > 0 && (
-              <p className="text-xs text-gray-400 mt-1 text-right">
+              <p className="text-xs text-muted-foreground mt-1 text-right">
                 {companyName.length}/30
               </p>
             )}
@@ -166,7 +166,7 @@ export default function CompanyNamePage() {
           )}
 
           {/* Rules hint */}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Only lowercase letters, numbers, and underscores. Min 3 characters.
           </p>
 
@@ -177,7 +177,7 @@ export default function CompanyNamePage() {
           <button
             type="submit"
             disabled={loading || validation === "taken" || validation === "checking"}
-            className="w-full bg-black text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity"
+            className="w-full bg-orange-500 text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity hover:bg-orange-400"
           >
             {loading ? (
               <>
@@ -199,13 +199,13 @@ export default function CompanyNamePage() {
             <div
               key={step}
               className={`h-1.5 rounded-full transition-all ${
-                step === 1 ? "w-6 bg-black" : "w-3 bg-gray-200"
+                step === 1 ? "w-6 bg-orange-500" : "w-3 bg-muted"
               }`}
             />
           ))}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">Step 1 of 4</p>
+        <p className="text-center text-xs text-muted-foreground mt-4">Step 1 of 4</p>
       </div>
     </div>
   );

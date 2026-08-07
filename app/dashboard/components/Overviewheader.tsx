@@ -49,14 +49,14 @@ export function OverviewHeader({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="rounded-full gap-2 text-xs font-medium text-muted-foreground border-white/15"
+            className="rounded-full gap-2 text-xs font-medium text-muted-foreground border-border"
           >
             <CalendarIcon className="size-3.5" />
             {selected}
             <ChevronDownIcon className="size-3.5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 border-white/10 bg-white/10 backdrop-blur-md rounded-2xl"
+        <DropdownMenuContent align="end" className="w-44 border-border bg-popover backdrop-blur-md rounded-2xl"
         style={{ borderRadius: "14px" }}
         >
           {options.map((option) => (

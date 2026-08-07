@@ -19,14 +19,14 @@ export function TrustBoard({
     circumference - (score / 100) * circumference;
 
   return (
-    <Card className="bg-black border border-white/10 rounded-3xl overflow-hidden">
+    <Card className="bg-card border border-border rounded-3xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between pb-0">
-        <h3 className="text-white text-sm font-semibold">
+        <h3 className="text-foreground text-sm font-semibold">
           Trust Score
         </h3>
 
         <button>
-          <MoreVertical className="h-4 w-4 text-zinc-400" />
+          <MoreVertical className="h-4 w-4 text-muted-foreground" />
         </button>
       </CardHeader>
 
@@ -62,7 +62,7 @@ export function TrustBoard({
             </svg>
 
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl font-bold text-white">
+              <span className="text-4xl font-bold text-foreground">
                 {score}%
               </span>
             </div>
@@ -70,7 +70,7 @@ export function TrustBoard({
         </div>
 
         {/* Bottom Card */}
-        <div className="border border-white/10 rounded-2xl p-4">
+        <div className="border border-border rounded-2xl p-4">
           <div className="flex items-center gap-3">
             <Image
               src="/avatar.png"
@@ -87,7 +87,7 @@ export function TrustBoard({
                 </span>
               </div>
 
-              <div className="w-full h-4 bg-zinc-600 rounded-full overflow-hidden">
+              <div className="w-full h-4 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-orange-500"
                   style={{

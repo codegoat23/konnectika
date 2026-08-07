@@ -22,9 +22,9 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-[#0a0a0a]/95 backdrop-blur border-b border-white/5">
+    <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center gap-8">
-        <Link href="/" className={`text-white flex items-center gap-2 self-center font-bold text-[36px] ${bricolage.className}`}>
+        <Link href="/" className={`text-foreground flex items-center gap-2 self-center font-bold text-[36px] ${bricolage.className}`}>
          
          
           Konnectika
@@ -37,8 +37,8 @@ export default function Navbar() {
               href={link.href}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 pathname === link.href
-                  ? "text-red-500"
-                  : "text-zinc-400 hover:text-white"
+                  ? "text-orange-500"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {link.label}
@@ -47,18 +47,18 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="relative p-2 text-zinc-400 hover:text-white transition-colors">
+          <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
             <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
           </button>
-          <button className="p-2 text-zinc-400 hover:text-white transition-colors">
+          <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
             <Bookmark size={20} />
           </button>
-          <button className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-white/10 hover:border-white/20 transition-colors">
-            <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-white">
+          <button className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-border hover:border-border transition-colors">
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-foreground">
               JD
             </div>
-            <ChevronDown size={14} className="text-zinc-500" />
+            <ChevronDown size={14} className="text-muted-foreground" />
           </button>
         </div>
       </div>

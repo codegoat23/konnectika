@@ -26,7 +26,7 @@ type CampaignFormProps = {
  const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
       {...props}
-      className="h-12 w-full text-sm rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-white outline-none transition-all focus:border-white/10 focus:ring-4 focus:ring-violet-500/10"
+      className="h-12 w-full text-sm rounded-2xl border border-border bg-background px-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
       style={{
         borderRadius:14
       }}
@@ -36,7 +36,7 @@ type CampaignFormProps = {
    const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
     <textarea
       {...props}
-      className="w-full text-sm rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-white outline-none transition-all focus:border-white/10 focus:ring-4 focus:ring-violet-500/10"
+      className="w-full text-sm rounded-2xl border border-border bg-background p-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
        style={{
         borderRadius:14
       }}
@@ -45,14 +45,14 @@ type CampaignFormProps = {
 
 
     const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-4"
+    <div className="rounded-3xl border border-border bg-card/40 p-6 space-y-4"
     style={{
       borderRadius:24
     }}
     >
       <div className="space-y-1">
-        <h2 className="text-lg font-semibold text-white">{title}</h2>
-        {desc && <p className="text-sm text-zinc-400">{desc}</p>}
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        {desc && <p className="text-sm text-muted-foreground">{desc}</p>}
       </div>
       {children}
     </div>
@@ -210,10 +210,10 @@ export default function CampaignForm({
     <form onSubmit={handleSubmit} className="w-3xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-foreground">
           {mode === "edit" ? "Edit Campaign" : "Create Campaign"}
         </h1>
-        <p className="text-zinc-400">
+        <p className="text-muted-foreground">
           Publish a campaign and start receiving creator applications.
         </p>
       </div>
@@ -226,7 +226,7 @@ export default function CampaignForm({
       >
         <div className="space-y-4">
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-zinc-400">Campaign Title</label>
+            <label className="text-sm text-muted-foreground">Campaign Title</label>
             <Input
               placeholder="Nike Summer Collection"
               value={form.name}
@@ -237,7 +237,7 @@ export default function CampaignForm({
           </div>
 
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-zinc-400">Description</label>
+            <label className="text-sm text-muted-foreground">Description</label>
             <Textarea
               rows={5}
               placeholder="Describe your campaign..."
@@ -250,7 +250,7 @@ export default function CampaignForm({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 flex flex-col gap-0.5">
-              <label className="text-sm text-zinc-400">Category</label>
+              <label className="text-sm text-muted-foreground">Category</label>
               <Input
                 placeholder="Fashion, Tech, Fitness..."
                 value={form.category}
@@ -261,9 +261,9 @@ export default function CampaignForm({
             </div>
 
             <div className="space-y-2 flex flex-col gap-0.5">
-              <label className="text-sm text-zinc-400">Campaign Type</label>
+              <label className="text-sm text-muted-foreground">Campaign Type</label>
               <select
-                className="h-12 w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-white"
+                className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-foreground"
                 value={form.campaignType}
                  style={{
         borderRadius:14
@@ -289,7 +289,7 @@ export default function CampaignForm({
       <Section title="Budget & Payment">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2 flex flex-col gap-0.5" >
-            <label className="text-sm text-zinc-400">Payment Rate</label>
+            <label className="text-sm text-muted-foreground">Payment Rate</label>
             <Input
               type="number"
               placeholder="150,000"
@@ -301,7 +301,7 @@ export default function CampaignForm({
           </div>
 
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-zinc-400">Budget Total</label>
+            <label className="text-sm text-muted-foreground">Budget Total</label>
             <Input
               type="number"
               placeholder="2,000,000"
@@ -318,7 +318,7 @@ export default function CampaignForm({
       <Section title="Content Requirements">
         <div className="space-y-4">
           <div className="space-y-2 flex flex-col gap-0.5">
-                  <label className="text-sm text-zinc-400">Content Format</label>
+                  <label className="text-sm text-muted-foreground">Content Format</label>
           <Input
             placeholder="Content format (Reels, Shorts, Posts...)"
             value={form.contentFormat}
@@ -328,7 +328,7 @@ export default function CampaignForm({
           />
           </div>
        <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-zinc-400">Content Duration</label>
+            <label className="text-sm text-muted-foreground">Content Duration</label>
              <Input
             placeholder="Duration (e.g. 7 days, 1 month)"
             value={form.duration}
@@ -366,8 +366,8 @@ export default function CampaignForm({
 
           ${
             active
-              ? "border-white bg-white text-black shadow-lg shadow-violet-500/10"
-              : "border-zinc-800 bg-zinc-950 hover:border-zinc-600"
+              ? "border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/15"
+              : "border-border bg-background hover:border-border"
           }
         `}
       >
@@ -377,8 +377,8 @@ export default function CampaignForm({
             flex h-12 w-12 items-center justify-center rounded-full
             ${
               active
-                ? " text-black"
-                : " text-zinc-400"
+                ? " text-white"
+                : " text-muted-foreground"
             }
           `}
         >
@@ -389,19 +389,19 @@ export default function CampaignForm({
         <div className="flex flex-col items-start">
           <span className={`text-sm font-semibold capitalize  ${
               active
-                ? " text-black"
-                : " text-white"
+                ? " text-white"
+                : " text-foreground"
             }`}>
             {p}
           </span>
-          <span className="text-xs text-zinc-400">
+          <span className="text-xs text-muted-foreground">
             {active ? "Selected" : "Tap to select"}
           </span>
         </div>
 
         {/* Selected indicator */}
         {active && (
-          <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-black" />
+          <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-white" />
         )}
       </button>
     );
@@ -413,7 +413,7 @@ export default function CampaignForm({
       {/* Media */}
       <Section title="Cover Image">
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">Cover Image</label>
+          <label className="text-sm text-muted-foreground">Cover Image</label>
           <CoverImageUploader
             value={form.thumbnailPic}
             onChange={(url) =>
@@ -426,7 +426,7 @@ export default function CampaignForm({
       {/* Final */}
       <Section title="Final Settings">
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">
+          <label className="text-sm text-muted-foreground">
             Applications Close
           </label>
           <Input
@@ -442,7 +442,7 @@ export default function CampaignForm({
         </div>
 
         <div className="space-y-2 mt-4">
-          <label className="text-sm text-zinc-400">Tags</label>
+          <label className="text-sm text-muted-foreground">Tags</label>
           <Textarea
             rows={3}
             placeholder="marketing, influencer, viral..."
@@ -454,7 +454,7 @@ export default function CampaignForm({
         </div>
 
         <div className="space-y-2 mt-4">
-          <label className="text-sm text-zinc-400">
+          <label className="text-sm text-muted-foreground">
             Requirements (one per line)
           </label>
           <Textarea

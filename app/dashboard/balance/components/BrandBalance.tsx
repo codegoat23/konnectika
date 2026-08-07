@@ -18,7 +18,7 @@ interface Props {
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  AVAILABLE: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  AVAILABLE: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   WITHDRAWN: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
 };
 
@@ -46,10 +46,10 @@ export default function BrandBalance({ payments }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(totalSpending)}
           </div>
-          <div className="text-[11px] text-white/80">Campaign commitments</div>
+          <div className="text-[11px] text-muted-foreground">Campaign commitments</div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Pending Settlement
           </div>
@@ -61,7 +61,7 @@ export default function BrandBalance({ payments }: Props) {
           </div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Creators Paid
           </div>
@@ -82,25 +82,25 @@ export default function BrandBalance({ payments }: Props) {
 
           {payments.length === 0 ? (
             <div
-              className="mt-5 flex flex-col items-center justify-center border border-white/10 bg-zinc-900/40 py-20"
+              className="mt-5 flex flex-col items-center justify-center border border-border bg-card/40 py-20"
               style={{ borderRadius: 24 }}
             >
               <div className="text-5xl mb-4">💸</div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-foreground">
                 No creator payments
               </h3>
-              <p className="mt-2 max-w-sm text-center text-sm text-zinc-400">
+              <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
                 Payments to creators will appear here after campaign submissions
                 are approved.
               </p>
             </div>
           ) : (
             <div
-              className="border border-white/10 overflow-hidden mt-5"
+              className="border border-border overflow-hidden mt-5"
               style={{ borderRadius: 24 }}
             >
               <table className="w-full text-sm">
-  <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+  <thead className="bg-card text-muted-foreground text-xs tracking-wider">
     <tr>
       <th className="p-3 text-left">No.</th>
       <th className="p-3 text-left">Creator</th>
@@ -115,23 +115,23 @@ export default function BrandBalance({ payments }: Props) {
     {payments.map((payment, index) => (
       <tr
         key={payment.id}
-        className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
+        className="group border-t border-border transition-all duration-200 hover:bg-card/60"
       >
-        <td className="p-3 text-zinc-500">
-          <div className="flex justify-center items-center gap-2 border border-white/10 rounded-full px-2 py-2 text-xs font-medium text-zinc-400">
+        <td className="p-3 text-muted-foreground">
+          <div className="flex justify-center items-center gap-2 border border-border rounded-full px-2 py-2 text-xs font-medium text-muted-foreground">
 {index + 1}
           </div>
           </td>
 
-        <td className="p-3 text-white">
+        <td className="p-3 text-foreground">
           {payment.creator?.username || "Unknown"}
         </td>
 
-        <td className="p-3 text-zinc-400">
+        <td className="p-3 text-muted-foreground">
           {payment.submission?.campaign?.name || "—"}
         </td>
 
-        <td className="p-3 text-zinc-400">
+        <td className="p-3 text-muted-foreground">
           TZS {formatTZS(payment.amount)}
         </td>
 
@@ -145,7 +145,7 @@ export default function BrandBalance({ payments }: Props) {
           </span>
         </td>
 
-        <td className="p-3 text-zinc-400">
+        <td className="p-3 text-muted-foreground">
           {formatDate(payment.availableAt)}
         </td>
       </tr>

@@ -21,13 +21,13 @@ export default function ActiveCampaigns({active_campaigns}:ActiveCampaignsProps)
     style={{ borderRadius: "24px" }}
     >
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">
+        <h2 className="text-lg font-semibold text-foreground">
           Active Campaigns
         </h2>
 
         <Link
           href="/discover"
-          className="text-xs text-zinc-400 hover:text-white transition-colors border p-2  " 
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors border p-2  " 
           style={{ borderRadius: "12px" }}
         >
           View All
@@ -36,13 +36,13 @@ export default function ActiveCampaigns({active_campaigns}:ActiveCampaignsProps)
 
       <div>
         {active_campaigns.length === 0 ? 
-        <div className="flex flex-col justify-center items-center gap-3 border border-white/10 p-18 rounded-[24] bg-white/2">
+        <div className="flex flex-col justify-center items-center gap-3 border border-border p-18 rounded-[24] bg-card">
           <span className="text-sm font-normal">You haven&apos;t applied to any campaigns yet</span>
             <a
     href="/discover"
     target="_blank"
     rel="noopener noreferrer"
-    className="px-5 py-2 rounded-xl text-sm bg-white text-black font-medium hover:bg-zinc-200 transition flex items-center gap-2"
+    className="px-5 py-2 rounded-xl text-sm bg-primary text-primary-foreground font-medium hover:bg-orange-600 transition flex items-center gap-2"
     style={{
       borderRadius:10
     }}

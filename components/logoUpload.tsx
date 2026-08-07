@@ -25,7 +25,7 @@ export default function LogoUpload(){
             </Label>
             <Label 
             htmlFor="logo"
-            className="flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed border-gray-300 hover:border-black"
+            className="flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed border-border hover:border-orange-500"
             >
 
                 {preview? (
@@ -38,8 +38,8 @@ export default function LogoUpload(){
                     />
                 ) : (
                     <>
-                    <Upload className="mb-2 h-6 w-6 text-gray-500"/>
-                    <span className="text-sm text-gray-500">Upload Logo</span>
+                    <Upload className="mb-2 h-6 w-6 text-muted-foreground"/>
+                    <span className="text-sm text-muted-foreground">Upload Logo</span>
                     </>
                 )}
                 <Input

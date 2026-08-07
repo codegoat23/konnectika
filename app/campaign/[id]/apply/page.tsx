@@ -133,33 +133,33 @@ export default function ApplyPage() {
   // ⏳ LOADING
   if (checkingAuth || fetchingCampaign) {
     return (
-      <div className="min-h-screen bg-zinc-950 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 flex items-center justify-between">
-            <div className="h-10 w-24 rounded-xl bg-zinc-800 animate-pulse" />
+            <div className="h-10 w-24 rounded-xl bg-muted animate-pulse" />
             <div className="flex gap-3">
-              <div className="h-10 w-28 rounded-full bg-zinc-800 animate-pulse" />
-              <div className="h-10 w-28 rounded-full bg-zinc-800 animate-pulse" />
+              <div className="h-10 w-28 rounded-full bg-muted animate-pulse" />
+              <div className="h-10 w-28 rounded-full bg-muted animate-pulse" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div
-              className="space-y-4 rounded-[24px] border border-white/10 bg-zinc-900 p-6"
+              className="space-y-4 rounded-[24px] border border-border bg-card p-6"
             >
-              <div className="h-56 w-full rounded-2xl bg-zinc-800 animate-pulse" />
-              <div className="h-6 w-2/3 rounded bg-zinc-800 animate-pulse" />
-              <div className="h-4 w-full rounded bg-zinc-800 animate-pulse" />
-              <div className="h-4 w-5/6 rounded bg-zinc-800 animate-pulse" />
+              <div className="h-56 w-full rounded-2xl bg-muted animate-pulse" />
+              <div className="h-6 w-2/3 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-full rounded bg-muted animate-pulse" />
+              <div className="h-4 w-5/6 rounded bg-muted animate-pulse" />
             </div>
 
             <div
-              className="space-y-4 rounded-[24px] border border-white/10 bg-zinc-900 p-6"
+              className="space-y-4 rounded-[24px] border border-border bg-card p-6"
             >
-              <div className="h-6 w-1/2 rounded bg-zinc-800 animate-pulse" />
-              <div className="h-4 w-full rounded bg-zinc-800 animate-pulse" />
-              <div className="h-4 w-3/4 rounded bg-zinc-800 animate-pulse" />
-              <div className="h-10 w-40 rounded-xl bg-zinc-800 animate-pulse" />
+              <div className="h-6 w-1/2 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-full rounded bg-muted animate-pulse" />
+              <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
+              <div className="h-10 w-40 rounded-xl bg-muted animate-pulse" />
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function ApplyPage() {
   // ❌ ERROR
   if (error || !campaign) {
     return (
-      <div className="min-h-screen bg-zinc-950 p-6 text-red-400">
+      <div className="min-h-screen bg-background p-6 text-red-400">
         {error || "Campaign not available"}
       </div>
     );
@@ -187,7 +187,7 @@ export default function ApplyPage() {
 };
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
+    <div className="min-h-screen bg-background p-6">
 
       {/* NAV */}
      <div className="w-full flex items-center justify-between max-w-6xl mx-auto mb-6">
@@ -206,14 +206,14 @@ export default function ApplyPage() {
   <div className="flex gap-3">
     <button
       onClick={() => router.push("/discover")}
-      className="px-4 py-2 bg-zinc-900 border border-white/10 text-zinc-300 rounded-full hover:text-white"
+      className="px-4 py-2 bg-card border border-border text-muted-foreground rounded-full hover:text-foreground"
     >
       ← Discover
     </button>
 
     <button
       onClick={() => router.push("/dashboard")}
-      className="px-4 py-2 bg-white border border-white/10 text-black rounded-full hover:text-white"
+      className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-400"
     >
       Dashboard
     </button>
@@ -224,7 +224,7 @@ export default function ApplyPage() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-screen">
 
         {/* LEFT */}
-        <div className="bg-zinc-900 border border-white/10 flex flex-col overflow-hidden rounded-[24px]">
+        <div className="bg-card border border-border flex flex-col overflow-hidden rounded-[24px]">
 
           <div
             className="h-56 bg-cover bg-center shrink-0"
@@ -233,15 +233,15 @@ export default function ApplyPage() {
 
           <div className="p-6 overflow-y-auto flex-1 scrollbar-custom">
 
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-3xl font-bold text-foreground">
               {campaign.name}
             </h1>
 
-            <p className="text-zinc-400 mt-3">
+            <p className="text-muted-foreground mt-3">
               {campaign.description}
             </p>
 
-            <div className="mt-6 border border-white/5 rounded-xl overflow-hidden">
+            <div className="mt-6 border border-border rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <tbody>
                   {([
@@ -257,11 +257,11 @@ export default function ApplyPage() {
                         : "—",
                     ],
                   ] as [string, string][]).map(([label, value]) => (
-                    <tr key={label} className="border-b border-white/5">
-                      <td className="px-4 py-3 text-zinc-500">
+                    <tr key={label} className="border-b border-border">
+                      <td className="px-4 py-3 text-muted-foreground">
                         {label}
                       </td>
-                      <td className="px-4 py-3 text-zinc-200">
+                      <td className="px-4 py-3 text-foreground">
                         {value}
                       </td>
                     </tr>
@@ -271,14 +271,14 @@ export default function ApplyPage() {
             </div>
 
             <div className="mt-6">
-              <h3 className="text-white font-semibold mb-3">
+              <h3 className="text-foreground font-semibold mb-3">
                 Requirements
               </h3>
 
               <ul className="space-y-3">
                 {campaign.requirements?.map((r: string, i: number) => (
-                  <li key={i} className="flex gap-3 text-zinc-300 text-sm">
-                    <span className="text-green-400">✓</span>
+                  <li key={i} className="flex gap-3 text-muted-foreground text-sm">
+                    <span className="text-orange-400">✓</span>
                     {r}
                   </li>
                 ))}
@@ -289,27 +289,27 @@ export default function ApplyPage() {
         </div>
 
         {/* RIGHT */}
-        <div className="bg-zinc-900 border border-white/10 flex flex-col p-6 rounded-[24px]">
+        <div className="bg-card border border-border flex flex-col p-6 rounded-[24px]">
 
           
          {/* CREATOR PROFILE */}
-<div className="bg-zinc-800/60 border border-white/10 rounded-xl p-4" style={{borderRadius: "24px"}}>
+<div className="bg-muted/60 border border-border rounded-xl p-4" style={{borderRadius: "24px"}}>
 
   {/* Top identity row */}
   <div className="flex items-center gap-4">
 
-    <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-white font-bold overflow-hidden">
+    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-foreground font-bold overflow-hidden">
       {user?.displayName?.charAt(0) ||
         user?.username?.charAt(0) ||
         "C"}
     </div>
 
     <div>
-      <p className="text-white font-medium">
+      <p className="text-foreground font-medium">
         {user?.displayName || user?.username || "Creator"}
       </p>
 
-      <p className="text-zinc-400 text-xs">
+      <p className="text-muted-foreground text-xs">
         {user?.user?.email}
       </p>
     </div>
@@ -329,7 +329,7 @@ export default function ApplyPage() {
 
     return (
       <div className="mt-4">
-        <p className="text-zinc-400 text-xs mb-2 uppercase tracking-wider">
+        <p className="text-muted-foreground text-xs mb-2 uppercase tracking-wider">
           Social Platforms
         </p>
 
@@ -342,7 +342,7 @@ export default function ApplyPage() {
                 key={acc.id}
                 href={acc.url || "#"}
                 target="_blank"
-                className="flex items-center gap-2 px-3 py-2 rounded-full bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 transition"
+                className="flex items-center gap-2 px-3 py-2 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-border transition"
               >
                 <Icon className="text-base" />
                 <span className="text-xs">@{acc.handle}</span>
@@ -358,7 +358,7 @@ export default function ApplyPage() {
           {/* TEXTAREA */}
           <div className="flex-1 flex flex-col mt-6">
             <textarea
-              className="w-full flex-1 min-h-[350px] p-4 bg-zinc-800 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="w-full flex-1 min-h-[350px] p-4 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/30"
               style={{ borderRadius: "24px" }}
               placeholder="Tell the brand who you are, your audience, and why you're the perfect fit..."
               value={message}
@@ -371,7 +371,7 @@ export default function ApplyPage() {
             <button
               onClick={submitApplication}
               disabled={loading}
-              className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-zinc-200 transition disabled:opacity-50"
+              className="w-full bg-orange-500 text-white py-3 rounded-full font-medium hover:bg-orange-400 transition disabled:opacity-50"
             >
               {loading ? "Submitting..." : "Submit Application"}
             </button>

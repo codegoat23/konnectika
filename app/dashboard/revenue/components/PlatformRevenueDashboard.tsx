@@ -23,7 +23,7 @@ interface Props {
 }
 
 const TYPE_STYLES: Record<string, string> = {
-  CREATOR_FEE: "bg-violet-500/10 text-violet-400 border border-violet-500/20",
+  CREATOR_FEE: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
   BRAND_FEE: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
 };
 
@@ -41,7 +41,7 @@ function formatDate(date: Date | string): string {
 }
 
 const selectClass =
-  "h-11 rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-sm text-white outline-none transition-all focus:border-white/10 focus:ring-4 focus:ring-violet-500/10";
+  "h-11 rounded-2xl border border-border bg-background px-4 text-sm text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10";
 
 export default function PlatformRevenueDashboard({ records, summary }: Props) {
   const [typeFilter, setTypeFilter] = useState("all");
@@ -87,8 +87,8 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3 px-4 lg:px-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Platform Revenue</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-2xl font-semibold text-foreground">Platform Revenue</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Fees collected from brands and creators. Each record is immutable.
           </p>
         </div>
@@ -123,16 +123,16 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(summary.total)}
           </div>
-          <div className="text-[11px] text-white/80">
+          <div className="text-[11px] text-muted-foreground">
             All fees collected across the platform
           </div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Creator Fees
           </div>
-          <div className="mt-2 text-xl font-semibold tabular-nums">
+          <div className="mt-2 text-xl font-semibold tabular-nums text-foreground">
             TZS {formatTZS(summary.byType.CREATOR_FEE ?? 0)}
           </div>
           <div className="text-[11px] text-muted-foreground">
@@ -140,11 +140,11 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
           </div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Brand Fees
           </div>
-          <div className="mt-2 text-xl font-semibold tabular-nums">
+          <div className="mt-2 text-xl font-semibold tabular-nums text-foreground">
             TZS {formatTZS(summary.byType.BRAND_FEE ?? 0)}
           </div>
           <div className="text-[11px] text-muted-foreground">
@@ -152,11 +152,11 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
           </div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
             Collected (PAID)
           </div>
-          <div className="mt-2 text-xl font-semibold tabular-nums">
+          <div className="mt-2 text-xl font-semibold tabular-nums text-foreground">
             TZS {formatTZS(summary.byStatus.PAID ?? 0)}
           </div>
           <div className="text-[11px] text-muted-foreground">
@@ -169,10 +169,10 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
       {monthly.length > 0 && (
         <div className="px-4 lg:px-6">
           <div
-            className="border border-white/10 bg-zinc-900/40 p-5"
+            className="border border-border bg-card/40 p-5"
             style={{ borderRadius: 24 }}
           >
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               Revenue by month
             </h3>
             <div className="mt-4 h-56 w-full">
@@ -225,11 +225,11 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
       {/* history table */}
       <div className="px-4 lg:px-6">
         <div
-          className="border border-white/10 overflow-hidden"
+          className="border border-border overflow-hidden"
           style={{ borderRadius: 24 }}
         >
           <table className="w-full text-sm">
-            <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+            <thead className="bg-card text-muted-foreground text-xs tracking-wider">
               <tr>
                 <th className="p-3 text-left">Type</th>
                 <th className="p-3 text-left">Source</th>
@@ -245,7 +245,7 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
               {filtered.map((r) => (
                 <tr
                   key={r.id}
-                  className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
+                  className="group border-t border-border transition-all duration-200 hover:bg-card/60"
                 >
                   <td className="p-3">
                     <span
@@ -254,15 +254,15 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
                       {r.type.replace("_", " ")}
                     </span>
                   </td>
-                  <td className="p-3 text-white">{sourceLabel(r)}</td>
-                  <td className="p-3 text-zinc-400">{r.campaign.name}</td>
-                  <td className="p-3 text-zinc-400">
+                  <td className="p-3 text-foreground">{sourceLabel(r)}</td>
+                  <td className="p-3 text-muted-foreground">{r.campaign.name}</td>
+                  <td className="p-3 text-muted-foreground">
                     TZS {formatTZS(r.grossAmount)}
                   </td>
-                  <td className="p-3 font-medium text-white">
+                  <td className="p-3 font-medium text-foreground">
                     TZS {formatTZS(r.feeAmount)}
                   </td>
-                  <td className="p-3 text-zinc-400">{r.feeRate}%</td>
+                  <td className="p-3 text-muted-foreground">{r.feeRate}%</td>
                   <td className="p-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs border ${STATUS_STYLES[r.status]}`}
@@ -270,7 +270,7 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
                       {r.status}
                     </span>
                   </td>
-                  <td className="p-3 text-zinc-500">
+                  <td className="p-3 text-muted-foreground">
                     {formatDate(r.createdAt)}
                   </td>
                 </tr>
@@ -279,7 +279,7 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
                 <tr>
                   <td colSpan={8} className="px-4 py-10 text-center">
                     <div className="text-4xl mb-4">💸</div>
-                    <p className="text-sm text-zinc-400">
+                    <p className="text-sm text-muted-foreground">
                       No platform revenue records match this filter.
                     </p>
                   </td>

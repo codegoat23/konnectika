@@ -14,19 +14,19 @@ const platforms = [
     name: "Twitter / X",
     icon: FaTwitter,
     status: "Connected",
-    color: "text-sky-500",
+    color: "text-muted-foreground",
   },
   {
     name: "Instagram",
     icon: FaInstagram,
     status: "Connected",
-    color: "text-pink-500",
+    color: "text-muted-foreground",
   },
   {
     name: "YouTube",
     icon: FaYoutube,
     status: "Connected",
-    color: "text-red-500",
+    color: "text-muted-foreground",
   },
   {
     name: "TikTok",
@@ -38,18 +38,18 @@ const platforms = [
     name: "GitHub",
     icon: FaGithub,
     status: "Connected",
-    color: "text-zinc-900",
+    color: "text-foreground",
   },
 ];
 
 export default function ConnectedPlatformsAccordion() {
   return (
-    <div className="w-full rounded-2xl border bg-white p-3 shadow-sm">
+    <div className="w-full rounded-2xl border bg-background p-3 shadow-sm">
       <Accordion type="single" collapsible>
         <AccordionItem value="platforms" className="border-none">
           
           {/* Header */}
-          <AccordionTrigger className="text-sm font-semibold text-zinc-800">
+          <AccordionTrigger className="text-sm font-semibold text-foreground">
             Connected Platforms
           </AccordionTrigger>
 
@@ -62,17 +62,17 @@ export default function ConnectedPlatformsAccordion() {
                 return (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-xl border bg-zinc-50 px-3 py-2"
+                    className="flex items-center justify-between rounded-xl border bg-muted px-3 py-2"
                   >
                     {/* Left side */}
                     <div className="flex items-center gap-3">
                       <Icon className={`text-lg ${platform.color}`} />
 
                       <div>
-                        <p className="text-sm font-medium text-zinc-800">
+                        <p className="text-sm font-medium text-foreground">
                           {platform.name}
                         </p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-xs text-muted-foreground">
                           {platform.status}
                         </p>
                       </div>
@@ -83,7 +83,7 @@ export default function ConnectedPlatformsAccordion() {
                       className={`h-2.5 w-2.5 rounded-full ${
                         platform.status === "Connected"
                           ? "bg-emerald-500"
-                          : "bg-zinc-400"
+                          : "bg-muted"
                       }`}
                     />
                   </div>
@@ -91,7 +91,7 @@ export default function ConnectedPlatformsAccordion() {
               })}
 
               {/* View All */}
-              <button className="mt-2 w-full rounded-xl border border-zinc-200 bg-white py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50">
+              <button className="mt-2 w-full rounded-xl border border-border bg-muted py-2 text-sm font-medium text-muted-foreground transition hover:bg-accent">
                 View All
               </button>
             </div>

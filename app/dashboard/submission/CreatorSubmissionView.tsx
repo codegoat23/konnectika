@@ -45,14 +45,14 @@ export default function CreatorSubmissionView() {
   if (loading) return <Skeleton />;
 
   return (
-    <div className="px-4 lg:px-8 py-6 space-y-6 bg-zinc-950 min-h-screen">
+    <div className="px-4 lg:px-8 py-6 space-y-6 bg-background min-h-screen">
 
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold text-white">
+        <h1 className="text-2xl font-semibold text-foreground">
           Submit Proof
         </h1>
-        <p className="text-sm text-zinc-400 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Your approved campaigns waiting for submission.
         </p>
       </div>
@@ -68,7 +68,7 @@ export default function CreatorSubmissionView() {
 
       {/* EMPTY STATE */}
       {readyToSubmit.length === 0 ? (
-        <div className="text-zinc-500 text-sm">
+        <div className="text-muted-foreground text-sm">
           Nothing waiting right now — approved campaigns will appear here.
         </div>
       ) : (
@@ -82,14 +82,14 @@ export default function CreatorSubmissionView() {
               }
               className="
                 group cursor-pointer
-                bg-zinc-900/70
-                border border-white/5
+                bg-card/70
+                border border-border
                 rounded-2xl
                 p-5
                 flex items-center justify-between
                 transition-all duration-200
-                hover:border-white/15
-                hover:bg-zinc-900
+                hover:border-border
+                hover:bg-card
                 hover:scale-[1.01]
               "
                style={{
@@ -99,15 +99,15 @@ export default function CreatorSubmissionView() {
 
               {/* LEFT CONTENT */}
               <div className="space-y-1">
-                <h2 className="text-white font-semibold text-base group-hover:text-white">
+                <h2 className="text-foreground font-semibold text-base group-hover:text-foreground">
                   {item.campaign.name}
                 </h2>
 
-                <p className="text-zinc-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {item.campaign.brand ?? "Unknown brand"}
                 </p>
 
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted-foreground">
                   Approved on{" "}
                   {new Date(item.createdAt).toLocaleDateString()}
                 </p>
@@ -118,14 +118,14 @@ export default function CreatorSubmissionView() {
 
                 {/* RATE */}
                 <div className="text-right">
-                  <p className="text-xs text-zinc-500">Payment</p>
+                  <p className="text-xs text-muted-foreground">Payment</p>
                   <p className="text-emerald-400 font-semibold">
                     ${item.campaign.paymentRate}
                   </p>
                 </div>
 
                 {/* ARROW */}
-                <div className="text-zinc-500 group-hover:text-white transition">
+                <div className="text-muted-foreground group-hover:text-foreground transition">
                   <ArrowRight size={18} />
                 </div>
 
@@ -142,14 +142,14 @@ export default function CreatorSubmissionView() {
 /* 🧊 SKELETON */
 function Skeleton() {
   return (
-    <div className="px-6 py-8 space-y-4 bg-zinc-950 min-h-screen">
-      <div className="h-6 w-40 bg-zinc-800 rounded animate-pulse" />
-      <div className="h-4 w-64 bg-zinc-800 rounded animate-pulse" />
+    <div className="px-6 py-8 space-y-4 bg-background min-h-screen">
+      <div className="h-6 w-40 bg-muted rounded animate-pulse" />
+      <div className="h-4 w-64 bg-muted rounded animate-pulse" />
 
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="h-20 bg-zinc-900 border border-white/5 rounded-2xl animate-pulse"
+          className="h-20 bg-card border border-border rounded-2xl animate-pulse"
         />
       ))}
     </div>

@@ -132,7 +132,7 @@ export default function SocialsOnboardingPage() {
           Add your social presence
         </h1>
 
-        <p className="text-gray-500 text-center mt-2 text-sm">
+        <p className="text-muted-foreground text-center mt-2 text-sm">
           Connect platforms so brands can discover you.
         </p>
 
@@ -154,12 +154,12 @@ export default function SocialsOnboardingPage() {
               <div
                 key={p.key}
                 className={`border rounded-xl overflow-hidden transition-shadow ${
-                  hasValue ? "border-green-400 shadow-sm" : "border-white/20"
+                  hasValue ? "border-green-400 shadow-sm" : "border-border"
                 }`}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : p.key)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 hover:text-black transition-colors"
+                  className="w-full flex items-center justify-between p-4 hover:bg-muted hover:text-foreground transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -178,16 +178,16 @@ export default function SocialsOnboardingPage() {
                   </div>
 
                   {isOpen ? (
-                    <ChevronUp size={16} className="text-gray-400" />
+                    <ChevronUp size={16} className="text-muted-foreground" />
                   ) : (
-                    <ChevronDown size={16} className="text-gray-400" />
+                    <ChevronDown size={16} className="text-muted-foreground" />
                   )}
                 </button>
 
                 {isOpen && (
                   <div className="px-4 pb-4 border-t  pt-3 space-y-2">
-                    <div className="flex items-center border rounded-lg  overflow-hidden focus-within:ring-2 focus-within:ring-black">
-                      <span className="pl-3 text-gray-400 text-sm select-none">
+                    <div className="flex items-center border rounded-lg  overflow-hidden focus-within:ring-2 focus-within:ring-orange-500/30">
+                      <span className="pl-3 text-muted-foreground text-sm select-none">
                         @
                       </span>
                       <input
@@ -202,13 +202,13 @@ export default function SocialsOnboardingPage() {
                     </div>
 
                     {handles[p.key]?.trim() && (
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         Preview:{" "}
                         <a
                           href={`${p.base}${handles[p.key]}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-white/50 underline"
+                          className="text-muted-foreground underline"
                         >
                           {p.base}
                           {handles[p.key]}
@@ -227,7 +227,7 @@ export default function SocialsOnboardingPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="mt-6 w-full bg-black text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity"
+          className="mt-6 w-full bg-orange-500 text-white rounded-xl py-3 flex items-center justify-center gap-2 disabled:opacity-50 transition-opacity hover:bg-orange-400"
         >
           {loading ? (
             <>
@@ -247,13 +247,13 @@ export default function SocialsOnboardingPage() {
             <div
               key={step}
               className={`h-1.5 rounded-full transition-all ${
-                step === 2 ? "w-6 bg-black" : "w-3 "
+                step === 2 ? "w-6 bg-orange-500" : "w-3 "
               }`}
             />
           ))}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs text-muted-foreground mt-4">
           Step 2 of 4
         </p>
       </div>

@@ -7,12 +7,12 @@ export function SkeletonStatCards({ count = 4 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="space-y-3 rounded-2xl border border-white/5 bg-zinc-900 p-5"
+          className="space-y-3 rounded-2xl border border-border bg-card p-5"
           style={{ borderRadius: 16 }}
         >
-          <Skeleton className="h-3 w-24 bg-zinc-800" />
-          <Skeleton className="h-7 w-32 bg-zinc-800" />
-          <Skeleton className="h-3 w-20 bg-zinc-800" />
+          <Skeleton className="h-3 w-24 bg-muted" />
+          <Skeleton className="h-7 w-32 bg-muted" />
+          <Skeleton className="h-3 w-20 bg-muted" />
         </div>
       ))}
     </div>
@@ -25,14 +25,14 @@ export function SkeletonRows({ rows = 4 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center justify-between rounded-2xl border border-white/5 bg-zinc-900/70 p-5"
+          className="flex items-center justify-between rounded-2xl border border-border bg-card/70 p-5"
           style={{ borderRadius: 24 }}
         >
           <div className="space-y-2">
-            <Skeleton className="h-4 w-48 max-w-full bg-zinc-800" />
-            <Skeleton className="h-3 w-28 bg-zinc-800" />
+            <Skeleton className="h-4 w-48 max-w-full bg-muted" />
+            <Skeleton className="h-3 w-28 bg-muted" />
           </div>
-          <Skeleton className="h-6 w-20 bg-zinc-800" />
+          <Skeleton className="h-6 w-20 bg-muted" />
         </div>
       ))}
     </div>
@@ -45,7 +45,7 @@ export function DashboardLoading() {
       <div className="space-y-6 px-4 lg:px-6">
         <SkeletonStatCards />
         <div className="space-y-3 pt-4">
-          <Skeleton className="h-6 w-48 bg-zinc-800" />
+          <Skeleton className="h-6 w-48 bg-muted" />
           <SkeletonRows rows={4} />
         </div>
       </div>
@@ -56,11 +56,11 @@ export function DashboardLoading() {
 export function CardLoading() {
   return (
     <div className="space-y-6">
-      <div className="space-y-3 rounded-3xl border border-white/10 bg-zinc-900 p-5">
-        <Skeleton className="h-5 w-2/3 bg-zinc-800" />
-        <Skeleton className="h-4 w-full bg-zinc-800" />
-        <Skeleton className="h-4 w-5/6 bg-zinc-800" />
-        <Skeleton className="h-4 w-1/2 bg-zinc-800" />
+      <div className="space-y-3 rounded-3xl border border-border bg-card p-5">
+        <Skeleton className="h-5 w-2/3 bg-muted" />
+        <Skeleton className="h-4 w-full bg-muted" />
+        <Skeleton className="h-4 w-5/6 bg-muted" />
+        <Skeleton className="h-4 w-1/2 bg-muted" />
       </div>
       <SkeletonRows rows={3} />
     </div>

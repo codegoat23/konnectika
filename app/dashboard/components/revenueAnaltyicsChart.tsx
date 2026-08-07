@@ -179,7 +179,7 @@ export function RevenueAnalyticsChart(){
 
   return (
 
-<Card className="@container/card bg-white/10 backdrop-blur-md rounded-2xl">
+<Card className="@container/card bg-card backdrop-blur-md rounded-2xl">
 
 
 <CardHeader>
@@ -334,7 +334,7 @@ tickFormatter={(v:number)=>
 
 tick={{
 fontSize:12,
-fill:"white"
+fill:"var(--muted-foreground)"
 }}
 
 width={40}
@@ -353,7 +353,7 @@ axisLine={false}
 
 tick={{
 fontSize:13,
-fill:"white"
+fill:"var(--muted-foreground)"
 }}
 
 />
@@ -368,7 +368,7 @@ cursor={false}
 content={
 
 <ChartTooltipContent
-className="bg-black rounded-[10] border-white/3  0"
+className="bg-popover rounded-[10] border-border"
 formatter={(value)=>
 [
 `$${Number(value).toLocaleString()}`,

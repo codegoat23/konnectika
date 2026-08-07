@@ -56,7 +56,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
   if (!current) return null;
 
   return (
-    <div className="relative w-full min-h-[420px] rounded-2xl overflow-hidden ">
+    <div className="relative w-full min-h-[420px]  overflow-hidden ">
       
       {/* BACKGROUND */}
       <div
@@ -193,7 +193,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
             
             <button
               onClick={() => onJoin(current)}
-              className="bg-white text-black text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-zinc-100 active:scale-95 transition-all"
+              className="bg-primary text-primary-foreground text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-orange-400 active:scale-95 transition-all"
             >
               Join Campaign
             </button>

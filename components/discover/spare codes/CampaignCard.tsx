@@ -18,7 +18,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   return (
     <div
       onClick={() => onClick(campaign)}
-      className="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden cursor-pointer hover:border-white/15 hover:-translate-y-0.5 transition-all duration-200 group"
+      className="bg-zinc-900 border border-border rounded-2xl overflow-hidden cursor-pointer hover:border-zinc-700 hover:-translate-y-0.5 transition-all duration-200 group"
       style={{
         borderRadius: "24px"
       }}
@@ -41,7 +41,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
 
         <button
           onClick={(e) => e.stopPropagation()}
-          className="absolute top-3 right-3 p-1.5  bg-black/40 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-3 right-3 p-1.5  bg-black/40 text-zinc-400 hover:text-zinc-100 transition-colors"
           style={{ borderRadius: "9999px" }}
         >
           <Bookmark size={13} />
@@ -51,13 +51,13 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div>
-            <h3 className="text-white text-sm font-medium leading-tight line-clamp-1">
+            <h3 className="text-zinc-100 text-sm font-medium leading-tight line-clamp-1">
               {campaign.name}
             </h3>
             <p className="text-zinc-500 text-xs mt-0.5 flex items-center gap-1">
               {campaign.brand}
               {campaign.isFeatured && (
-                <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-orange-500 inline-block" />
               )}
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
           </div>
           <div className="w-full bg-zinc-800 rounded-full h-1">
             <div
-              className="h-1 rounded-full bg-white transition-all"
+              className="h-1 rounded-full bg-orange-500 transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>

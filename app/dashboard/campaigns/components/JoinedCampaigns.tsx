@@ -18,19 +18,19 @@ export default function JoinedCampaigns({
   if (campaigns.length === 0) {
     return (
       <section className="px-4 lg:px-6">
-        <h2 className="text-lg font-semibold text-white mb-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           Campaigns Joined
         </h2>
 
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="p-4 rounded-full bg-zinc-800 mb-4">
-            <RefreshCw size={24} className="text-zinc-500" />
+          <div className="p-4 rounded-full bg-muted mb-4">
+            <RefreshCw size={24} className="text-muted-foreground" />
           </div>
-          <p className="text-zinc-300 font-medium mb-1">
+          <p className="text-muted-foreground font-medium mb-1">
             You haven&apos;t applied to any campaigns yet
           </p>
-          <p className="text-zinc-500 text-sm">
-            <a href="/discover" className="text-white underline">
+          <p className="text-muted-foreground text-sm">
+            <a href="/discover" className="text-foreground underline hover:text-orange-400">
               Browse open campaigns
             </a>{" "}
             to get started
@@ -53,18 +53,18 @@ export default function JoinedCampaigns({
   return (
     <section className="px-4 lg:px-6">
           {/* CTA SECTION */}
-<div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/10 bg-zinc-900/40 p-4 rounded-2xl"
+<div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-border bg-card/40 p-4 rounded-2xl"
 style={{
   borderRadius:24
 }}
 >
 
   <div>
-    <p className="text-white font-semibold text-sm">
+    <p className="text-foreground font-semibold text-sm">
       Discover more opportunities
     </p>
 
-    <p className="text-zinc-400 text-xs leading-relaxed">
+    <p className="text-muted-foreground text-xs leading-relaxed">
       Explore active campaigns and apply to grow your reach
     </p>
   </div>
@@ -73,7 +73,7 @@ style={{
     href="/discover"
     target="_blank"
     rel="noopener noreferrer"
-    className="px-5 py-2 rounded-xl text-sm bg-white text-black font-medium hover:bg-zinc-200 transition flex items-center gap-2"
+    className="px-5 py-2 rounded-xl text-sm bg-orange-500 text-white font-medium hover:bg-orange-400 transition flex items-center gap-2"
     style={{
       borderRadius:10
     }}
@@ -82,7 +82,7 @@ style={{
   </a>
 
 </div>
-      <h2 className="text-lg font-semibold text-white mb-4 mt-10">
+      <h2 className="text-lg font-semibold text-foreground mb-4 mt-10">
         Campaigns Joined
       </h2>
 

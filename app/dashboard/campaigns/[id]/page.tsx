@@ -75,9 +75,9 @@ export default function CampaignDetailPage() {
   if (loadingData) {
     return (
       <div className="max-w-5xl mx-auto p-6 space-y-4">
-        <div className="h-52 bg-zinc-800 rounded-3xl animate-pulse" />
-        <div className="h-6 bg-zinc-800 rounded w-1/3 animate-pulse" />
-        <div className="h-40 bg-zinc-800 rounded-2xl animate-pulse" />
+        <div className="h-52 bg-muted rounded-3xl animate-pulse" />
+        <div className="h-6 bg-muted rounded w-1/3 animate-pulse" />
+        <div className="h-40 bg-muted rounded-2xl animate-pulse" />
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function CampaignDetailPage() {
   if (!campaign) {
     return (
       <DashboardShell>
-        <div className="max-w-5xl px-4 py-12 text-center text-zinc-400">
+        <div className="max-w-5xl px-4 py-12 text-center text-muted-foreground">
           Campaign not found.
         </div>
       </DashboardShell>

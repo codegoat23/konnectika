@@ -7,6 +7,113 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   KONNECTIKA DESIGN SYSTEM — orange accent on white/neutral zinc
+   ------------------------------------------------------------
+   Primary brand color: orange-500 (accent only — never a surface).
+   Neutrals: zinc (white in light, zinc-950 in dark).
+   Semantic colors stay semantic only: green = success,
+   amber = warning, red = error.
+   The sidebar stays dark (zinc-950) in BOTH themes.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+  --radius: 0.75rem;
+
+  --background: oklch(1 0 0); /* white */
+  --foreground: oklch(0.21 0.006 285.885); /* zinc-900 */
+
+  --card: oklch(1 0 0); /* white */
+  --card-foreground: oklch(0.21 0.006 285.885);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.006 285.885);
+
+  --primary: oklch(0.705 0.213 47.604); /* orange-500 */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.967 0.001 286.375); /* zinc-100 */
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+
+  --muted: oklch(0.967 0.001 286.375); /* zinc-100 */
+  --muted-foreground: oklch(0.552 0.016 285.938); /* zinc-500 */
+
+  --accent: oklch(0.705 0.213 47.604 / 0.1); /* orange-500/10 */
+  --accent-foreground: oklch(0.553 0.195 38.402); /* orange-700 */
+
+  --destructive: oklch(0.637 0.237 25.331); /* red-500 (semantic error) */
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.92 0.004 286.32); /* zinc-200 */
+  --input: oklch(0.871 0.006 286.286); /* zinc-300 */
+  --ring: oklch(0.705 0.213 47.604); /* orange-500 — focus rings */
+
+  --chart-1: oklch(0.705 0.213 47.604); /* orange-500 */
+  --chart-2: oklch(0.646 0.222 41.116); /* orange-600 */
+  --chart-3: oklch(0.807 0.189 55.655); /* orange-400 */
+  --chart-4: oklch(0.553 0.195 38.402); /* orange-700 */
+  --chart-5: oklch(0.837 0.128 66.29); /* orange-300 */
+
+  /* Sidebar is permanently dark (zinc-950) in both themes. */
+  --sidebar: oklch(0.141 0.005 285.823); /* zinc-950 */
+  --sidebar-foreground: oklch(0.967 0.001 286.375); /* zinc-100 */
+  --sidebar-primary: oklch(0.705 0.213 47.604); /* orange-500 */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.705 0.213 47.604 / 0.12); /* orange-500/12 */
+  --sidebar-accent-foreground: oklch(0.837 0.128 66.29); /* orange-300 */
+  --sidebar-border: oklch(0.274 0.006 286.033); /* zinc-800 */
+  --sidebar-ring: oklch(0.705 0.213 47.604);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.141 0.005 285.823); /* zinc-950 */
+  --foreground: oklch(0.967 0.001 286.375); /* zinc-100 */
+
+  --card: oklch(0.21 0.006 285.885); /* zinc-900 */
+  --card-foreground: oklch(0.967 0.001 286.375);
+
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.967 0.001 286.375);
+
+  --primary: oklch(0.705 0.213 47.604); /* orange-500 */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.274 0.006 286.033); /* zinc-800 */
+  --secondary-foreground: oklch(0.967 0.001 286.375);
+
+  --muted: oklch(0.274 0.006 286.033 / 0.5); /* zinc-800/50 */
+  --muted-foreground: oklch(0.705 0.015 286.067); /* zinc-400 */
+
+  --accent: oklch(0.705 0.213 47.604 / 0.12); /* orange-500/12 */
+  --accent-foreground: oklch(0.837 0.128 66.29); /* orange-300 */
+
+  --destructive: oklch(0.637 0.237 25.331); /* red-500 (semantic error) */
+  --destructive-foreground: oklch(0.967 0.001 286.375);
+
+  --border: oklch(0.274 0.006 286.033); /* zinc-800 */
+  --input: oklch(0.274 0.006 286.033);
+  --ring: oklch(0.705 0.213 47.604); /* orange-500 — focus rings */
+
+  --chart-1: oklch(0.705 0.213 47.604); /* orange-500 */
+  --chart-2: oklch(0.646 0.222 41.116); /* orange-600 */
+  --chart-3: oklch(0.807 0.189 55.655); /* orange-400 */
+  --chart-4: oklch(0.553 0.195 38.402); /* orange-700 */
+  --chart-5: oklch(0.837 0.128 66.29); /* orange-300 */
+
+  /* Sidebar values identical to :root — permanently dark. */
+  --sidebar: oklch(0.141 0.005 285.823);
+  --sidebar-foreground: oklch(0.967 0.001 286.375);
+  --sidebar-primary: oklch(0.705 0.213 47.604);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.705 0.213 47.604 / 0.12);
+  --sidebar-accent-foreground: oklch(0.837 0.128 66.29);
+  --sidebar-border: oklch(0.274 0.006 286.033);
+  --sidebar-ring: oklch(0.705 0.213 47.604);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -15,7 +122,7 @@
   --font-sans: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-bricolage);
-  
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -55,21 +162,165 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Premium touches: orange text selection + focus ring default. */
+*::selection {
+  background: oklch(0.705 0.213 47.604 / 0.25);
+  color: inherit;
+}
+
+:focus-visible {
+  outline-color: oklch(0.705 0.213 47.604);
+}
+
+/* Body defaults: neutral text on theme background, orange accent only. */
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 .scrollbar-custom::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: #1f1f1f15;
+  background: color-mix(in oklch, var(--muted-foreground), transparent 85%);
   border-radius: 10px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #646363;
+  background: var(--muted-foreground);
   border-radius: 10px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #dc2626;
+  background: #f97316;
+}
+
+/* ============================================================
+   Landing page motion — float + marquee
+   ============================================================ */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Landing page — audience mode theming (Creator / Brand)
+   The homepage wrapper carries [data-audience="creator|brand"].
+   These scoped token sets override the global theme for the whole
+   landing page without touching the user's app-wide theme choice.
+   ============================================================ */
+[data-audience="creator"] {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: oklch(0.705 0.213 47.604 / 0.1);
+  --accent-foreground: #c2410c;
+  --border: #e4e4e7;
+  --input: #d4d4d8;
+  --ring: #f97316;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+}
+
+[data-audience="brand"] {
+  color-scheme: dark;
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #151515;
+  --card-foreground: #fafafa;
+  --popover: #151515;
+  --popover-foreground: #fafafa;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #1f1f1f;
+  --muted-foreground: #a1a1aa;
+  --accent: oklch(0.705 0.213 47.604 / 0.12);
+  --accent-foreground: #fdba74;
+  --border: #262626;
+  --input: #262626;
+  --ring: #f97316;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+}
+
+@keyframes rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
 }

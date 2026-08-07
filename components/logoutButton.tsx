@@ -34,7 +34,7 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={loading}
-      className="flex items-center gap-2   text-sm font-medium    disabled:opacity-50  text-white transition-colors rounded-2xl"
+      className="flex items-center gap-2   text-sm font-medium    disabled:opacity-50  text-foreground transition-colors rounded-2xl hover:text-orange-400"
       style={
         {borderRadius:"14px"}
       }

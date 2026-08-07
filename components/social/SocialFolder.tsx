@@ -194,11 +194,11 @@ export default function SocialFolderGrid() {
   }
 
   const inputClass =
-    "h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 text-sm text-white outline-none focus:border-white/25";
+    "h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-orange-500/30";
 
   return (
     <div className="flex flex-col gap-5">
-      <h2 className="text-lg font-semibold text-white">Social platforms</h2>
+      <h2 className="text-lg font-semibold text-foreground">Social platforms</h2>
 
       {error && (
         <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-400">
@@ -207,7 +207,7 @@ export default function SocialFolderGrid() {
       )}
 
       {/* CARD */}
-      <div className="w-[225px] overflow-hidden rounded-[28px] bg-white/10 p-2.5">
+      <div className="w-[225px] overflow-hidden rounded-[28px] bg-card p-2.5">
         <div className="relative rounded-[20px] bg-[#ff6900] shadow-xs px-6 py-6">
           <CornerDot className="left-3 top-3" />
           <CornerDot className="right-3 top-3" />
@@ -237,7 +237,7 @@ export default function SocialFolderGrid() {
             {/* Connected count */}
             <div className="text-4xl font-extrabold tracking-tight text-white">
               {loading ? (
-                <span className="inline-block h-9 w-10 animate-pulse rounded bg-white/20 align-middle" />
+                <span className="inline-block h-9 w-10 animate-pulse rounded bg-muted align-middle" />
               ) : (
                 <>
                   {socials.length}
@@ -248,27 +248,27 @@ export default function SocialFolderGrid() {
               )}
             </div>
 
-            <div className="text-sm font-medium text-white/60">
+            <div className="text-sm font-medium text-white/70">
               Platforms connected
             </div>
           </div>
         </div>
 
         {/* Bottom action bar */}
-        <div className="flex items-center justify-center gap-4 py-4 text-white">
+        <div className="flex items-center justify-center gap-4 py-4 text-foreground">
           <button
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-2 text-sm font-medium transition hover:text-white/70"
+            className="flex items-center gap-2 text-sm font-medium transition hover:text-muted-foreground"
           >
             <InfoIcon className="size-4" />
             Detail
           </button>
 
-          <span className="h-5 w-px bg-white/20" />
+          <span className="h-5 w-px bg-muted" />
 
           <button
             onClick={() => openAdd()}
-            className="flex items-center gap-2 text-sm font-medium transition hover:text-white/70"
+            className="flex items-center gap-2 text-sm font-medium text-orange-500 transition hover:text-orange-400"
           >
             <PlusIcon className="size-4" />
             Add
@@ -279,12 +279,12 @@ export default function SocialFolderGrid() {
       {/* ALL PLATFORMS MODAL */}
       {showAll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-[320px] rounded-[24px] border border-white/10 bg-black/90 p-5 shadow-xl">
+          <div className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">All platforms</p>
+              <p className="text-sm font-semibold text-foreground">All platforms</p>
               <button
                 onClick={() => setShowAll(false)}
-                className="text-zinc-300 transition hover:text-white"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
@@ -301,13 +301,13 @@ export default function SocialFolderGrid() {
                       setSelectedPlatform(p);
                       setShowAll(false);
                     }}
-                    className="relative flex flex-col items-center justify-center rounded-[14px] border border-white/10 p-4 transition hover:bg-white/5"
+                    className="relative flex flex-col items-center justify-center rounded-[14px] border border-border p-4 transition hover:bg-muted/60"
                   >
                     {connected && (
                       <span className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-sm" />
                     )}
-                    <Icon className={`text-2xl ${connected ? p.color : "text-zinc-600"}`} />
-                    <span className="mt-2 text-[10px] text-zinc-400">
+                    <Icon className="text-2xl text-muted-foreground" />
+                    <span className="mt-2 text-[10px] text-muted-foreground">
                       {p.name}
                     </span>
                   </button>
@@ -321,18 +321,16 @@ export default function SocialFolderGrid() {
       {/* PLATFORM DETAIL MODAL */}
       {selectedPlatform && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-[320px] rounded-[24px] border border-white/10 bg-zinc-950 p-5 shadow-xl">
+          <div className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl">
             <div className="flex items-center gap-3">
-              <selectedPlatform.icon
-                className={`text-2xl ${selectedPlatform.color}`}
-              />
+              <selectedPlatform.icon className="text-2xl text-muted-foreground" />
               <div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-foreground">
                   {selectedPlatform.name}
                 </p>
                 <p
                   className={`text-xs ${
-                    selectedAccount ? "text-emerald-400" : "text-zinc-500"
+                    selectedAccount ? "text-emerald-400" : "text-muted-foreground"
                   }`}
                 >
                   {selectedAccount ? "Connected" : "Not Connected"}
@@ -340,15 +338,15 @@ export default function SocialFolderGrid() {
               </div>
             </div>
 
-            <div className="mt-4 space-y-3 rounded-xl border border-white/10 bg-zinc-900 p-3 text-sm text-zinc-300">
+            <div className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 text-sm text-muted-foreground">
               {selectedAccount ? (
                 <>
                   <p>
-                    <span className="text-zinc-500">Handle: </span>
+                    <span className="text-muted-foreground">Handle: </span>
                     {selectedAccount.handle}
                   </p>
                   <p>
-                    <span className="text-zinc-500">Followers: </span>
+                    <span className="text-muted-foreground">Followers: </span>
                     {selectedAccount.followers.toLocaleString()}
                   </p>
                   {selectedAccount.url && (
@@ -356,21 +354,21 @@ export default function SocialFolderGrid() {
                       href={selectedAccount.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block truncate text-sky-400 hover:underline"
+                      className="block truncate text-orange-400 hover:underline"
                     >
                       {selectedAccount.url}
                     </a>
                   )}
                 </>
               ) : (
-                <p className="text-zinc-500">No account connected yet.</p>
+                <p className="text-muted-foreground">No account connected yet.</p>
               )}
             </div>
 
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setSelectedPlatform(null)}
-                className="w-full rounded-xl border border-white/10 py-2 text-sm text-zinc-300 hover:bg-white/5"
+                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60"
               >
                 Close
               </button>
@@ -409,16 +407,16 @@ export default function SocialFolderGrid() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <form
             onSubmit={saveSocial}
-            className="w-[320px] rounded-[24px] border border-white/10 bg-zinc-950 p-5 shadow-xl"
+            className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl"
           >
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-foreground">
                 {editing ? `Edit ${editing.name}` : "Add platform"}
               </p>
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="text-zinc-300 transition hover:text-white"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
@@ -426,7 +424,7 @@ export default function SocialFolderGrid() {
 
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">
+                <label className="mb-1 block text-xs text-muted-foreground">
                   Platform
                 </label>
                 <select
@@ -438,7 +436,7 @@ export default function SocialFolderGrid() {
                       platform: e.target.value as SocialPlatform,
                     })
                   }
-                  className={`${inputClass} bg-zinc-900 disabled:opacity-50`}
+                  className={`${inputClass} bg-card disabled:opacity-50`}
                 >
                   {PLATFORMS.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -449,7 +447,7 @@ export default function SocialFolderGrid() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">
+                <label className="mb-1 block text-xs text-muted-foreground">
                   Handle
                 </label>
                 <input
@@ -463,7 +461,7 @@ export default function SocialFolderGrid() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">
+                <label className="mb-1 block text-xs text-muted-foreground">
                   Profile URL (optional)
                 </label>
                 <input
@@ -479,14 +477,14 @@ export default function SocialFolderGrid() {
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="w-full rounded-xl border border-white/10 py-2 text-sm text-zinc-300 hover:bg-white/5"
+                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving || !form.handle.trim()}
-                className="w-full rounded-xl bg-emerald-600 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="w-full rounded-xl bg-orange-500 py-2 text-sm text-white hover:bg-orange-400 disabled:opacity-50"
               >
                 {saving ? "Saving..." : editing ? "Save Changes" : "Add"}
               </button>

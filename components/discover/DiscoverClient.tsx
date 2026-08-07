@@ -186,7 +186,7 @@ export default function DiscoverClient() {
   }, [filters, allCampaigns]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       <DiscoverHero
         featuredCampaigns={featuredCampaigns}
         onJoin={setSelectedCampaign}
@@ -201,7 +201,7 @@ export default function DiscoverClient() {
         />
 
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-semibold text-lg">
+          <h2 className="text-foreground font-semibold text-lg">
             {filtered.length === allCampaigns.length
               ? "All Campaigns"
               : `${filtered.length} Campaign${
@@ -220,7 +220,7 @@ export default function DiscoverClient() {
           <div className="flex justify-center mt-8">
             <button
               onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-              className="flex items-center gap-2 px-6 py-2.5 bg-zinc-900 border border-white/8 rounded-xl text-sm text-zinc-300 hover:border-white/20 transition-colors"
+              className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border rounded-xl text-sm text-muted-foreground hover:border-border transition-colors"
               style={{ borderRadius: "9999px" }}
             >
               Load more campaigns

@@ -25,9 +25,9 @@ export default function NotificationDrawer({
   } = useNotifications();
  
  const notificationTypeStyles = {
-  INFO: "border-l-blue-500",
+  INFO: "border-l-orange-500",
   SUCCESS: "border-l-green-500",
-  WARNING: "border-l-yellow-500",
+  WARNING: "border-l-amber-500",
   ERROR: "border-l-red-500",
 } as const;
 
@@ -47,12 +47,12 @@ export default function NotificationDrawer({
     w-[400px]
     rounded-2xl
     border
-    border-white/20
+    border-border
     overflow-hidden
   "
 >
 
-        <DrawerHeader className="flex flex-row items-center justify-between p-4 border-b border-white/20">
+        <DrawerHeader className="flex flex-row items-center justify-between p-4 border-b border-border">
           <DrawerTitle>
             Notifications
           </DrawerTitle>
@@ -76,9 +76,9 @@ export default function NotificationDrawer({
           )}
 {notifications.length > 1 &&(
 <div className="flex flex-row justify-between items-center">
-   <span className="text-sm font-regular text-white/50">recent notifications</span> 
+   <span className="text-sm font-regular text-muted-foreground">recent notifications</span> 
    <Button
-    className="text-blue-500"
+    className="text-orange-500"
     >Mark all Read</Button>
 </div>
 
@@ -94,11 +94,11 @@ export default function NotificationDrawer({
       cursor-pointer
       flex
       flex-col
-    bg-zinc-900/70
-      border border-white/5
+    bg-card
+      border border-border
      transition-all duration-200
-   hover:border-white/15
-   hover:bg-zinc-900
+   hover:border-orange-500/40
+   hover:bg-muted
     hover:scale-[1.01]
       border-l-1
       ${notificationTypeStyles[notification.type as keyof typeof notificationTypeStyles] || ""}
@@ -107,7 +107,7 @@ export default function NotificationDrawer({
       
       ${
         !notification.isRead
-          ? "bg-white/10"
+          ? "bg-orange-500/10"
           : ""
       }
     `}
@@ -116,11 +116,11 @@ export default function NotificationDrawer({
       {notification.title}
     </h3>
 
-    <p className="text-xs text-white/50">
+    <p className="text-xs text-muted-foreground">
       {notification.message}
     </p>
 
-    <p className="text-xs mt-2 text-white/25">
+    <p className="text-xs mt-2 text-muted-foreground">
       {new Date(notification.createdAt).toLocaleDateString()}
     </p>
   </div>

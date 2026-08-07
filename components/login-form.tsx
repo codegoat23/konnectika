@@ -80,13 +80,13 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6 items-center", className)} {...props}>
-      <Card className="w-full max-w-md rounded-[32px] shadow-xl border border-white/20 backdrop-blur-xl">
+      <Card className="w-full max-w-md rounded-[32px] shadow-xl border border-border backdrop-blur-xl">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-semibold tracking-tight">
             Welcome back
           </CardTitle>
 
-          <CardDescription className="text-sm text-gray-500">
+          <CardDescription className="text-sm text-muted-foreground">
             Login to continue 
           </CardDescription>
         </CardHeader>
@@ -103,7 +103,7 @@ export function LoginForm({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 rounded-[14] border-1 border-white/10"
+                  className="h-11 rounded-[14] border-1 border-border"
                  
                 />
               </Field>
@@ -118,13 +118,13 @@ export function LoginForm({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 rounded-[14] border-white/10 pr-10"
+                    className="h-11 rounded-[14] border-border pr-10"
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -134,7 +134,7 @@ export function LoginForm({
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 rounded-[14] bg-white text-black hover:bg-white/90  hover:text-black/90"
+                className="w-full h-11 rounded-[14] bg-primary text-primary-foreground hover:bg-orange-400"
               >
                 {loading ? "Logging in..." : "Login"}
               </Button>

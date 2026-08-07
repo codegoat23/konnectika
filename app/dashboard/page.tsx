@@ -49,6 +49,6 @@ const earnings = await getCreatorEarnings(creator.id);
       return <AdminDashboard />;
 
     default:
-      return <div className="p-6 text-white">Invalid role</div>;
+      return <div className="p-6 text-foreground">Invalid role</div>;
   }
 }

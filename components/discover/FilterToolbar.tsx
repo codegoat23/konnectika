@@ -47,23 +47,23 @@ export default function FilterToolbar({
         <div className="relative flex-1">
           <Search
             size={15}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <input
             type="text"
             placeholder="Search campaigns, brands or keywords..."
             value={filters.search}
             onChange={(e) => onChange({ search: e.target.value })}
-            className="w-full bg-zinc-900 border border-white/10 rounded-full pl-11 pr-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-red-500/50 transition-colors"
+            className="w-full bg-card border border-border rounded-full pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-orange-500 transition-colors"
           />
         </div>
 
         {/* FILTER BUTTON */}
-        <button className="relative flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-full text-sm text-zinc-300 hover:border-white/25 transition-colors shrink-0">
+        <button className="relative flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm text-muted-foreground hover:border-border transition-colors shrink-0">
           <SlidersHorizontal size={15} />
 
           {activeFilterCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center">
               {activeFilterCount}
             </span>
           )}
@@ -71,11 +71,11 @@ export default function FilterToolbar({
 
         {/* SORT */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-zinc-500 text-sm">Sort</span>
+          <span className="text-muted-foreground text-sm">Sort</span>
           <select
             value={filters.sortBy}
             onChange={(e) => onChange({ sortBy: e.target.value })}
-            className="bg-zinc-900 border border-white/10 rounded-full px-3 py-2.5 text-sm text-white outline-none focus:border-red-500/50 transition-colors cursor-pointer"
+            className="bg-card border border-border rounded-full px-3 py-2.5 text-sm text-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer"
           >
             {sortOptions.map((opt) => (
               <option key={opt} value={opt}>
@@ -93,7 +93,7 @@ export default function FilterToolbar({
         <select
           value={filters.category}
           onChange={(e) => onChange({ category: e.target.value })}
-          className="bg-zinc-900 border border-white/10 rounded-full px-3 py-2 text-xs text-zinc-300 outline-none focus:border-red-500/50 transition-colors cursor-pointer"
+          className="bg-card border border-border rounded-full px-3 py-2 text-xs text-muted-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer"
         >
           {categories.map((c) => (
             <option key={c} value={c}>
@@ -115,10 +115,10 @@ export default function FilterToolbar({
                     socialMedia: active ? "" : p.id,
                   })
                 }
-                className={`w-9 h-9 flex items-center justify-center rounded-full border border-white/10 transition-all text-sm ${
+                className={`w-9 h-9 flex items-center justify-center rounded-full border border-border transition-all text-sm ${
                   active
-                    ? "bg-red-500 text-white scale-105"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    ? "bg-orange-500 border-orange-500 text-white scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
                 title={p.label}
               >
@@ -132,7 +132,7 @@ export default function FilterToolbar({
         <select
           value={filters.paymentRate}
           onChange={(e) => onChange({ paymentRate: e.target.value })}
-          className="bg-zinc-900 border border-white/10 rounded-full px-3 py-2 text-xs text-zinc-300 outline-none focus:border-red-500/50 transition-colors cursor-pointer"
+          className="bg-card border border-border rounded-full px-3 py-2 text-xs text-muted-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer"
         >
           {paymentRates.map((r) => (
             <option key={r} value={r}>
@@ -149,7 +149,7 @@ export default function FilterToolbar({
               campaignType: e.target.value as FilterState["campaignType"],
             })
           }
-          className="bg-zinc-900 border border-white/10 rounded-full px-3 py-2 text-xs text-zinc-300 outline-none focus:border-red-500/50 transition-colors cursor-pointer"
+          className="bg-card border border-border rounded-full px-3 py-2 text-xs text-muted-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer"
         >
           {campaignTypes.map((t) => (
             <option key={t} value={t}>
@@ -162,7 +162,7 @@ export default function FilterToolbar({
         {activeFilterCount > 0 && (
           <button
             onClick={onClear}
-            className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors ml-2"
+            className="flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300 transition-colors ml-2"
           >
             <X size={12} />
             Clear

@@ -55,17 +55,17 @@ function fabricateSparkline(trend: "up" | "down" | undefined): number[] {
 
 const accentClasses: Record<NonNullable<StatCardData["accent"]>, string> = {
   orange: "bg-orange-500/10 text-orange-500",
-  blue: "bg-blue-500/10 text-blue-500",
+  blue: "bg-orange-500/10 text-orange-500",
   green: "bg-green-500/10 text-green-500",
-  violet: "bg-violet-500/10 text-violet-500",
+  violet: "bg-orange-500/10 text-orange-500",
   primary: "bg-primary/10 text-primary",
 };
 
 const strokeColor: Record<NonNullable<StatCardData["accent"]>, string> = {
   orange: "#f97316",
-  blue: "#3b82f6",
+  blue: "#fb923c",
   green: "#22c55e",
-  violet: "#8b5cf6",
+  violet: "#ea580c",
   primary: "var(--primary)",
 };
 
@@ -125,7 +125,7 @@ export function StatsCards({ stats }: { stats: StatCardData[] }) {
                   </Badge>
                 )}
                 {stat.footerSubtitle && (
-                  <span className="text-[11px] text-white/80">{stat.footerSubtitle}</span>
+                  <span className="text-[11px] text-muted-foreground">{stat.footerSubtitle}</span>
                 )}
               </div>
             </Card>
@@ -140,15 +140,16 @@ export function StatsCards({ stats }: { stats: StatCardData[] }) {
             : "text-green-500 bg-green-500/10";
         const accentClass = accentClasses[accent];
         const lineColor = strokeColor[accent];
+        const isGreenAccent = accent === "green";
 
         return (
           
           <Card
             key={stat.label}
-            className="relative overflow-hidden rounded-2xl  bg-white/10  p-4 shadow-xs gap-2"
+            className="relative overflow-hidden rounded-2xl  bg-card  p-4 shadow-xs gap-2"
           >
             <div className="relative flex items-center gap-2">
-              <div className={`flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 `}>
+              <div className={`flex size-7 shrink-0 items-center justify-center rounded-full ${isGreenAccent ? "bg-green-500/10 text-green-500" : "bg-orange-500/10 text-orange-500"}`}>
                 <Icon className="size-3.5" />
               </div>
               <span className="text-xs font-medium text-muted-foreground">{stat.label}</span>

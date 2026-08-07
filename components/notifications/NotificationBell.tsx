@@ -16,7 +16,7 @@ return (
 <>
 <button
 onClick={()=>setOpen(true)}
-className="relative cursor-pointer font-light border p-1 rounded-[8] border-white/50"
+className="relative cursor-pointer font-light border p-1 rounded-[8] border-border text-muted-foreground hover:text-foreground hover:border-border transition-colors"
 >
 
 <Bell size={22} strokeWidth={1.0}/>
@@ -27,7 +27,7 @@ className="
 absolute
 top-0
 right-0.5
-bg-red-500
+bg-orange-500
 text-white
 rounded-full
 text-xs

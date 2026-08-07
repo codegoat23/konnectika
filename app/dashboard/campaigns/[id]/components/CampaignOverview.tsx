@@ -12,7 +12,7 @@ interface CampaignOverviewData {
 export default function CampaignOverview({ campaign }: { campaign: CampaignOverviewData }) {
   return (
     <div
-      className="bg-zinc-900 border border-white/10 p-5 text-sm text-zinc-300 space-y-4"
+      className="bg-card border border-border p-5 text-sm text-muted-foreground space-y-4"
       style={{ borderRadius: 24 }}
     >
       <p className="text-xs">{campaign?.description}</p>
@@ -21,15 +21,15 @@ export default function CampaignOverview({ campaign }: { campaign: CampaignOverv
 
       {campaign?.requirements?.length > 0 && (
         <div className="pt-2">
-          <h3 className="text-white font-semibold mb-3">Requirements</h3>
+          <h3 className="text-foreground font-semibold mb-3">Requirements</h3>
 
           <div className="space-y-3">
             {campaign.requirements.map((req: string, index: number) => (
               <div
                 key={index}
-                className="flex items-start gap-3 text-sm text-zinc-300"
+                className="flex items-start gap-3 text-sm text-muted-foreground"
               >
-                <div className="w-2 h-2 rounded-full bg-green-500 mt-2" />
+                <div className="w-2 h-2 rounded-full bg-orange-500 mt-2" />
                 <span>{req}</span>
               </div>
             ))}

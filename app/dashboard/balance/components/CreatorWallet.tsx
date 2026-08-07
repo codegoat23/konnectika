@@ -31,19 +31,19 @@ type WalletWithdrawal = CreatorWalletData["withdrawals"][number];
 
 const EARNING_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  AVAILABLE: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  AVAILABLE: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   WITHDRAWN: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
 };
 
 const WITHDRAWAL_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  PROCESSING: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  PROCESSING: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
   PAID: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   REJECTED: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
 const EARNING_STATUS_DOT: Record<string, string> = {
   PENDING: "bg-amber-400",
-  AVAILABLE: "bg-blue-400",
+  AVAILABLE: "bg-emerald-400",
   WITHDRAWN: "bg-emerald-400",
 };
 
@@ -66,9 +66,9 @@ function formatDate(date: Date | null | undefined): string {
 
 function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
   return (
-    <div className="border border-white/10 overflow-hidden" style={{ borderRadius: 24 }}>
+    <div className="border border-border overflow-hidden" style={{ borderRadius: 24 }}>
       <table className="w-full text-sm">
-        <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+        <thead className="bg-card text-muted-foreground text-xs tracking-wider">
           <tr>
             <th className="p-3 text-left">No.</th>
             <th className="p-3 text-left">Campaign</th>
@@ -83,24 +83,24 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
           {earnings.map((earning, index) => (
             <tr
               key={earning.id}
-              className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
+              className="group border-t border-border transition-all duration-200 hover:bg-card/60"
             >
-                <td className="p-3 text-zinc-500">
-          <div className="flex justify-center items-center gap-2 border border-white/10 rounded-full px-2 py-2 text-xs font-medium text-zinc-400">
+                <td className="p-3 text-muted-foreground">
+          <div className="flex justify-center items-center gap-2 border border-border rounded-full px-2 py-2 text-xs font-medium text-muted-foreground">
 {index + 1}
           </div>
           </td>
-              <td className="p-3 text-white">
+              <td className="p-3 text-foreground">
                 {earning.submission?.campaign?.name || "Unknown"}
               </td>
-              <td className="p-3 text-zinc-400">TZS {formatTZS(earning.amount)}</td>
-              <td className="p-3 text-zinc-400">
+              <td className="p-3 text-muted-foreground">TZS {formatTZS(earning.amount)}</td>
+              <td className="p-3 text-muted-foreground">
                 TZS {formatTZS(earning.platformFee)}
-                <span className="ml-1 text-xs text-zinc-600">
+                <span className="ml-1 text-xs text-muted-foreground">
                   ({earning.platformFeeRate}%)
                 </span>
               </td>
-              <td className="p-3 text-white font-medium">
+              <td className="p-3 text-foreground font-medium">
                 TZS {formatTZS(earning.creatorAmount)}
               </td>
               <td className="p-3">
@@ -113,7 +113,7 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
   />
 </div>
               </td>
-              <td className="p-3 text-zinc-400">
+              <td className="p-3 text-muted-foreground">
                 {formatDate(earning.availableAt)}
               </td>
             </tr>
@@ -130,9 +130,9 @@ function WithdrawalHistory({
   withdrawals: WalletWithdrawal[];
 }) {
   return (
-    <div className="border border-white/10 overflow-hidden" style={{ borderRadius: 24 }}>
+    <div className="border border-border overflow-hidden" style={{ borderRadius: 24 }}>
       <table className="w-full text-sm">
-        <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+        <thead className="bg-card text-muted-foreground text-xs tracking-wider">
           <tr>
             <th className="p-3 text-left">Amount</th>
             <th className="p-3 text-left">Date</th>
@@ -144,15 +144,15 @@ function WithdrawalHistory({
           {withdrawals.map((withdrawal) => (
             <tr
               key={withdrawal.id}
-              className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60"
+              className="group border-t border-border transition-all duration-200 hover:bg-card/60"
             >
-              <td className="p-3 text-white font-medium">
+              <td className="p-3 text-foreground font-medium">
                 TZS {formatTZS(withdrawal.amount)}
               </td>
-              <td className="p-3 text-zinc-400">
+              <td className="p-3 text-muted-foreground">
                 {formatDate(withdrawal.requestedAt)}
               </td>
-              <td className="p-3 text-zinc-400">
+              <td className="p-3 text-muted-foreground">
                 {withdrawal.paymentMethod || "—"}
               </td>
               <td className="p-3">
@@ -204,7 +204,7 @@ function WithdrawDialog({ wallet }: { wallet: CreatorWalletData }) {
       <DialogTrigger asChild>
         <Button
           disabled={wallet.available <= 0}
-          className="bg-white text-black font-medium hover:bg-zinc-200 cursor-pointer"
+          className="bg-primary text-primary-foreground font-medium hover:bg-zinc-200 cursor-pointer"
           style={{ borderRadius: 14 }}
         >
           <ArrowUpRightIcon />
@@ -220,15 +220,15 @@ function WithdrawDialog({ wallet }: { wallet: CreatorWalletData }) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3">
-          <span className="text-sm text-zinc-400">Available Balance</span>
-          <span className="text-lg font-semibold text-white">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card/50 px-4 py-3">
+          <span className="text-sm text-muted-foreground">Available Balance</span>
+          <span className="text-lg font-semibold text-foreground">
             TZS {formatTZS(wallet.available)}
           </span>
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs text-zinc-400">Payment Method</label>
+          <label className="text-xs text-muted-foreground">Payment Method</label>
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
             <SelectTrigger>
               <SelectValue placeholder="Select payment method" />
@@ -289,7 +289,7 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
               <div className="mt-3 text-3xl font-semibold tabular-nums">
                 TZS {formatTZS(wallet.available)}
               </div>
-              <div className="mt-1 text-[11px] text-white/80">
+              <div className="mt-1 text-[11px] text-white">
                 Ready to withdraw across all approved campaigns
               </div>
             </div>
@@ -300,10 +300,10 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3">
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10">
-              <span className="text-xs font-medium text-white"><LucideHourglass size={12} /></span>
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
+              <span className="text-xs font-medium text-amber-400"><LucideHourglass size={12} /></span>
             </div>
             <span className="text-xs font-medium text-muted-foreground">Pending Balance</span>
           </div>
@@ -313,10 +313,10 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
           <div className="text-[11px] text-muted-foreground">Awaiting settlement</div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10">
-              <span className="text-xs font-medium text-white"><LuInfinity/></span>
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
+              <span className="text-xs font-medium text-orange-500"><LuInfinity/></span>
             </div>
             <span className="text-xs font-medium text-muted-foreground">Lifetime Earnings</span>
           </div>
@@ -326,10 +326,10 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
           <div className="text-[11px] text-muted-foreground">Across all campaigns</div>
         </Card>
 
-        <Card className="rounded-2xl bg-white/10 p-4 shadow-xs gap-2">
+        <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10">
-              <span className="text-xs font-medium text-white"><LuLandmark /></span>
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+              <span className="text-xs font-medium text-emerald-400"><LuLandmark /></span>
             </div>
             <span className="text-xs font-medium text-muted-foreground">Total Withdrawn</span>
           </div>
@@ -341,19 +341,19 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
       </div>
 
       <div className="px-4 lg:px-6">
-        <div className="rounded-2xl bg-card">
+        <div className="rounded-2xl ">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Earnings History</h2>
           </div>
 
           {wallet.earnings.length === 0 ? (
             <div
-              className="mt-5 flex flex-col items-center justify-center border border-white/10 bg-zinc-900/40 py-20"
+              className="mt-5 flex flex-col items-center justify-center border border-border bg-card/40 py-20"
               style={{ borderRadius: 24 }}
             >
               <div className="text-5xl mb-4"><LuBadgeDollarSign /></div>
-              <h3 className="text-lg font-semibold text-white">No earnings yet</h3>
-              <p className="mt-2 max-w-sm text-center text-sm text-zinc-400">
+              <h3 className="text-lg font-semibold text-foreground">No earnings yet</h3>
+              <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
                 Your earnings will appear here after your campaign submissions
                 have been approved by brands.
               </p>
@@ -367,19 +367,19 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
       </div>
 
       <div className="px-4 lg:px-6">
-        <div className="rounded-2xl bg-card">
+        <div className="rounded-2xl ">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Withdrawal History</h2>
           </div>
 
           {wallet.withdrawals.length === 0 ? (
             <div
-              className="mt-5 flex flex-col items-center justify-center border border-white/10 bg-zinc-900/40 py-16"
+              className="mt-5 flex flex-col items-center justify-center border border-border bg-card/40 py-16"
               style={{ borderRadius: 24 }}
             >
               <div className="text-4xl mb-4"><LuLandmark /></div>
-              <h3 className="text-lg font-semibold text-white">No withdrawals yet</h3>
-              <p className="mt-2 max-w-sm text-center text-sm text-zinc-400">
+              <h3 className="text-lg font-semibold text-foreground">No withdrawals yet</h3>
+              <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
                 Once your earnings are available, you can withdraw them here.
               </p>
             </div>

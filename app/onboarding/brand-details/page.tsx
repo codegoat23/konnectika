@@ -103,7 +103,7 @@ const router = useRouter();
           <Input
             name="website"
             placeholder="https://example.com"
-            className="border-white/20 h-11"
+            className="border-border h-11"
           />
         </div>
 
@@ -116,7 +116,7 @@ const router = useRouter();
           <Input
             name="industry"
             placeholder="Fashion, Tech, Food..."
-             className="border-white/20 h-11"
+             className="border-border h-11"
           />
         </div>
 
@@ -129,14 +129,14 @@ const router = useRouter();
           <Textarea
             name="description"
             placeholder="Tell creators about your brand..."
-             className="border-white/20 h-30"
+             className="border-border h-30"
           />
         </div>
 
 
         <Button
           disabled={loading}
-          className="w-full bg-white text-black h-10 rounded-[14] hover:text-white hover:bg-black/30"
+          className="w-full bg-primary text-primary-foreground h-10 rounded-[14] hover:text-white hover:bg-black/30"
         >
           {loading ? "Saving..." : "Complete setup"}
         </Button>

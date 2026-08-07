@@ -96,20 +96,20 @@ export function SignupForm({
     className={cn("flex flex-col gap-6 items-center", className)}
     {...props}
   >
-    <Card className="w-full max-w-md rounded-[32px] shadow-xl border border-white/20 backdrop-blur-xl">
+    <Card className="w-full max-w-md rounded-[32px] shadow-xl border border-border backdrop-blur-xl">
       <CardHeader className="text-center space-y-2">
         <CardTitle className="text-2xl font-semibold tracking-tight">
           Create Account
         </CardTitle>
 
-        <CardDescription className="text-sm text-gray-500">
+        <CardDescription className="text-sm text-muted-foreground">
           {role === "CREATOR"
             ? "Join and start earning"
             : "Join and start creating campaigns"}
         </CardDescription>
 
         {/* ROLE SELECTOR */}
-        <div className="flex rounded-[24] bg-white/10  p-1 mt-4">
+        <div className="flex rounded-[24] bg-card p-1 mt-4">
           <button
             type="button"
             onClick={() => setRole("CREATOR")}
@@ -148,7 +148,7 @@ export function SignupForm({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="h-11 rounded-[14px] border border-white/10"
+                className="h-11 rounded-[14px] border border-border"
               />
             </Field>
 
@@ -160,7 +160,7 @@ export function SignupForm({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 rounded-[14px] border border-white/10"
+                className="h-11 rounded-[14px] border border-border"
               />
             </Field>
 
@@ -174,13 +174,13 @@ export function SignupForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 rounded-[14px] border border-white/10 pr-10"
+                  className="h-11 rounded-[14px] border border-border pr-10"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? (
                     <EyeOff size={18} />
@@ -201,7 +201,7 @@ export function SignupForm({
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="h-11 rounded-[14px] border border-white/10 pr-10"
+                  className="h-11 rounded-[14px] border border-border pr-10"
                 />
 
                 <button
@@ -209,7 +209,7 @@ export function SignupForm({
                   onClick={() =>
                     setShowConfirmPassword((v) => !v)
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={18} />
@@ -223,7 +223,7 @@ export function SignupForm({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 rounded-[14px] bg-white text-black hover:bg-orange-600"
+              className="w-full h-11 rounded-[14px] bg-primary text-primary-foreground hover:bg-orange-600"
             >
               {loading ? "Creating account..." : "Create Account"}
             </Button>

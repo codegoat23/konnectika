@@ -15,7 +15,7 @@ type Submission = {
 };
 
 const STATUS_STYLES: Record<Submission["status"], string> = {
-  SUBMITTED: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+  SUBMITTED: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
   UNDER_REVIEW: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
   APPROVED: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   CHANGES_REQUESTED: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
@@ -58,15 +58,15 @@ export default function AdminSubmissionView() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">All submissions</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-2xl font-semibold text-foreground">All submissions</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Every submission across all brands and campaigns.
           </p>
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-11 rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-sm text-white outline-none transition-all focus:border-white/10 focus:ring-4 focus:ring-violet-500/10"
+          className="h-11 rounded-2xl border border-border bg-background px-4 text-sm text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
         >
           <option value="all">All statuses</option>
           <option value="SUBMITTED">Submitted</option>
@@ -83,9 +83,9 @@ export default function AdminSubmissionView() {
         </div>
       )}
 
-      <div className="border border-white/10 overflow-hidden" style={{ borderRadius: 24 }}>
+      <div className="border border-border overflow-hidden" style={{ borderRadius: 24 }}>
         <table className="w-full text-sm">
-          <thead className="bg-zinc-900 text-zinc-400 text-xs tracking-wider">
+          <thead className="bg-card text-muted-foreground text-xs tracking-wider">
             <tr>
               <th className="p-3 text-left">Creator</th>
               <th className="p-3 text-left">Campaign</th>
@@ -100,17 +100,17 @@ export default function AdminSubmissionView() {
               <tr
                 key={s.id}
                 onClick={() => setSelected(s)}
-                className="group border-t border-white/5 transition-all duration-200 hover:bg-zinc-900/60 cursor-pointer"
+                className="group border-t border-border transition-all duration-200 hover:bg-card/60 cursor-pointer"
               >
-                <td className="p-3 text-white">
+                <td className="p-3 text-foreground">
                   {s.creator.displayName ?? s.creator.username ?? "Unnamed"}
                 </td>
-                <td className="p-3 text-zinc-400">{s.campaign.name}</td>
-                <td className="p-3 text-zinc-400">
+                <td className="p-3 text-muted-foreground">{s.campaign.name}</td>
+                <td className="p-3 text-muted-foreground">
                   {s.campaign.businessProfile?.companyName ?? "—"}
                 </td>
                 <td className="p-3">
-                  <span className="text-xs text-violet-400 hover:underline">
+                  <span className="text-xs text-orange-400 hover:underline">
                     {s.screenshots.length} img · {s.postLinks.length} link — View
                   </span>
                 </td>
@@ -121,14 +121,14 @@ export default function AdminSubmissionView() {
                     {s.status.replace("_", " ")}
                   </span>
                 </td>
-                <td className="p-3 text-zinc-500">
+                <td className="p-3 text-muted-foreground">
                   {new Date(s.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-zinc-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   No submissions match this filter.
                 </td>
               </tr>
@@ -141,22 +141,22 @@ export default function AdminSubmissionView() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border border-white/10 p-6 space-y-5"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-card border border-border p-6 space-y-5"
             style={{ borderRadius: 24 }}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-foreground">
                   {selected.campaign.name}
                 </h2>
-                <p className="mt-0.5 text-sm text-zinc-400">
+                <p className="mt-0.5 text-sm text-muted-foreground">
                   {selected.creator.displayName ?? selected.creator.username ?? "Unnamed"}{" "}
                   · {selected.campaign.businessProfile?.companyName ?? "—"}
                 </p>
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="rounded-full p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -169,14 +169,14 @@ export default function AdminSubmissionView() {
               >
                 {selected.status.replace("_", " ")}
               </span>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-muted-foreground">
                 Submitted {new Date(selected.createdAt).toLocaleDateString()}
               </span>
             </div>
 
             {selected.screenshots.length > 0 && (
               <div>
-                <h3 className="mb-2 text-sm font-semibold text-white">
+                <h3 className="mb-2 text-sm font-semibold text-foreground">
                   Screenshots ({selected.screenshots.length})
                 </h3>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -192,7 +192,7 @@ export default function AdminSubmissionView() {
                       <img
                         src={src}
                         alt={`Screenshot ${i + 1}`}
-                        className="h-32 w-full rounded-xl border border-zinc-800 object-cover transition group-hover:opacity-80"
+                        className="h-32 w-full rounded-xl border border-border object-cover transition group-hover:opacity-80"
                       />
                     </a>
                   ))}
@@ -202,7 +202,7 @@ export default function AdminSubmissionView() {
 
             {selected.postLinks.length > 0 && (
               <div>
-                <h3 className="mb-2 text-sm font-semibold text-white">
+                <h3 className="mb-2 text-sm font-semibold text-foreground">
                   Post Links ({selected.postLinks.length})
                 </h3>
                 <ul className="space-y-1.5">
@@ -212,7 +212,7 @@ export default function AdminSubmissionView() {
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="break-all text-sm text-violet-400 hover:text-violet-300 hover:underline"
+                        className="break-all text-sm text-orange-400 hover:text-orange-300 hover:underline"
                       >
                         {link}
                       </a>
@@ -224,8 +224,8 @@ export default function AdminSubmissionView() {
 
             {selected.caption && (
               <div>
-                <h3 className="mb-1 text-sm font-semibold text-white">Caption</h3>
-                <p className="text-sm text-zinc-300">{selected.caption}</p>
+                <h3 className="mb-1 text-sm font-semibold text-foreground">Caption</h3>
+                <p className="text-sm text-muted-foreground">{selected.caption}</p>
               </div>
             )}
           </div>
@@ -238,8 +238,8 @@ export default function AdminSubmissionView() {
 function PageSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-7 w-48 animate-pulse rounded bg-zinc-800" />
-      <div className="h-64 w-full animate-pulse rounded bg-zinc-900" />
+      <div className="h-7 w-48 animate-pulse rounded bg-muted" />
+      <div className="h-64 w-full animate-pulse rounded bg-card" />
     </div>
   );
 }

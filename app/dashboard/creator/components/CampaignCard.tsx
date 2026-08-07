@@ -30,7 +30,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
     rounded-[24]
     overflow-hidden
     cursor-pointer
-    border border-white/10
+    border border-border
     z-20
   "
  
@@ -133,12 +133,12 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
     <div className="mt-1">
       <PlatformIcons platforms={campaign.platforms} />
     </div>
-<div className=" flex flex-row justify-between items-center gap-2 text-xs text-white/70">
+<div className=" flex flex-row justify-between items-center gap-2 text-xs text-zinc-400">
  <div className="mt-2 flex gap-1 items-center flex-wrap">
       {campaign.tags.slice(0, 2).map((tag) => (
         <span
           key={tag}
-          className="px-2 py-1 rounded-full bg-white/10 text-[10px] text-white"
+          className="px-2 py-1 rounded-full bg-orange-500/10 text-[10px] text-orange-400"
         >
           {tag}
         </span>
@@ -153,9 +153,9 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   </div>
 
   {/* Progress Bar */}
-  <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10">
+  <div className="absolute bottom-0 left-0 w-full h-1 bg-muted">
     <div
-      className="h-full bg-white"
+      className="h-full bg-orange-500"
       style={{ width: `${progress}%` }}
     />
   </div>

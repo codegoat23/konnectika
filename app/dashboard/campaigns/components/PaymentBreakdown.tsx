@@ -31,9 +31,9 @@ export default function PaymentBreakdown({
   showNote = true,
 }: PaymentBreakdownProps) {
   return (
-    <div className="bg-zinc-900 border border-white/10 p-5" style={{ borderRadius: 24 }}>
+    <div className="bg-card border border-border p-5" style={{ borderRadius: 24 }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-white font-semibold">{title}</h3>
+        <h3 className="text-foreground font-semibold">{title}</h3>
 
         {showStatus && paymentStatus && (
           <span
@@ -48,25 +48,25 @@ export default function PaymentBreakdown({
 
       <div className="space-y-3 text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-zinc-400">Campaign Budget</span>
-          <span className="text-white font-medium">
+          <span className="text-muted-foreground">Campaign Budget</span>
+          <span className="text-foreground font-medium">
             TZS {formatTZS(budget)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-zinc-400">
+          <span className="text-muted-foreground">
             Platform Fee ({feeRate}%)
           </span>
-          <span className="text-zinc-300">
+          <span className="text-muted-foreground">
             TZS {formatTZS(fee)}
           </span>
         </div>
 
-        <div className="h-px bg-white/10" />
+        <div className="h-px bg-border" />
 
         <div className="flex items-center justify-between">
-          <span className="text-zinc-200 font-medium">
+          <span className="text-foreground font-medium">
             Total Payment Required
           </span>
           <span className="text-orange-400 font-semibold">
@@ -76,7 +76,7 @@ export default function PaymentBreakdown({
       </div>
 
       {showNote && (
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-4 text-xs text-muted-foreground">
           Payments are handled manually. Your campaign will be created as{" "}
           <span className="text-amber-400">Unpaid</span> and becomes active
           once an admin confirms payment.

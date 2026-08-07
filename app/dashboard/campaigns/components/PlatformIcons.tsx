@@ -14,23 +14,23 @@ interface PlatformIconsProps {
 
 const platformConfig = {
   instagram: {
-    bg: "bg-gradient-to-br from-purple-500 to-pink-500",
+    bg: "bg-muted border border-border",
     icon: FaInstagram,
   },
   tiktok: {
-    bg: "bg-black border border-zinc-700",
+    bg: "bg-black border border-border",
     icon: FaTiktok,
   },
   facebook: {
-    bg: "bg-blue-600",
+    bg: "bg-muted border border-border",
     icon: FaFacebook,
   },
   youtube: {
-    bg: "bg-red-600",
+    bg: "bg-muted border border-border",
     icon: FaYoutube,
   },
   x: {
-    bg: "bg-zinc-800 border border-zinc-700",
+    bg: "bg-muted border border-border",
     icon: FaXTwitter,
   },
 } as const;
@@ -55,7 +55,7 @@ const dim =
         return (
           <div
             key={p}
-            className={`${dim}  rounded flex items-center justify-center text-white`}
+            className={`${dim}  rounded flex items-center justify-center text-foreground`}
             title={p}
           >
             <Icon size={iconSize} />

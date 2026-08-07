@@ -191,11 +191,11 @@ campaign={campaign}
 {/* RIGHT APPLICATIONS */}
 
 <div
-  className="border border-white/10 overflow-hidden mt-6 lg:mt-0 bg-zinc-900/60 flex flex-col min-h-0"
+  className="border border-border overflow-hidden mt-6 lg:mt-0 bg-card/60 flex flex-col min-h-0"
   style={{ borderRadius: 24 }}
 >
   <div className="flex justify-between items-center shrink-0">
-    <h2 className="text-white font-semibold flex items-center gap-2 p-6">
+    <h2 className="text-foreground font-semibold flex items-center gap-2 p-6">
       <Users size={16} />
       Applicants
     </h2>
@@ -203,13 +203,13 @@ campaign={campaign}
 
   {applications.length === 0 ? (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <Users size={32} className="text-zinc-600 mb-3" />
+      <Users size={32} className="text-muted-foreground mb-3" />
 
-      <h3 className="text-white font-medium">
+      <h3 className="text-foreground font-medium">
         No applications yet
       </h3>
 
-      <p className="text-zinc-500 text-sm mt-1">
+      <p className="text-muted-foreground text-sm mt-1">
         Creators who apply to this campaign will appear here.
       </p>
     </div>
@@ -217,7 +217,7 @@ campaign={campaign}
     <div className="overflow-y-auto flex-1 p-3 rounded-t-[24] *:scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent ">
       <table className="w-full text-sm table-fixed rounded-t-[10]">
 
-        <thead className="bg-zinc-900 text-zinc-400 text-xs sticky top-0 z-10 rounded-t-[10]">
+        <thead className="bg-card text-muted-foreground text-xs sticky top-0 z-10 rounded-t-[10]">
           <tr>
             <th className="p-3 text-left w-[35%]">
               Creator
@@ -250,14 +250,14 @@ campaign={campaign}
               }}
               className="
                 border-t
-                border-white/5
+                border-border
                 cursor-pointer
-                hover:bg-zinc-900/60
+                hover:bg-card/60
                 transition
               "
             >
 
-              <td className="p-3 text-white truncate">
+              <td className="p-3 text-foreground truncate">
                 {a.creator?.username || "Unknown"}
               </td>
 
@@ -302,14 +302,14 @@ campaign={campaign}
               </td>
 
 
-              <td className="p-3 text-zinc-500 text-xs">
+              <td className="p-3 text-muted-foreground text-xs">
                 {new Date(a.createdAt).toLocaleDateString()}
               </td>
 
 
               <td className="p-3 text-right">
 
-                <div className="flex justify-end items-center gap-1 text-zinc-500">
+                <div className="flex justify-end items-center gap-1 text-muted-foreground">
                   <span className="text-xs">
                     View
                   </span>
@@ -340,7 +340,7 @@ campaign={campaign}
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
 
           <div
-            className="w-full max-w-2xl bg-zinc-900 border border-white/10 p-6 space-y-5"
+            className="w-full max-w-2xl bg-popover border border-border p-6 space-y-5"
             style={{ borderRadius: 24 }}
           >
 
@@ -350,11 +350,11 @@ campaign={campaign}
 
               <div>
 
-                <h2 className="text-white font-semibold text-lg">
+                <h2 className="text-foreground font-semibold text-lg">
                   Creator Application
                 </h2>
 
-                <p className="text-zinc-400 text-xs">
+                <p                 className="text-muted-foreground text-xs">
                   Review submission & take action
                 </p>
 
@@ -363,7 +363,7 @@ campaign={campaign}
 
               <button
                 onClick={()=>setOpen(false)}
-                className="text-zinc-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 ✕
               </button>
@@ -376,7 +376,7 @@ campaign={campaign}
 
             {/* CREATOR PROFILE */}
             <div
-              className="bg-zinc-800/60 border border-white/10 p-4"
+              className="bg-muted/60 border border-border p-4"
               style={{borderRadius:24}}
             >
 
@@ -388,12 +388,12 @@ campaign={campaign}
                   w-12
                   h-12
                   rounded-full
-                  bg-zinc-700
+                  bg-muted
                   overflow-hidden
                   flex
                   items-center
                   justify-center
-                  text-white
+                  text-foreground
                   font-bold
                   "
                 >
@@ -412,7 +412,7 @@ campaign={campaign}
 
                 <div>
 
-                  <p className="text-white font-medium">
+                  <p className="text-foreground font-medium">
 
                     {
                       selectedApp?.creator?.displayName
@@ -425,7 +425,7 @@ campaign={campaign}
                   </p>
 
 
-                  <p className="text-zinc-400 text-xs">
+                  <p                 className="text-muted-foreground text-xs">
 
                     @{selectedApp?.creator?.username}
 
@@ -482,7 +482,7 @@ campaign={campaign}
                   <div className="mt-4">
 
 
-                    <p className="text-zinc-400 text-xs mb-2 uppercase tracking-wider">
+                    <p className="text-muted-foreground text-xs mb-2 uppercase tracking-wider">
 
                       Social Platforms
 
@@ -519,11 +519,11 @@ campaign={campaign}
                                 px-3
                                 py-2
                                 rounded-full
-                                bg-zinc-900
+                                bg-card
                                 border
-                                border-white/10
-                                text-zinc-300
-                                hover:text-white
+                                border-border
+                                text-muted-foreground
+                                hover:text-foreground
                                 "
                               >
 
@@ -569,21 +569,21 @@ campaign={campaign}
                 <div
                   className="
                   p-3
-                  bg-zinc-900
+                  bg-card
                   border
-                  border-white/10
+                  border-border
                   rounded-xl
                   "
                 >
 
-                  <p className="text-zinc-400 text-xs mb-1">
+                  <p className="text-muted-foreground text-xs mb-1">
 
                     Application Message
 
                   </p>
 
 
-                  <p className="text-zinc-300 text-sm">
+                  <p className="text-muted-foreground text-sm">
 
                     {selectedApp.message}
 
@@ -607,22 +607,22 @@ campaign={campaign}
 
                 <div
                   className="
-                  bg-zinc-800/40
+                  bg-muted/40
                   border
-                  border-white/10
+                  border-border
                   rounded-xl
                   p-4
                   "
                 >
 
-                  <p className="text-white font-medium mb-2">
+                  <p className="text-foreground font-medium mb-2">
 
                     Submission
 
                   </p>
 
 
-                  <div className="space-y-2 text-sm text-zinc-300">
+                  <div className="space-y-2 text-sm text-muted-foreground">
 
 
                     <p>
@@ -651,7 +651,7 @@ campaign={campaign}
                     {
                       selectedApp.submission.caption && (
 
-                        <p className="text-zinc-400">
+                        <p className="text-muted-foreground">
 
                           &quot;{selectedApp.submission.caption}&quot;
 
