@@ -15,6 +15,8 @@ import {
   brandWorkflow,
   type BrandCreator,
 } from "@/data/home/brand";
+import Growth from "./Growth";
+import Testimony from "./testimony";
 
 const whyChecks = [
   "Every creator is vetted for authenticity and reach",
@@ -120,31 +122,38 @@ export function BrandSections() {
           <SectionHeading
             label="How it works"
             title="From brief to results in four steps"
-            subtitle="A streamlined workflow built for marketing teams who value speed and control."
+           
           />
-          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {brandWorkflow.map((step, i) => (
-              <Reveal key={step.step} delay={i * 90}>
-                <div className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-card p-6">
-                  <span
-                    className="absolute right-4 top-3 text-5xl font-extrabold leading-none text-white/[0.06]"
-                    aria-hidden
-                  >
-                    {step.step}
-                  </span>
-                  <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                    <HomeIcon name={step.icon} className="size-5" />
-                  </span>
-                  <h3 className="mt-5 text-base font-bold text-white">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                    {step.description}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+     <div className="mt-14 grid max-w-4xl mx-auto gap-5 md:grid-cols-2">
+  {brandWorkflow.map((step, i) => (
+    <Reveal key={step.step} delay={i * 90}>
+      <div
+        className={`relative h-full overflow-hidden rounded-3xl border border-white/10 bg-card p-6 ${
+          i % 2 === 1 ? "md:translate-y-10" : ""
+        }`}
+      >
+        <span
+          className="absolute right-4 top-3 text-5xl font-extrabold leading-none text-white/[0.06]"
+          aria-hidden
+        >
+          {step.step}
+        </span>
+
+        <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+          <HomeIcon name={step.icon} className="size-5" />
+        </span>
+
+        <h3 className="mt-5 text-base font-bold text-white">
+          {step.title}
+        </h3>
+
+        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
+          {step.description}
+        </p>
+      </div>
+    </Reveal>
+  ))}
+</div>
         </div>
       </section>
 
@@ -153,74 +162,14 @@ export function BrandSections() {
         aria-labelledby="marketplace-heading"
         className="scroll-mt-24"
       >
-        <div className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
-          <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.2fr]">
-            <div>
-              <SectionHeading
-                label="Creator marketplace"
-                title="Browse Africa's best creators"
-                subtitle="Filter by niche, platform, and engagement to build your dream roster in minutes."
-                align="left"
-              />
-              <Reveal delay={120}>
-                <div className="mt-8 flex flex-wrap gap-2">
-                  {categoryChips.map((chip) => (
-                    <span
-                      key={chip}
-                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-zinc-300"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-9">
-                  <Link href="/signup">
-                    <Button
-                      size="lg"
-                      className="h-12 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground hover:bg-orange-400"
-                    >
-                      Launch your campaign
-                      <ArrowRight data-icon="inline-end" />
-                    </Button>
-                  </Link>
-                </div>
-              </Reveal>
-            </div>
-            <Reveal delay={140}>
-              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-card">
-                <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
-                  <p className="text-sm font-bold text-white">
-                    Top creators this week
-                  </p>
-                  <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400">
-                    <Search className="size-3.5" /> Search creators
-                  </div>
-                </div>
-                <ul className="divide-y divide-white/[0.06]">
-                  {brandCreators.slice(0, 4).map((creator) => (
-                    <CreatorRow key={creator.id} creator={creator} />
-                  ))}
-                </ul>
-                <div className="border-t border-white/10 px-5 py-3 text-center">
-                  <Link
-                    href="/signup"
-                    className="text-sm font-semibold text-primary hover:underline"
-                  >
-                    Browse all 10K+ creators
-                  </Link>
-                </div>
-              </div>
-            </Reveal>
+        <Reveal>
+          <div className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28 ">
+            <Growth />
           </div>
-        </div>
+        </Reveal>
       </section>
-
-      <TestimonialsSection
-        label="Brand results"
-        title="Teams that scaled with Konnectika"
-        testimonials={brandTestimonials}
-        highlightColor="emerald"
-      />
+      <Testimony />
+     
 
       <CTABanner
         tone="brand"

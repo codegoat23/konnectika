@@ -8,7 +8,7 @@ import {
   FaFacebook,
 } from "react-icons/fa6";
 
-import LogoMark from "@/public/assets/logo-main.svg";
+import LogoMark from "@/public/assets/logo-plain.svg";
 import { footerGroups, socialLinks } from "@/data/home";
 import type { Audience } from "@/components/home/dual/AudienceToggle";
 import { cn } from "@/lib/utils";
@@ -48,14 +48,7 @@ export function Footer({ mode }: FooterProps) {
                 height={38}
                 className="h-auto w-auto"
               />
-              <span
-                className={cn(
-                  "text-xl font-extrabold tracking-tight",
-                  brand ? "text-white" : "text-foreground"
-                )}
-              >
-                Konnectika
-              </span>
+             
             </div>
             <p
               className={cn(

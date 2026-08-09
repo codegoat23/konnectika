@@ -69,17 +69,7 @@ export function CTABanner({
             />
 
             <div className="relative">
-              <span
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold backdrop-blur",
-                  creator
-                    ? "border border-white/25 bg-white/10 text-white"
-                    : "border border-white/10 bg-white/5 text-zinc-200"
-                )}
-              >
-                <Sparkles className="size-3.5" />
-                {badge}
-              </span>
+             
               <h2
                 className={cn(
                   "mx-auto mt-6 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl",

@@ -74,10 +74,12 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
             <Link href="/login" className="hidden sm:block">
               <Button
                 variant="ghost"
-                className={cn(
-                  "rounded-full px-4",
-                  brand && "text-zinc-300 hover:bg-white/10 hover:text-white"
-                )}
+               className={cn(
+  "rounded-full px-4",
+  brand
+    ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+    : "text-black hover:bg-black/10 hover:text-black"
+)}
               >
                 Login
               </Button>
@@ -85,7 +87,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
             <Link href="/signup">
               <Button
                 className={cn(
-                  "rounded-full px-5",
+                  "rounded-full px-5 py-5.5",
                   brand
                     ? "bg-foreground text-background hover:bg-zinc-300"
                     : "bg-primary text-primary-foreground hover:bg-orange-400"

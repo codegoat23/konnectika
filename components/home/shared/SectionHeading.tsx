@@ -18,12 +18,13 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   return (
     <Reveal className={cn(align === "center" ? "text-center" : "", className)}>
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-        {label}
-      </p>
+       <span className="rounded-full border border-zinc-200/50 bg-zinc-100/30 px-4 py-2 text-sm font-semibold text-black">
+         {label}
+      </span>
+     
       <h2
         className={cn(
-          "mt-3 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl",
+          "mt-3 text-3xl font-extrabold tracking-tight text-foreground sm:text-6xl",
           align === "center" ? "mx-auto max-w-2xl" : "max-w-2xl"
         )}
       >

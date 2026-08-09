@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Konnectika — Where African creativity meets opportunity",
   description:
     "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
 };
 
 export default function RootLayout({

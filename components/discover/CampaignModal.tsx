@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, Bookmark, Check, Calendar, Clock, Users, Wallet } from "lucide-react";
+import { X, Bookmark, Check, Calendar, Clock, Users, Wallet, Maximize2 } from "lucide-react";
 import type { Campaign } from "@/types";
 import PlatformIcons from "./PlatformIcons";
 import { formatTZS, getProgressPercent } from "@/lib/utils";
@@ -47,6 +47,14 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
   }}
 >
        
+          <button
+            onClick={() => router.push(`/discover/${campaign.id}`)}
+            className="absolute top-3 left-3 p-1.5 rounded-full bg-black/50 text-zinc-400 hover:text-zinc-100 border border-border transition-colors"
+            aria-label="Open campaign detail page"
+            title="Open detail page"
+          >
+            <Maximize2 size={16} />
+          </button>
           <button
             onClick={onClose}
             className="absolute top-3 right-3 p-1.5 rounded-full bg-black/50 text-zinc-400 hover:text-zinc-100 border border-border transition-colors"
@@ -159,7 +167,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
   onClick={() => {
     router.push(`/campaign/${campaign.id}/apply`);
   }}
-  className="flex-1 bg-orange-500 text-white text-sm font-medium py-3 rounded-full cursor-pointer hover:bg-orange-400 transition-colors"
+  className="flex-1 bg-white text-black text-sm font-medium py-3 rounded-full cursor-pointer hover:bg-orange-400 transition-colors"
 >
   Join Campaign
 </button>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/home/Reveal";
@@ -18,55 +18,63 @@ import {
   type HomeCampaign,
 } from "@/data/home/creator";
 import { formatTZS } from "@/lib/utils";
+import Testimony from "./testimony";
 
 function CampaignCard({ campaign }: { campaign: HomeCampaign }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-      <div className="relative aspect-[20/10] overflow-hidden">
-        <Image
-          src={campaign.image}
-          alt={`${campaign.brand} — ${campaign.title}`}
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-        <span className="absolute left-4 top-4 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-          {campaign.badge}
-        </span>
-        <span className="absolute bottom-4 left-4 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-zinc-900">
-          TZS {formatTZS(campaign.reward)}
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-center gap-2.5">
-          <span
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-extrabold text-white"
-            style={{ backgroundColor: campaign.color }}
-            aria-hidden
-          >
-            {campaign.brand.charAt(0)}
-          </span>
-          <span className="text-sm font-bold text-foreground">
-            {campaign.brand}
-          </span>
-          <span className="ml-auto">
-            <PlatformIcon platform={campaign.platform} />
+    <article className="group relative flex h-[350px] flex-col overflow-hidden rounded-3xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      {/* Background image, full bleed */}
+      <Image
+        src={campaign.image}
+        alt={`${campaign.brand} — ${campaign.title}`}
+        fill
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+
+      {/* Bottom gradient scrim so overlaid text stays legible */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+
+      {/* Badge, top-left */}
+      <span className="absolute left-4 top-4 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+        {campaign.badge}
+      </span>
+
+      {/* Brand chip, top-right */}
+      <span
+        className="absolute right-4 top-4 z-10 flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-extrabold text-white shadow-md"
+        style={{ backgroundColor: campaign.color }}
+        aria-hidden
+      >
+        {campaign.brand.charAt(0)}
+      </span>
+
+      {/* Content, pinned to bottom over the scrim */}
+      <div className="relative z-10 mt-auto flex flex-col gap-3 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-lg font-bold leading-tight text-white">
+            {campaign.title}
+          </h3>
+          <span className="shrink-0 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-zinc-900">
+            TZS {formatTZS(campaign.reward)}
           </span>
         </div>
-        <h3 className="mt-3 text-base font-bold text-foreground">
-          {campaign.title}
-        </h3>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {campaign.category} · {campaign.applicants} applicants
-        </p>
-        <Link
-          href="/discover"
-          className="mt-auto pt-4"
-          aria-label={`Apply to ${campaign.title} by ${campaign.brand}`}
-        >
-         
-        </Link>
+
+        <p className="text-sm text-white/80">{campaign.brand}</p>
+
+        <div className="flex flex-wrap gap-2">
+          <span className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+            <PlatformIcon platform={campaign.platform} />
+          </span>
+          <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+            {campaign.category}
+          </span>
+          <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+            {campaign.applicants} applicants
+          </span>
+        </div>
+
+      
       </div>
     </article>
   );
@@ -80,42 +88,7 @@ export function CreatorSections() {
         aria-labelledby="how-it-works-heading"
         className="scroll-mt-24"
       >
-        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <SectionHeading
-                label="How it works"
-                title="From discovery to payment in three simple steps"
-                subtitle="Browse campaigns that fit your niche, submit content you're proud of, and get paid when brands approve it."
-                align="left"
-              />
-              <Reveal delay={120}>
-                <div className="mt-8 flex flex-wrap items-center gap-4">
-                  <Link href="/discover">
-                    <Button
-                      size="lg"
-                      className="h-11 rounded-full bg-primary px-6 text-primary-foreground hover:bg-orange-400"
-                    >
-                      Browse Campaigns
-                      <ArrowRight data-icon="inline-end" />
-                    </Button>
-                  </Link>
-                  <Link
-                    href="#featured-campaigns"
-                    className="text-sm font-semibold text-primary hover:underline"
-                  >
-                    See featured campaigns
-                  </Link>
-                </div>
-              </Reveal>
-            </div>
-            <Reveal delay={120}>
-              <div className="rounded-[28px] border border-border bg-card p-8 shadow-sm sm:p-10">
-                <Steps steps={creatorSteps} />
-              </div>
-            </Reveal>
-          </div>
-        </div>
+      
       </section>
 
       <section
@@ -127,7 +100,7 @@ export function CreatorSections() {
           <SectionHeading
             label="Why creators love it"
             title="Everything you need to turn followers into income"
-            subtitle="Konnectika handles discovery, briefs, and payments so you can focus on making great content."
+           
           />
           <div className="mt-14">
             <Reveal>
@@ -146,7 +119,7 @@ export function CreatorSections() {
           <SectionHeading
             label="Featured campaigns"
             title="Brands looking for creators like you"
-            subtitle="Real campaigns, real budgets. Find the ones that match your craft."
+           
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {creatorCampaigns.map((campaign, i) => (
@@ -168,13 +141,9 @@ export function CreatorSections() {
           </div>
         </div>
       </section>
+      <Testimony />
 
-      <TestimonialsSection
-        label="Success stories"
-        title="Creators turning passion into pay"
-        testimonials={creatorTestimonials}
-        highlightColor="orange"
-      />
+     
 
       <CTABanner
         tone="creator"
