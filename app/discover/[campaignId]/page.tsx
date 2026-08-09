@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { getCampaignDetail } from "@/lib/campaign-detail";
+import { Separator } from "@/components/ui/separator";
 
 interface PageProps {
   params: Promise<{ campaignId: string }>;
@@ -143,13 +144,13 @@ export default async function CampaignDetailPage({ params }: PageProps) {
         <div className="mt-6">
           <PublicCampaignHeader campaign={campaign} cta={cta} />
         </div>
+        <Separator className="my-4 mt-10"/>
 
-        <div className="mt-10">
-          <CampaignMetrics campaign={campaign} />
-        </div>
-
-        <div className="mt-10">
+        <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:items-start">
           <CampaignTabs campaign={campaign} />
+          <aside className="lg:sticky lg:top-8">
+            <CampaignMetrics campaign={campaign} />
+          </aside>
         </div>
       </div>
     </main>

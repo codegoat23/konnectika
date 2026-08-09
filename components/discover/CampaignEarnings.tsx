@@ -11,9 +11,7 @@ export function CampaignEarnings({ earnings }: CampaignEarningsProps) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-xl font-bold text-foreground">Earnings</h2>
-        <p className="text-xs text-muted-foreground">
-          Flat rate per approved post
-        </p>
+       
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -55,15 +55,13 @@ function CampaignCard({ campaign }: { campaign: HomeCampaign }) {
           <h3 className="text-lg font-bold leading-tight text-white">
             {campaign.title}
           </h3>
-          <span className="shrink-0 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-zinc-900">
-            TZS {formatTZS(campaign.reward)}
-          </span>
+         
         </div>
 
         <p className="text-sm text-white/80">{campaign.brand}</p>
 
         <div className="flex flex-wrap gap-2">
-          <span className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+          <span className="flex items-center gap-1 rounded-full  px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
             <PlatformIcon platform={campaign.platform} />
           </span>
           <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">

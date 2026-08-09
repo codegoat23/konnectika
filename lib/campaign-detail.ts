@@ -30,6 +30,8 @@ export interface CampaignDetail {
   platforms: Platform[];
   /** True when applicationsClose has passed (or the campaign is otherwise done). */
   isClosed: boolean;
+  /** Whole days until applicationsClose (0 when closed). */
+  daysLeft: number;
   isFeatured: boolean;
   /** Relative time, e.g. "3 days ago". */
   lastUpdated: string;
@@ -130,6 +132,12 @@ export const getCampaignDetail = cache(
       applicants: campaign._count.applications,
       platforms,
       isClosed: campaign.applicationsClose < new Date(),
+      daysLeft: Math.max(
+        0,
+        Math.ceil(
+          (campaign.applicationsClose.getTime() - Date.now()) / 86_400_000
+        )
+      ),
       isFeatured: campaign.isFeatured,
       lastUpdated: formatDistanceToNow(campaign.updatedAt, { addSuffix: true }),
       description: campaign.description,

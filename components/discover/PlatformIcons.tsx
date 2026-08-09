@@ -44,7 +44,7 @@ const dim =
     ? "w-6 h-6"
     : "w-7 h-7";
 
- const iconSize = size === "sm" ? 14 : 16;
+ const iconSize = size === "sm" ? 18 : 16;
 
   return (
     <div className="flex items-center gap-1">

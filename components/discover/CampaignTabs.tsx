@@ -23,7 +23,7 @@ export function CampaignTabs({ campaign }: CampaignTabsProps) {
 
       <TabsContent value="overview">
         <div className="mt-8 space-y-12">
-          <p className="max-w-3xl text-base leading-7 text-muted-foreground">
+          <p className="max-w-xl text-base leading-7 text-muted-foreground">
             {campaign.description}
           </p>
 
