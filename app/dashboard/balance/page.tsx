@@ -7,10 +7,9 @@ import DashboardShell from "@/app/dashboard/components/dashboard-shell";
 
 import CreatorWallet from "./components/CreatorWallet";
 import BrandBalance from "./components/BrandBalance";
-import AdminWithdrawals from "./components/AdminWithdrawals";
 
 import { getBrandBalance } from "@/lib/balance";
-import { getCreatorWallet, getAdminWithdrawals } from "@/lib/wallet";
+import { getCreatorWallet } from "@/lib/wallet";
 import { prisma } from "@/lib/prisma";
 
 export default async function BalancePage() {
@@ -32,10 +31,11 @@ export default async function BalancePage() {
         : {
             available: 0,
             pending: 0,
+            approved: 0,
+            processing: 0,
+            paid: 0,
             lifetime: 0,
-            withdrawn: 0,
             earnings: [],
-            withdrawals: [],
           };
 
       return (
@@ -56,13 +56,8 @@ export default async function BalancePage() {
     }
 
     case "ADMIN": {
-      const withdrawals = await getAdminWithdrawals();
-
-      return (
-        <DashboardShell>
-          <AdminWithdrawals withdrawals={withdrawals} />
-        </DashboardShell>
-      );
+      // Admins manage creator settlements in the payout dashboard.
+      redirect("/dashboard/payouts");
     }
 
     default:

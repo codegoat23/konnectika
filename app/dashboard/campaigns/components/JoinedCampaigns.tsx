@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import { JoinedCampaign } from "@/lib/campaigns";
 import JoinedCampaignCard from "./JoinedCampaignCard";
 import CampaignModal from "@/app/dashboard/creator/components/CampaignModal";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function JoinedCampaigns({
@@ -23,16 +24,16 @@ export default function JoinedCampaigns({
         </h2>
 
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="p-4 rounded-full bg-muted mb-4">
+          <div className="p-4 rounded-full bg-card border border-border mb-4">
             <RefreshCw size={24} className="text-muted-foreground" />
           </div>
           <p className="text-muted-foreground font-medium mb-1">
             You haven&apos;t applied to any campaigns yet
           </p>
           <p className="text-muted-foreground text-sm">
-            <a href="/discover" className="text-foreground underline hover:text-orange-400">
+            <Link href="/discover" className="text-foreground underline hover:text-orange-600">
               Browse open campaigns
-            </a>{" "}
+            </Link>{" "}
             to get started
           </p>
         </div>
@@ -53,7 +54,7 @@ export default function JoinedCampaigns({
   return (
     <section className="px-4 lg:px-6">
           {/* CTA SECTION */}
-<div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-border bg-card/40 p-4 rounded-2xl"
+<div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-border bg-card p-4 rounded-2xl"
 style={{
   borderRadius:24
 }}
@@ -73,7 +74,7 @@ style={{
     href="/discover"
     target="_blank"
     rel="noopener noreferrer"
-    className="px-5 py-2 rounded-xl text-sm bg-orange-500 text-white font-medium hover:bg-orange-400 transition flex items-center gap-2"
+    className="px-5 py-2 rounded-xl text-sm bg-orange-500 text-white font-medium hover:bg-orange-600 transition flex items-center gap-2"
     style={{
       borderRadius:10
     }}

@@ -3,23 +3,62 @@ import { getAuthUser } from "@/lib/auth";
 import { NotifyAdmin, Notifycreators } from "@/lib/notification";
 import { computeBrandFee } from "@/lib/pricing";
 import { recordBrandFee } from "@/lib/platform-revenue";
+import { getCampaignsPaidBudget } from "@/lib/campaign-budget";
+import {
+  isMobileMoneyMethod,
+  normalizePhoneNumber,
+  validatePaymentPhone,
+} from "@/lib/payment";
 
 
 export async function GET() {
+  // Public discovery list. Explicit `select` whitelist — never expose payment
+  // details (paymentMethod/paymentPhone/paymentStatus/platformFee/totalCharge)
+  // or admin-only fields to unauthenticated visitors.
   const campaigns = await prisma.campaign.findMany({
     where: {
       status: "APPROVED",
     },
-    include: {
-      businessProfile: true,
-      _count: { select: { applications: true } }
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      campaignType: true,
+      description: true,
+      badge: true,
+      thumbnailColor: true,
+      thumbnailPic: true,
+      platforms: true,
+      paymentRate: true,
+      budgetFunded: true,
+      budgetTotal: true,
+      daysLeft: true,
+      tags: true,
+      requirements: true,
+      applicationsClose: true,
+      contentFormat: true,
+      duration: true,
+      isOpenToAll: true,
+      isFeatured: true,
+      businessProfile: {
+        select: { companyName: true },
+      },
+      _count: { select: { applications: true } },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
-  return Response.json(campaigns);
+  // Override the stored budgetFunded column with the real paid-out total so
+  // the discover progress bars always reflect cash actually paid to creators.
+  const paid = await getCampaignsPaidBudget(campaigns.map((c) => c.id));
+  const campaignsWithRealBudget = campaigns.map((c) => ({
+    ...c,
+    budgetFunded: paid.get(c.id) ?? 0,
+  }));
+
+  return Response.json(campaignsWithRealBudget);
 }
 
 export async function POST(req: Request) {
@@ -87,6 +126,25 @@ export async function POST(req: Request) {
       );
     }
 
+    // Brand payment details: mobile-money methods must include the phone the
+    // brand will pay from / be matched on when the admin confirms the charge.
+    const paymentMethod = body.paymentMethod?.trim() ?? null;
+    const paymentPhone = body.paymentPhone?.trim() ?? null;
+
+    if (
+      isMobileMoneyMethod(paymentMethod) &&
+      !normalizePhoneNumber(paymentPhone)
+    ) {
+      return Response.json(
+        {
+          error:
+            validatePaymentPhone(paymentMethod, paymentPhone) ??
+            "A valid phone number is required for mobile money payments.",
+        },
+        { status: 400 }
+      );
+    }
+
     // 💰 Brand platform fee: charged on top of the campaign budget. It
     // belongs to the platform and never reduces creator payouts. The rate
     // is snapshotted onto the revenue row, and the row upserts on
@@ -131,6 +189,9 @@ export async function POST(req: Request) {
           platformFeeRate: brandFee.feeRate,
           platformFee: brandFee.feeAmount,
           totalCharge: brandFee.totalCharge,
+
+          paymentMethod,
+          paymentPhone: normalizePhoneNumber(paymentPhone),
 
           daysLeft: Number(body.daysLeft) || 0,
 

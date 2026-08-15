@@ -90,7 +90,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   {/* Progress */}
   <div className="w-full bg-muted rounded-full h-1 overflow-hidden">
     <div
-      className="h-1 rounded-full bg-orange-500 transition-all duration-300"
+      className="h-1 rounded-full bg-white transition-all duration-300"
       style={{ width: `${progress}%` }}
     />
   </div>

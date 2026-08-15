@@ -101,17 +101,28 @@ if (campaign.applicationsClose && campaign.applicationsClose < new Date()) {
 }
 
 
-const application = await prisma.campaignApplication.create({
-  data: {
-    creatorId: creatorProfile.id,
-    campaignId,
-    message,
+const application = await prisma.$transaction(async (tx) => {
+    const created = await tx.campaignApplication.create({
+      data: {
+        creatorId: creatorProfile.id,
+        campaignId,
+        message,
 
-    instagramFollowers: instagram?.followers,
-    tiktokFollowers: tiktok?.followers,
-    youtubeFollowers: youtube?.followers,
-  },
-});
+        instagramFollowers: instagram?.followers,
+        tiktokFollowers: tiktok?.followers,
+        youtubeFollowers: youtube?.followers,
+      },
+    });
+
+    // Keep the campaign's creator-join counter in sync with its applications
+    // (the discover/apply pages render creatorsJoined as the application count).
+    await tx.campaign.update({
+      where: { id: campaignId },
+      data: { creatorsJoined: { increment: 1 } },
+    });
+
+    return created;
+  });
 
 //Notification for new submission
 await notify({

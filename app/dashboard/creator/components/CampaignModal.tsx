@@ -30,7 +30,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
       style={{ backdropFilter: "blur(8px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-custom "
+      <div className="relative bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl scrollbar-custom "
       style={{
         borderRadius: "24px"
       }}
@@ -153,7 +153,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
           </div>
 
           <div className="flex gap-3 mt-5">
-            <button className="flex-1 bg-orange-500 hover:bg-orange-400 text-white text-sm font-medium py-3  transition-colors"
+            <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-3  transition-colors"
             style={{
               borderRadius: "9999px",
               

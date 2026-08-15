@@ -197,26 +197,45 @@ const user = {
   avatar: "ES"
 }
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [isAdmin, setIsAdmin] = React.useState(false);
+  const [role, setRole] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetch("/api/user")
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setIsAdmin(data?.User?.role === "ADMIN"))
+      .then((data) => setRole(data?.User?.role ?? null))
       .catch(() => {});
   }, []);
 
   const navMain = React.useMemo(() => {
-    if (!isAdmin) return data.navMain;
-    return [
-      ...data.navMain,
-      {
+    // Admins have no wallet balance — that page just redirects to the payout
+    // dashboard, so drop it from their nav.
+    const items =
+      role === "ADMIN"
+        ? data.navMain.filter((item) => item.url !== "/dashboard/balance")
+        : [...data.navMain];
+    if (role === "ADMIN" || role === "BRAND") {
+      items.push({
+        title: "Applicants",
+        url: "/dashboard/applicants",
+        icon: <UsersIcon />,
+      });
+    }
+    if (role === "ADMIN" || role === "CREATOR") {
+      items.push({
+        title: "Payouts",
+        url: "/dashboard/payouts",
+        icon: <Landmark />,
+      });
+    }
+    if (role === "ADMIN") {
+      items.push({
         title: "Revenue",
         url: "/dashboard/revenue",
         icon: <Landmark />,
-      },
-    ];
-  }, [isAdmin]);
+      });
+    }
+    return items;
+  }, [role]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

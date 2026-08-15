@@ -44,7 +44,7 @@ export function TrustBoard({
                 cy="110"
                 r={radius}
                 fill="transparent"
-                stroke="#d4d4d8"
+                stroke="#E7E5E4"
                 strokeWidth="24"
               />
 
@@ -53,7 +53,7 @@ export function TrustBoard({
                 cy="110"
                 r={radius}
                 fill="transparent"
-                stroke="#fb923c"
+                stroke="#F97316"
                 strokeWidth="24"
                 strokeLinecap="round"
                 strokeDasharray={circumference}

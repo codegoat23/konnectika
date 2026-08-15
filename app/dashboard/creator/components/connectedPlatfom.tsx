@@ -44,7 +44,7 @@ const platforms = [
 
 export default function ConnectedPlatformsAccordion() {
   return (
-    <div className="w-full rounded-2xl border bg-background p-3 shadow-sm">
+    <div className="w-full rounded-2xl border bg-card p-3 shadow-sm">
       <Accordion type="single" collapsible>
         <AccordionItem value="platforms" className="border-none">
           
@@ -83,7 +83,7 @@ export default function ConnectedPlatformsAccordion() {
                       className={`h-2.5 w-2.5 rounded-full ${
                         platform.status === "Connected"
                           ? "bg-emerald-500"
-                          : "bg-muted"
+                          : "bg-muted-foreground/40"
                       }`}
                     />
                   </div>

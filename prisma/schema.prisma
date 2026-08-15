@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  
 }
 
 enum Role {
@@ -14,89 +13,89 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String?
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String?
 
-  role      Role     @default(CREATOR)
-  onboardingStep Int @default(1)
-  onboardingDone Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role           Role     @default(CREATOR)
+  onboardingStep Int      @default(1)
+  onboardingDone Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   creatorProfile  CreatorProfile?
   businessProfile BusinessProfile?
- notifications Notification[]
+  notifications   Notification[]
 }
 
 model CreatorProfile {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  username      String?   @unique
-  displayName   String?
+  username    String? @unique
+  displayName String?
 
-  phone         String?
-  phoneVerified Boolean  @default(false)
-  earnings Earning[] 
-  submissions Submission[]
-  withdrawals Withdrawal[]
-  socialAccounts SocialAccount[]
-  applications  CampaignApplication[]
+  phone           String?
+  phoneVerified   Boolean               @default(false)
+  earnings        Earning[]
+  submissions     Submission[]
+  payouts         Payout[]
+  socialAccounts  SocialAccount[]
+  applications    CampaignApplication[]
   platformRevenue PlatformRevenue[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
 
   @@index([username])
 }
 
 model BusinessProfile {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   companyName String? @unique
   logo        String?
   website     String?
 
-    industry    String?
-    description String?
-    socialAccounts SocialAccount[]
+  industry       String?
+  description    String?
+  socialAccounts SocialAccount[]
 
-    // 🔥 RELATION: business creates campaigns
-    campaigns   Campaign[]
-    platformRevenue PlatformRevenue[]
+  // 🔥 RELATION: business creates campaigns
+  campaigns       Campaign[]
+  platformRevenue PlatformRevenue[]
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([companyName])
 }
+
 model SocialAccount {
   id String @id @default(cuid())
 
-  creatorId String?
+  creatorId  String?
   businessId String?
 
-  creator CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creator  CreatorProfile?  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   business BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   platform SocialPlatform
-  handle String
-  url String?
+  handle   String
+  url      String?
 
-  followers Int @default(0)
-  verified Boolean @default(false)
+  followers Int     @default(0)
+  verified  Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([creatorId, platform])
   @@unique([businessId, platform])
-
   @@index([creatorId])
   @@index([businessId])
 }
@@ -111,7 +110,7 @@ enum SocialPlatform {
 }
 
 model Campaign {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
   name        String
   description String
@@ -124,43 +123,50 @@ model Campaign {
   thumbnailPic      String
   thumbnailInitials String
 
-  paymentRate   Int
-  budgetFunded  Int   @default(0)
-  budgetTotal   Int
+  paymentRate  Int
+  budgetFunded Int @default(0)
+  budgetTotal  Int
 
   // 💳 Payment snapshot — backend source of truth (see lib/pricing.ts).
   // Computed from budgetTotal at creation/edit time and SNAPSHOTTED here, so
   // changing the fee % later never rewrites history. Existing campaigns keep
   // the defaults (UNPAID, 0/0/0) until their next edit.
-  paymentStatus  CampaignPaymentStatus @default(UNPAID)
-  platformFeeRate Int @default(0) // percent charged to the brand
-  platformFee     Int @default(0) // budgetTotal * platformFeeRate / 100
-  totalCharge     Int @default(0) // budgetTotal + platformFee
+  paymentStatus   CampaignPaymentStatus @default(UNPAID)
+  platformFeeRate Int                   @default(0) // percent charged to the brand
+  platformFee     Int                   @default(0) // budgetTotal * platformFeeRate / 100
+  totalCharge     Int                   @default(0) // budgetTotal + platformFee
 
-  daysLeft      Int
+  // 💳 Brand payment details (how the brand pays the platform). The phone is
+  // captured for mobile-money methods so the platform can match the incoming
+  // transfer when confirming the campaign as PAID.
+  paymentMethod String?
+  paymentPhone  String?
+
+  daysLeft Int
 
   contentFormat String
   duration      String
 
   applicationsClose DateTime
 
-  isOpenToAll   Boolean @default(true)
-  isFeatured    Boolean @default(false)
+  isOpenToAll Boolean @default(true)
+  isFeatured  Boolean @default(false)
 
   // ⭐ NEW FIELDS (from your frontend)
   tags           String[]
   requirements   String[]
-  creatorsJoined Int     @default(0)
+  creatorsJoined Int            @default(0)
   brand          String?
-  status CampaignStatus @default(PENDING_REVIEW)
+  status         CampaignStatus @default(PENDING_REVIEW)
 
   // relations
   businessProfileId String
-  businessProfile   BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
-  submissions Submission[]
-  platforms Platform[]
-  applications CampaignApplication[]
-  platformRevenue PlatformRevenue[]
+  businessProfile   BusinessProfile       @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  submissions       Submission[]
+  platforms         Platform[]
+  applications      CampaignApplication[]
+  platformRevenue   PlatformRevenue[]
+  earnings          Earning[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -178,7 +184,7 @@ enum CampaignStatus {
 
 enum CampaignPaymentStatus {
   UNPAID // created but the brand has not paid yet
-  PAID   // admin approved => funds received (manual payment)
+  PAID // admin approved => funds received (manual payment)
 }
 
 enum BadgeType {
@@ -202,27 +208,29 @@ enum CampaignTypeEnum {
   Affiliate
   Ambassador
 }
+
 model CampaignApplication {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  creatorId   String
-  campaignId  String
+  creatorId  String
+  campaignId String
 
-  message     String?
+  message String?
 
-  status      ApplicationStatus @default(PENDING)
+  status ApplicationStatus @default(PENDING)
 
   // optional but VERY useful (snapshot at time of apply)
   instagramFollowers Int?
   tiktokFollowers    Int?
   youtubeFollowers   Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-   submission  Submission?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  submission Submission?
+  earning    Earning?
 
   creator  CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  campaign Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@unique([creatorId, campaignId])
   @@index([creatorId])
@@ -246,28 +254,29 @@ enum ApplicationStatus {
 // Mirrors FLOW.md's verification step (SUBMITTED -> review -> done)
 // without colliding with your existing ApplicationStatus enum.
 enum SubmissionStatus {
-  SUBMITTED      // creator just submitted, nothing reviewed yet
-  UNDER_REVIEW   // brand has opened it / started reviewing
-  APPROVED       // brand approved -> can feed into payment stage later
+  PENDING_REVIEW // creator just submitted, nothing reviewed yet
+  SUBMITTED // legacy alias for PENDING_REVIEW
+  UNDER_REVIEW // brand has opened it / started reviewing
+  APPROVED // brand approved -> can feed into payment stage later
   CHANGES_REQUESTED // brand asked creator to fix/redo
-  REJECTED       // brand rejected outright
+  REJECTED // brand rejected outright
 }
 
 // --- 2. New model: Submission ---------------------------------
 model Submission {
-  id           String @id @default(cuid())
+  id String @id @default(cuid())
 
   // Link back to the approved application this proof is for.
   // We key off applicationId (not just campaignId + creatorId)
   // because the application is the record that proves this
   // creator was actually approved for this campaign.
-  applicationId String        @unique // one submission per application (see note below)
+  applicationId String              @unique // one submission per application (see note below)
   application   CampaignApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   // Denormalized for fast filtering/joins without always
   // having to traverse application -> campaign / creator.
-  creatorId  String
-  creator    CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId String
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
@@ -275,14 +284,13 @@ model Submission {
   // --- proof content ---
   screenshots String[] // array of uploaded file URLs (S3 / Supabase Storage)
   postLinks   String[] // array of live post URLs (Instagram/TikTok/etc.)
-  caption     String?  // optional note from creator describing the submission
+  caption     String? // optional note from creator describing the submission
 
-
-  earning Earning?
-  status        SubmissionStatus @default(SUBMITTED)
-  reviewNote    String?          // brand's feedback / reason for rejection or change request
-  reviewedAt    DateTime?
-  reviewedBy    String?          // userId of the brand/admin who reviewed it
+  earning    Earning?
+  status     SubmissionStatus @default(SUBMITTED)
+  reviewNote String? // brand's feedback / reason for rejection or change request
+  reviewedAt DateTime?
+  reviewedBy String? // userId of the brand/admin who reviewed it
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -315,97 +323,74 @@ model Submission {
 // can decide. The API code below is written to support EITHER choice
 // with a one-line change (see comment in app/api/submissions/route.ts).
 
-
 model Earning {
   id String @id @default(cuid())
 
   creatorId String
-  creator CreatorProfile @relation(fields:[creatorId],references:[id],onDelete:Cascade)
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-  submissionId String @unique
-  submission Submission @relation(fields:[submissionId],references:[id],onDelete:Cascade)
+  // Direct links to the campaign and the approved application the earning
+  // came from. Campaign is REQUIRED (backfilled from submission on migrate);
+  // application is set when the earning is created at application approval.
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+
+  applicationId String?              @unique
+  application   CampaignApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  // Linked once content is approved (nullable because an earning is created
+  // at APPLICATION approval, before any content exists).
+  submissionId String?     @unique
+  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   // --- payment breakdown (gross / fee / net) ---
-  amount           Int // gross campaign payment
-  platformFeeRate  Int @default(0) // percent
-  platformFee      Int @default(0)
-  creatorAmount    Int @default(0) // net the creator earns
+  amount          Int // gross campaign payment
+  platformFeeRate Int @default(0) // percent
+  platformFee     Int @default(0)
+  creatorAmount   Int @default(0) // net the creator earns
 
   status EarningStatus @default(PENDING)
 
-  // --- settlement timeline ---
+  // --- settlement timeline (admin approval only) ---
+  requestedAt DateTime? // when the earning was created (application approval)
   approvedAt  DateTime?
-  availableAt DateTime? // PENDING -> AVAILABLE once this passes
-  withdrawnAt DateTime?
+  availableAt DateTime? // set when the admin approves the earning (APPROVED -> AVAILABLE)
 
-  // --- withdrawal linkage ---
-  withdrawalId String?
-  withdrawal   Withdrawal? @relation(fields:[withdrawalId],references:[id],onDelete:SetNull)
+  // --- scheduled payout linkage (monthly creator payout system) ---
+  payoutId String?
+  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
 
   // --- platform revenue linkage (CREATOR_FEE deducted from this earning) ---
   platformRevenue PlatformRevenue?
 
-  createdAt DateTime @default(now())
-  paidAt    DateTime? // kept for backwards compatibility / revenue chart
+  createdAt DateTime  @default(now())
+  paidAt    DateTime? // set when the payout covering this earning is paid
 
   @@index([creatorId])
+  @@index([campaignId])
   @@index([status])
-  @@index([withdrawalId])
+  @@index([payoutId])
 }
 
 enum EarningStatus {
-  PENDING    // approved, waiting for the settlement period to end
-  AVAILABLE  // settlement passed, creator can withdraw
-  WITHDRAWN  // included in a successful withdrawal
-}
-
-model Withdrawal {
-  id String @id @default(cuid())
-
-  creatorId String
-  creator   CreatorProfile @relation(fields:[creatorId],references:[id],onDelete:Cascade)
-
-  amount Int // sum of linked earnings' creatorAmount
-
-  status WithdrawalStatus @default(PENDING)
-
-  requestedAt DateTime @default(now())
-  paidAt      DateTime?
-  rejectedAt  DateTime?
-
-  paymentMethod   String?
-  paymentReference String?
-
-  reviewedBy String? // admin userId
-  reviewedAt DateTime?
-
-  earnings Earning[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([creatorId])
-  @@index([status])
-}
-
-enum WithdrawalStatus {
-  PENDING    // requested by creator, awaiting admin review
-  PROCESSING // admin picked it up / paying out
-  PAID       // admin marked it paid
-  REJECTED   // admin declined, funds returned to available
+  PENDING // created at application approval, awaiting content approval
+  APPROVED // content approved by the brand, awaiting admin settlement approval
+  AVAILABLE // admin approved, rolls into the next payout
+  PAID // settled through a payout
+  REJECTED // content rejected -> no payout
 }
 
 model Notification {
-  id          String   @id @default(cuid())
-  title       String
-  message     String
-  type        NotificationType
-  isRead      Boolean  @default(false)
+  id      String           @id @default(cuid())
+  title   String
+  message String
+  type    NotificationType
+  isRead  Boolean          @default(false)
 
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 enum NotificationType {
@@ -425,19 +410,19 @@ enum NotificationType {
 
 enum PlatformRevenueType {
   CREATOR_FEE // 10% (configurable) deducted from a creator's gross earning
-  BRAND_FEE   // 5%  (configurable) charged to a brand on campaign creation
+  BRAND_FEE // 5%  (configurable) charged to a brand on campaign creation
 }
 
 enum PlatformRevenueStatus {
   ACCRUED // recorded when the underlying money event happens
-  PAID    // funds actually received by the platform
+  PAID // funds actually received by the platform
 }
 
 model PlatformRevenue {
-  id        String                @id @default(cuid())
+  id String @id @default(cuid())
 
-  type      PlatformRevenueType
-  status    PlatformRevenueStatus @default(ACCRUED)
+  type   PlatformRevenueType
+  status PlatformRevenueStatus @default(ACCRUED)
 
   // snapshot of the fee configuration at record time
   feeRate     Int // percent
@@ -451,14 +436,14 @@ model PlatformRevenue {
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Restrict)
 
-  creatorId  String? // set for CREATOR_FEE
-  creator    CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  creatorId String? // set for CREATOR_FEE
+  creator   CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Restrict)
 
   businessId String? // set for BRAND_FEE
   business   BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Restrict)
 
-  earningId  String? @unique // set for CREATOR_FEE -> the earning the fee was deducted from
-  earning    Earning? @relation(fields: [earningId], references: [id], onDelete: Restrict)
+  earningId String?  @unique // set for CREATOR_FEE -> the earning the fee was deducted from
+  earning   Earning? @relation(fields: [earningId], references: [id], onDelete: Restrict)
 
   description String?
 
@@ -466,12 +451,97 @@ model PlatformRevenue {
 
   // Idempotency: a retried money event cannot create a duplicate revenue row.
   // (earningId is @unique, so an earning can fund at most one CREATOR_FEE.)
-  @@unique([campaignId, type])
-
+  //
+  // A campaign can have MANY approved creators, so CREATOR_FEE rows must not
+  // be limited to one per campaign. The unique key therefore discriminates on
+  // businessId (NULL for CREATOR_FEE, set for BRAND_FEE): Postgres treats NULL
+  // as distinct in unique indexes, so any number of CREATOR_FEE rows may exist
+  // per campaign, while BRAND_FEE stays unique per campaign+business.
+  @@unique([campaignId, type, businessId])
   @@index([campaignId])
   @@index([creatorId])
   @@index([businessId])
   @@index([type])
   @@index([status])
   @@index([createdAt])
+}
+
+// ============================================================
+// SCHEDULED CREATOR PAYOUTS
+// ============================================================
+//
+// Monthly, admin-review payout batches. When a creator's AVAILABLE earnings
+// cross the platform's minimum payout threshold, a Payout row is created
+// (on the monthly payout day via runScheduledPayouts(), or by the creator
+// requesting one once eligible). The creator's earnings are frozen into the
+// payout (payoutId) so they stop counting toward the available balance, and
+// the admin approves / rejects / marks the payout PAID manually.
+//
+//   PENDING  -> created by the schedule or a creator request (funds frozen)
+//   APPROVED -> admin reviewed and approved the payout
+//   PAID     -> admin processed the manual payment (earnings become PAID)
+//   REJECTED -> admin declined; earnings are unfrozen and roll over
+//
+// A rejected / excess balance rolls to the next month because only earnings
+// that were AVAILABLE at payout creation are frozen; anything below the
+// threshold stays in the available balance automatically.
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+model Payout {
+  id String @id @default(cuid())
+
+  creatorId String
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  // Sum of the linked earnings' creatorAmount at payout creation. Never
+  // exceeds the creator's available balance (enforced in lib/payout.ts).
+  amount Int
+
+  status PayoutStatus @default(PENDING)
+
+  // Creator's chosen settlement destination (captured at request time).
+  paymentMethod String?
+  paymentPhone  String?
+
+  requestedAt DateTime  @default(now())
+  approvedAt  DateTime?
+  paidAt      DateTime?
+  rejectedAt  DateTime?
+
+  // Admin settlement details (manual payment in V1).
+  paymentReference String?
+  rejectionReason  String?
+  reviewedBy       String? // admin userId
+  reviewedAt       DateTime?
+
+  earnings Earning[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+// ============================================================
+// PLATFORM SETTINGS (key/value)
+// ============================================================
+//
+// Admin-editable platform configuration. Currently used by the payout system:
+//   payout.minimumAmount  -> minimum payout threshold in TZS (default 50000)
+//   payout.day            -> monthly payout day-of-month (default 25)
+// Values are stored as strings and parsed by lib/payout.ts. Missing rows
+// fall back to the defaults in lib/payout.ts.
+
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }

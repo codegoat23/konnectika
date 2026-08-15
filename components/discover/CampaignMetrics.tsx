@@ -70,7 +70,7 @@ export function CampaignMetrics({ campaign }: CampaignMetricsProps) {
           {/* Progress bar */}
           <div className="h-3 w-full overflow-hidden rounded-full bg-white/[0.08]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-orange-500 to-orange-400"
+              className="h-full rounded-full bg-white"
               style={{
                 width: `${progress}%`,
               }}

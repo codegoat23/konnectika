@@ -3,9 +3,9 @@
 import { Edit } from "lucide-react";
 
 const creatorStatusStyles: Record<string, string> = {
-  APPROVED: "bg-green-500/10 text-green-400",
-  REJECTED: "bg-red-500/10 text-red-400",
-  CHANGES_REQUESTED: "bg-amber-500/10 text-amber-400",
+  APPROVED: "bg-green-50 text-green-700",
+  REJECTED: "bg-red-50 text-red-700",
+  CHANGES_REQUESTED: "bg-amber-50 text-amber-700",
 };
 
 interface CampaignHeaderData {
@@ -20,12 +20,14 @@ export default function CampaignHeader({
   creatorStatus,
   onBack,
   onEdit,
+  actions,
 }: {
   campaign: CampaignHeaderData;
   role: string;
   creatorStatus?: string;
   onBack?: () => void;
   onEdit?: () => void;
+  actions?: React.ReactNode;
 }) {
   return (
     <>
@@ -38,24 +40,27 @@ export default function CampaignHeader({
           ← Back
         </button>
 
-        {role === "BRAND" ? (
-          <button
-            onClick={onEdit}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-medium"
-          >
-            <Edit size={14} />
-            Edit Campaign
-          </button>
-        ) : role === "CREATOR" ? (
-          <div
-            className={`px-4 py-2 rounded-full text-sm font-medium ${
-              creatorStatusStyles[creatorStatus || ""] ||
-              "bg-amber-500/10 text-amber-400"
-            }`}
-          >
-            {creatorStatus || "PENDING"}
-          </div>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {role === "BRAND" ? (
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-medium"
+            >
+              <Edit size={14} />
+              Edit Campaign
+            </button>
+          ) : role === "CREATOR" ? (
+            <div
+              className={`px-4 py-2 rounded-full text-sm font-medium ${
+                creatorStatusStyles[creatorStatus || ""] ||
+                "bg-amber-50 text-amber-700"
+              }`}
+            >
+              {creatorStatus || "PENDING"}
+            </div>
+          ) : null}
+          {actions}
+        </div>
       </div>
 
       {/* CAMPAIGN HERO CARD */}

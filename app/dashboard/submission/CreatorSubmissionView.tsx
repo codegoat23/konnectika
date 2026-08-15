@@ -59,7 +59,7 @@ export default function CreatorSubmissionView() {
 
       {/* ERROR */}
       {error && (
-        <div className="border border-red-500/20 bg-red-500/10 text-red-300 px-4 py-3 rounded-xl text-sm"
+        <div className="border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm"
        
         >
           {error}
@@ -119,7 +119,7 @@ export default function CreatorSubmissionView() {
                 {/* RATE */}
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">Payment</p>
-                  <p className="text-emerald-400 font-semibold">
+                  <p className="text-emerald-600 font-semibold">
                     ${item.campaign.paymentRate}
                   </p>
                 </div>

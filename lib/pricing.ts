@@ -48,6 +48,19 @@ export function computeCreatorFeeSplit(gross: number): CreatorFeeSplit {
   };
 }
 
+/**
+ * The creator earning for a campaign payment: what the creator is owed
+ * (gross), the platform's cut, and the net the creator actually receives.
+ *
+ * This is the single function the payment flow uses when creating an
+ * earning (at application approval) — a thin, named wrapper over
+ * computeCreatorFeeSplit so the flow reads clearly and the same math is
+ * reused everywhere.
+ */
+export function calculateCreatorEarning(gross: number): CreatorFeeSplit {
+  return computeCreatorFeeSplit(gross);
+}
+
 export interface BrandFee {
   budget: number; // campaign budgetTotal
   feeRate: number; // percent

@@ -4,11 +4,16 @@ import { OverviewHeader } from "./Overviewheader";
 import { Card } from "@/components/ui/card";
 import type { Prisma } from "@prisma/client";
 import { formatTZS } from "@/lib/utils";
+import { EARNING_STATUS_STYLES } from "@/lib/status-styles";
 
 type BrandPayment = Prisma.EarningGetPayload<{
   include: {
     creator: true;
-    submission: { include: { campaign: true } };
+    campaign: true;
+    submission: true;
+    payout: {
+      select: { id: true; status: true; paymentReference: true; paidAt: true };
+    };
   };
 }>;
 
@@ -16,11 +21,7 @@ interface Props {
   payments: BrandPayment[];
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  AVAILABLE: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-  WITHDRAWN: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-};
+const PAYABLE = ["APPROVED", "AVAILABLE"];
 
 function formatDate(date: Date | null | undefined): string {
   if (!date) return "—";
@@ -32,9 +33,13 @@ function formatDate(date: Date | null | undefined): string {
 }
 
 export default function BrandBalance({ payments }: Props) {
-  const totalSpending = payments.reduce((sum, item) => sum + item.amount, 0);
-  const pendingCount = payments.filter((x) => x.status === "PENDING").length;
-  const paidCount = payments.filter((x) => x.status === "WITHDRAWN").length;
+  const active = payments.filter((x) => x.status !== "REJECTED");
+  const totalSpending = active.reduce((sum, item) => sum + item.amount, 0);
+  const pendingCount = active.filter((x) => PAYABLE.includes(x.status)).length;
+  const paidCount = active.filter((x) => x.status === "PAID").length;
+  const paidTotal = active
+    .filter((x) => x.status === "PAID")
+    .reduce((sum, item) => sum + item.amount, 0);
 
   return (
     <div className="space-y-6">
@@ -46,18 +51,20 @@ export default function BrandBalance({ payments }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(totalSpending)}
           </div>
-          <div className="text-[11px] text-muted-foreground">Campaign commitments</div>
+          <div className="text-[11px] text-white/80">
+            Campaign commitments
+          </div>
         </Card>
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="text-xs font-medium text-muted-foreground">
-            Pending Settlement
+            Payments Pending
           </div>
           <div className="mt-2 text-xl font-semibold tabular-nums">
             {pendingCount}
           </div>
           <div className="text-[11px] text-muted-foreground">
-            Awaiting the settlement period
+            Approved, awaiting payout
           </div>
         </Card>
 
@@ -69,20 +76,24 @@ export default function BrandBalance({ payments }: Props) {
             {paidCount}
           </div>
           <div className="text-[11px] text-muted-foreground">
-            Completed withdrawals
+            TZS {formatTZS(paidTotal)} settled via payouts
           </div>
         </Card>
       </div>
 
       <div className="px-4 lg:px-6">
-        <div className="rounded-2xl bg-card">
+        <div className="rounded-2xl ">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Creator Payments</h2>
+            <p className="text-xs text-muted-foreground">
+              Creator earnings are settled by the platform through scheduled
+              payouts. Approved content accrues here until then.
+            </p>
           </div>
 
           {payments.length === 0 ? (
             <div
-              className="mt-5 flex flex-col items-center justify-center border border-border bg-card/40 py-20"
+              className="mt-5 flex flex-col items-center justify-center border border-border bg-card py-20"
               style={{ borderRadius: 24 }}
             >
               <div className="text-5xl mb-4">💸</div>
@@ -95,64 +106,84 @@ export default function BrandBalance({ payments }: Props) {
               </p>
             </div>
           ) : (
-            <div
-              className="border border-border overflow-hidden mt-5"
-              style={{ borderRadius: 24 }}
-            >
-              <table className="w-full text-sm">
-  <thead className="bg-card text-muted-foreground text-xs tracking-wider">
-    <tr>
-      <th className="p-3 text-left">No.</th>
-      <th className="p-3 text-left">Creator</th>
-      <th className="p-3 text-left">Campaign</th>
-      <th className="p-3 text-left">Gross Amount</th>
-      <th className="p-3 text-left">Status</th>
-      <th className="p-3 text-left">Available</th>
-    </tr>
-  </thead>
+            <div className="mt-5 overflow-hidden rounded-3xl border border-border bg-card">
+  <div className="overflow-x-auto">
+    <table className="w-full text-sm">
+      <thead className="bg-muted/40 text-xs tracking-wider text-muted-foreground">
+        <tr className="border-b border-border">
+          <th className="p-3 text-left font-medium">No.</th>
+          <th className="p-3 text-left font-medium">Creator</th>
+          <th className="p-3 text-left font-medium">Campaign</th>
+          <th className="p-3 text-left font-medium">Amount</th>
+          <th className="p-3 text-left font-medium">Status</th>
+          <th className="p-3 text-left font-medium">Settlement</th>
+        </tr>
+      </thead>
 
-  <tbody>
-    {payments.map((payment, index) => (
-      <tr
-        key={payment.id}
-        className="group border-t border-border transition-all duration-200 hover:bg-card/60"
-      >
-        <td className="p-3 text-muted-foreground">
-          <div className="flex justify-center items-center gap-2 border border-border rounded-full px-2 py-2 text-xs font-medium text-muted-foreground">
-{index + 1}
-          </div>
-          </td>
-
-        <td className="p-3 text-foreground">
-          {payment.creator?.username || "Unknown"}
-        </td>
-
-        <td className="p-3 text-muted-foreground">
-          {payment.submission?.campaign?.name || "—"}
-        </td>
-
-        <td className="p-3 text-muted-foreground">
-          TZS {formatTZS(payment.amount)}
-        </td>
-
-        <td className="p-3">
-          <span
-            className={`px-2 py-1 rounded-full text-xs border ${
-              STATUS_STYLES[payment.status] ?? ""
-            }`}
+      <tbody>
+        {payments.map((payment, index) => (
+          <tr
+            key={payment.id}
+            className="
+              group
+              border-b border-border/60
+              last:border-b-0
+              transition-colors duration-150
+              hover:bg-muted/50
+            "
           >
-            {payment.status}
-          </span>
-        </td>
+            {/* No. */}
+            <td className="p-3 text-muted-foreground">
+              <div className="flex size-7 items-center justify-center rounded-full border border-border bg-background text-xs font-medium text-muted-foreground">
+                {index + 1}
+              </div>
+            </td>
 
-        <td className="p-3 text-muted-foreground">
-          {formatDate(payment.availableAt)}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-            </div>
+            {/* Creator */}
+            <td className="p-3 font-medium text-foreground">
+              {payment.creator?.username || "Unknown"}
+            </td>
+
+            {/* Campaign */}
+            <td className="p-3 text-muted-foreground">
+              {payment.campaign?.name || "—"}
+            </td>
+
+            {/* Amount */}
+            <td className="p-3 font-medium text-foreground">
+              TZS {formatTZS(payment.amount)}
+            </td>
+
+            {/* Status */}
+            <td className="p-3">
+              <span
+                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
+                  EARNING_STATUS_STYLES[payment.status] ?? ""
+                }`}
+              >
+                {payment.status}
+              </span>
+            </td>
+
+            {/* Settlement */}
+            <td className="p-3 text-muted-foreground">
+              {payment.payout
+                ? payment.payout.paymentReference ||
+                  `${payment.payout.status} payout`
+                : "—"}
+
+              {payment.status === "PAID" && payment.payout && (
+                <span className="ml-1 text-xs text-muted-foreground">
+                  ({formatDate(payment.payout.paidAt)})
+                </span>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
           )}
         </div>
       </div>

@@ -27,14 +27,15 @@ type AdminApplicationDetails = Prisma.CampaignApplicationGetPayload<{
   include: {
     creator: { include: { socialAccounts: true } };
     submission: true;
+    earning: true;
   };
 }>;
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING_REVIEW: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  APPROVED: "bg-green-500/10 text-green-400 border-green-500/20",
-  REJECTED: "bg-red-500/10 text-red-400 border-red-500/20",
-  COMPLETED: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  PENDING_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
+  APPROVED: "bg-green-50 text-green-700 border-green-200",
+  REJECTED: "bg-red-50 text-red-700 border-red-200",
+  COMPLETED: "bg-orange-50 text-orange-700 border-orange-200",
 };
 
 export default function AdminCampaignReview({
@@ -43,12 +44,14 @@ export default function AdminCampaignReview({
   page,
   totalPages,
   onPageChange,
+  onActionComplete,
 }: {
   campaign: CampaignDetails;
   applications: AdminApplicationDetails[];
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onActionComplete: () => Promise<void> | void;
 }) {
   const [status, setStatus] = useState<CampaignDetails["status"]>(
     campaign.status
@@ -81,6 +84,10 @@ export default function AdminCampaignReview({
     }
 
     setStatus(newStatus);
+    // Refresh the server-side campaign data so the real budgetFunded (cash
+    // paid out to creators) and paymentStatus render immediately instead of
+    // staying stuck at the value loaded on mount.
+    await onActionComplete();
   }
 
   function openReview(target: "APPROVED" | "REJECTED") {
@@ -146,7 +153,7 @@ export default function AdminCampaignReview({
   return (
     <div className="space-y-6">
       {actionError && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {actionError}
         </div>
       )}
@@ -200,7 +207,7 @@ export default function AdminCampaignReview({
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Funded</p>
-              <p className="text-emerald-400 font-semibold">
+              <p className="text-emerald-600 font-semibold">
                 TZS {campaign.budgetFunded.toLocaleString()}
               </p>
             </div>
@@ -210,7 +217,7 @@ export default function AdminCampaignReview({
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Remaining</p>
-              <p className="text-amber-400 font-semibold">
+              <p className="text-amber-600 font-semibold">
                 TZS {(
                   campaign.budgetTotal - campaign.budgetFunded
                 ).toLocaleString()}
@@ -231,6 +238,32 @@ export default function AdminCampaignReview({
               showNote={false}
             />
           </div>
+
+          {/* Brand payment source — how the brand will pay the platform */}
+          {campaign.paymentMethod && (
+            <div
+              className="mt-4 bg-muted/50 border border-border p-3 rounded-xl"
+              style={{ borderRadius: 16 }}
+            >
+              <p className="text-xs text-muted-foreground mb-2">
+                Brand Payment Source
+              </p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Method</span>
+                <span className="text-foreground font-medium">
+                  {campaign.paymentMethod}
+                </span>
+              </div>
+              {campaign.paymentPhone && (
+                <div className="mt-1 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Phone</span>
+                  <span className="text-foreground font-medium">
+                    {campaign.paymentPhone}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -241,7 +274,7 @@ export default function AdminCampaignReview({
           disabled={savingFeatured}
           className={`px-5 py-3 rounded-[10] text-sm border border-orange-500 text-orange-500 font-medium transition ${
             featured
-              ? "bg-orange-500 text-white hover:bg-orange-400"
+              ? "bg-orange-500 text-white hover:bg-orange-600"
               : "bg-muted text-foreground border border-border hover:bg-muted"
           } disabled:opacity-50`}
         >
@@ -255,14 +288,14 @@ export default function AdminCampaignReview({
           <>
             <button
               onClick={() => openReview("APPROVED")}
-              className="bg-green-500 px-5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-green-400"
+              className="bg-green-500 px-5 py-3 rounded-xl text-sm font-medium text-white hover:bg-green-600"
             >
               Approve
             </button>
 
             <button
               onClick={() => openReview("REJECTED")}
-              className="bg-red-500 px-5 py-3 rounded-xl text-sm font-medium text-white hover:bg-red-400"
+              className="bg-red-500 px-5 py-3 rounded-xl text-sm font-medium text-white hover:bg-red-600"
             >
               Reject
             </button>
@@ -272,7 +305,7 @@ export default function AdminCampaignReview({
         {status === "APPROVED" && (
           <button
             onClick={() => updateStatus("COMPLETED")}
-            className="bg-orange-500 px-5 py-3  text-sm font-medium text-white hover:bg-orange-400 rounded-[10]"
+            className="bg-orange-500 px-5 py-3  text-sm font-medium text-white hover:bg-orange-600 rounded-[10]"
           >
             Complete
           </button>
@@ -297,10 +330,12 @@ export default function AdminCampaignReview({
 
       {/* APPLICATIONS */}
       <AdminApplications
+        campaignId={campaign.id}
         applications={applications}
         page={page}
         totalPages={totalPages}
         onPageChange={onPageChange}
+        onEarningApproved={onActionComplete}
       />
 
       {/* REVIEW CONFIRMATION MODAL */}
@@ -365,8 +400,8 @@ export default function AdminCampaignReview({
                 disabled={submitting}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white disabled:opacity-50 ${
                   approved
-                    ? "bg-green-500 text-white hover:bg-green-400"
-                    : "bg-red-500 hover:bg-red-400"
+                    ? "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-red-500 hover:bg-red-600"
                 }`}
               >
                 {submitting

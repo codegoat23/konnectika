@@ -37,14 +37,11 @@ export async function GET(req: Request) {
 
     where:{
       creatorId:creator.id,
-      status:"WITHDRAWN",
-      withdrawnAt:{
-        not:null
-      }
+      status:"PAID"
     },
 
     orderBy:{
-      withdrawnAt:"asc"
+      paidAt:"asc"
     }
 
   });
@@ -57,7 +54,7 @@ export async function GET(req: Request) {
 
   earnings.forEach((earning)=>{
 
-    const date = new Date(earning.withdrawnAt!);
+    const date = new Date(earning.paidAt!);
 
 
     let key="";

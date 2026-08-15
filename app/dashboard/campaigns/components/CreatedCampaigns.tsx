@@ -2,14 +2,15 @@
 
 import { CreatedCampaign } from "@/lib/campaigns";
 
-import { Users } from "lucide-react";
+import { BadgeCheck, Megaphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { TbFileDescription } from "react-icons/tb";
 
 const BADGE_STYLES: Record<string, string> = {
-  active: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-  hot: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-  new: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-  featured: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+  active: "bg-green-50 text-green-700 border border-green-200",
+  hot: "bg-orange-50 text-orange-700 border border-orange-200",
+  new: "bg-orange-50 text-orange-700 border border-orange-200",
+  featured: "bg-orange-50 text-orange-700 border border-orange-200",
 };
 
 export default function CreatedCampaigns({
@@ -33,7 +34,7 @@ export default function CreatedCampaigns({
           You haven&apos;t created any campaigns yet.{" "}
           <button
     onClick={() => router.push("/dashboard/campaigns/new")}
-      className="rounded-xl bg-orange-500 text-white px-4 py-2 text-sm font-medium hover:bg-orange-400 transition"
+      className="rounded-xl bg-orange-500 text-white px-4 py-2 text-sm font-medium hover:bg-orange-600 transition"
     style={{
       borderRadius:14
     }}
@@ -67,7 +68,7 @@ export default function CreatedCampaigns({
 
     <button
       onClick={() => router.push("/dashboard/campaigns/new")}
-    className="rounded-xl bg-orange-500 text-white px-4 py-2 text-sm font-medium hover:bg-orange-400 transition"
+    className="rounded-xl bg-primary text-white px-4 py-2 text-sm font-medium hover:bg-[#EA580C] transition"
       style={{
         borderRadius:14
       }}
@@ -77,63 +78,98 @@ export default function CreatedCampaigns({
   </div>
 </div>
 
-      <div className="space-y-3">
-        {visibleCampaigns.map((campaign) => (
-       <div
-  key={campaign.id}
-  onClick={() => router.push(`/dashboard/campaigns/${campaign.id}`)}
-  className="cursor-pointer border border-border rounded-2xl p-4 flex justify-between items-start bg-card/60 hover:bg-card/80 transition"
-  style={{ borderRadius: 24 }}
->
-  <div className="flex gap-4 flex-1 flex-row  items-center">
+   <div className="overflow-hidden rounded-2xl border border-border bg-card">
+  <table className="w-full text-sm">
+    <thead className="bg-card">
+      <tr className="border-b border-border">
+        <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Megaphone size={14} />
+            <span>Campaign</span>
+          </div>
+        </th>
 
-    {/* Thumbnail */}
-    <div className="w-20 h-20 shrink-0 overflow-hidden rounded-xl ">
-      <img
-        src={campaign.thumbnailPic}
-        alt={campaign.name}
-        className="w-full h-full object-cover"
-        style={{borderRadius:16}}
-      />
-    </div>
+        <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <TbFileDescription size={14} />
+            <span>Description</span>
+          </div>
+        </th>
 
-    {/* Content */}
-    <div className="min-w-0 flex flex-col gap-1">
-      <h3 className="font-medium text-foreground text-sm">
-        {campaign.name}
-      </h3>
-
-      <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-        {campaign.description}
-      </p>
-
-    
-  
-    </div>
-    
+        <th className="p-4 text-left text-xs font-medium text-muted-foreground">
+  <div className="flex items-center gap-2">
+    <BadgeCheck size={14} />
+    <span>Badge</span>
   </div>
+</th>
 
-  {/* Right Side */}
-  <div className="flex flex-col items-end gap-6 shrink-0 ml-4">
-    <span
-      className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-        BADGE_STYLES[campaign.badge] ??
-        "bg-zinc-500/10 text-muted-foreground border border-border/20"
-      }`}
-    >
-      {campaign.badge}
-    </span>
+        <th className="p-4 text-center text-xs font-medium text-muted-foreground">
+          <div className="flex items-center justify-center gap-2">
+            <Users size={14} />
+            <span>Applicants</span>
+          </div>
+        </th>
+      </tr>
+    </thead>
 
-    <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-xs font-semibold text-foreground ">
-  <Users size={14} />
-  <span>{campaign._count.applications}</span>
+    <tbody className="divide-y divide-border">
+      {visibleCampaigns.map((campaign) => (
+        <tr
+          key={campaign.id}
+          onClick={() =>
+            router.push(`/dashboard/campaigns/${campaign.id}`)
+          }
+          className="cursor-pointer transition-colors hover:bg-muted/40"
+        >
+          {/* Campaign */}
+          <td className="p-4 align-middle">
+            <div className="flex min-w-[220px] items-center gap-3">
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted">
+                <img
+                  src={campaign.thumbnailPic}
+                  alt={campaign.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <div className="min-w-0">
+                <h3 className="truncate font-medium text-foreground">
+                  {campaign.name}
+                </h3>
+              </div>
+            </div>
+          </td>
+
+          {/* Description */}
+          <td className="p-4 align-middle">
+            <p className="line-clamp-2 max-w-[420px] text-xs leading-5 text-muted-foreground">
+              {campaign.description}
+            </p>
+          </td>
+
+          {/* Badge */}
+          <td className="p-4 align-middle">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                BADGE_STYLES[campaign.badge] ??
+                "border border-border/40 bg-muted text-muted-foreground"
+              }`}
+            >
+              {campaign.badge}
+            </span>
+          </td>
+
+          {/* Applicants */}
+          <td className="p-4 text-center align-middle">
+            <span className="inline-flex min-w-8 items-center justify-center rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs font-semibold text-foreground">
+              {campaign._count.applications}
+            </span>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 </div>
-  </div>
-  
-</div>
-
-        ))}
-      </div>
     </section>
   );
 }

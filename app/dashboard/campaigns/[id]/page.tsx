@@ -23,6 +23,7 @@ type CampaignApplicationDetails = Prisma.CampaignApplicationGetPayload<{
   include: {
     creator: { include: { socialAccounts: true } };
     submission: true;
+    earning: true;
   };
 }>;
 
@@ -110,6 +111,7 @@ export default function CampaignDetailPage() {
             page={page}
             totalPages={data?.totalPages ?? 1}
             onPageChange={setPage}
+            onActionComplete={load}
           />
         ) : (
           <>
@@ -122,10 +124,6 @@ export default function CampaignDetailPage() {
            {role === "BRAND" && (
   <BrandCampaignView
     campaign={campaign}
-    applications={applications}
-    page={page}
-    onPageChange={setPage}
-    onActionComplete={load}
   />
 )}
 

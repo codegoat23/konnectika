@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getCampaignsPaidBudget } from "@/lib/campaign-budget";
 
 /**
  * Three campaign-list views, one per role, all surfaced at /dashboard/campaign.
@@ -69,8 +70,13 @@ export async function getJoinedCampaigns(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 
+  const paid = await getCampaignsPaidBudget(
+    applications.map((a) => a.campaign.id)
+  );
+
   return applications.map((a) => ({
     ...a.campaign,
+    budgetFunded: paid.get(a.campaign.id) ?? 0,
     status: a.status,
     appliedAt: a.createdAt,
     statusUpdatedAt: a.updatedAt,
@@ -112,8 +118,13 @@ export async function getApprovedCampaigns(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 
+  const paid = await getCampaignsPaidBudget(
+    approved_applications.map((a) => a.campaign.id)
+  );
+
   return approved_applications.map((a) => ({
     ...a.campaign,
+    budgetFunded: paid.get(a.campaign.id) ?? 0,
     appliedAt: a.createdAt,
     statusUpdatedAt: a.updatedAt,
   }));
@@ -131,7 +142,7 @@ export async function getCreatedCampaigns(userId: string) {
 
   if (!businessProfile) return [];
 
-  return prisma.campaign.findMany({
+  const campaigns = await prisma.campaign.findMany({
     where: { businessProfileId: businessProfile.id },
     select: {
       ...CAMPAIGN_CARD_SELECT,
@@ -141,6 +152,12 @@ export async function getCreatedCampaigns(userId: string) {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  const paid = await getCampaignsPaidBudget(campaigns.map((c) => c.id));
+  return campaigns.map((c) => ({
+    ...c,
+    budgetFunded: paid.get(c.id) ?? 0,
+  }));
 }
 
 export type CreatedCampaign = Awaited<
@@ -156,7 +173,7 @@ export type ApprovedCampaigns = Awaited<
 // ---------------------------------------------------------------------------
 
 export async function getAllCampaigns() {
-  return prisma.campaign.findMany({
+  const campaigns = await prisma.campaign.findMany({
     select: {
       ...CAMPAIGN_CARD_SELECT,
       createdAt: true,
@@ -165,6 +182,12 @@ export async function getAllCampaigns() {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  const paid = await getCampaignsPaidBudget(campaigns.map((c) => c.id));
+  return campaigns.map((c) => ({
+    ...c,
+    budgetFunded: paid.get(c.id) ?? 0,
+  }));
 }
 
 export type AllCampaign = Awaited<ReturnType<typeof getAllCampaigns>>[number];

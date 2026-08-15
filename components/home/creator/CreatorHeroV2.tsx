@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import HeroCards from './heroCards'
 import SocialSlide from './SocialSlide'
 
-const words = ["Content", "Reels", "Posts", "Shorts"]
+const words = ["Contents", "Reels", "Posts", "Shorts"]
 
 export default function CreatorHeroV2() {
   const [index, setIndex] = useState(0)

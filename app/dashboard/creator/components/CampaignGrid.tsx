@@ -31,7 +31,7 @@ export default function CampaignGrid({ campaigns, onCardClick, isLoading }: Camp
   if (campaigns.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="p-4 rounded-full bg-muted mb-4">
+        <div className="p-4 rounded-full bg-card border border-border mb-4">
           <RefreshCw size={24} className="text-muted-foreground" />
         </div>
         <p className="text-muted-foreground font-medium mb-1">No campaigns found</p>

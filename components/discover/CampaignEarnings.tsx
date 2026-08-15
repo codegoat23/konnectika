@@ -26,7 +26,7 @@ export function CampaignEarnings({ earnings }: CampaignEarningsProps) {
                 {getPlatformLabel(earning.platform)}
               </p>
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-xl font-bold text-foreground">
               TZS {formatTZS(earning.rate)}
             </p>
             <p className="text-xs text-muted-foreground">per approved post</p>

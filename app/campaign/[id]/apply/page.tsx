@@ -213,7 +213,7 @@ export default function ApplyPage() {
 
     <button
       onClick={() => router.push("/dashboard")}
-      className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-400"
+      className="px-4 py-2 bg-white text-black rounded-full hover:bg-orange-400"
     >
       Dashboard
     </button>
@@ -371,7 +371,7 @@ export default function ApplyPage() {
             <button
               onClick={submitApplication}
               disabled={loading}
-              className="w-full bg-orange-500 text-white py-3 rounded-full font-medium hover:bg-orange-400 transition disabled:opacity-50"
+              className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-white/80 transition disabled:opacity-50"
             >
               {loading ? "Submitting..." : "Submit Application"}
             </button>

@@ -63,9 +63,10 @@ export async function recordBrandFee(
 ) {
   return tx.platformRevenue.upsert({
     where: {
-      campaignId_type: {
+      campaignId_type_businessId: {
         campaignId: input.campaignId,
         type: "BRAND_FEE",
+        businessId: input.businessId,
       },
     },
     update: {},

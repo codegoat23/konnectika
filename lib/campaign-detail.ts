@@ -2,6 +2,7 @@ import { cache } from "react";
 import { formatDistanceToNow } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
+import { getCampaignPaidBudget } from "@/lib/campaign-budget";
 import type { Platform } from "@/types";
 
 /**
@@ -95,6 +96,8 @@ export const getCampaignDetail = cache(
     const business = campaign.businessProfile;
     const platforms = campaign.platforms as Platform[];
     const brand = business?.companyName ?? campaign.brand ?? "Unknown";
+    // Real budget progress: cash actually paid to creators so far.
+    const budgetFunded = await getCampaignPaidBudget(campaign.id);
 
     const resources: CampaignResource[] = [];
     if (business?.website) {
@@ -127,7 +130,7 @@ export const getCampaignDetail = cache(
       thumbnailPic: campaign.thumbnailPic,
       thumbnailInitials: campaign.thumbnailInitials,
       paymentRate: campaign.paymentRate,
-      budgetFunded: campaign.budgetFunded,
+      budgetFunded,
       budgetTotal: campaign.budgetTotal,
       applicants: campaign._count.applications,
       platforms,

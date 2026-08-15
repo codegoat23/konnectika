@@ -16,10 +16,10 @@ return (
 <>
 <button
 onClick={()=>setOpen(true)}
-className="relative cursor-pointer font-light border p-1 rounded-[8] border-border text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+className="relative cursor-pointer   p-1  text-muted-foreground hover:text-foreground transition-colors"
 >
 
-<Bell size={22} strokeWidth={1.0}/>
+<Bell size={22}  className="size-4 scale-100 transition-transform"/>
 
 
 <div

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ campaignId: string }> }
 ) {
   const user = await getAuthUser();
 
@@ -11,7 +11,7 @@ export async function PATCH(
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { id } = await params;
+  const { campaignId } = await params;
   const body = await req.json().catch(() => ({}));
 
   if (typeof body.featured !== "boolean") {
@@ -22,7 +22,7 @@ export async function PATCH(
   }
 
   const campaign = await prisma.campaign.update({
-    where: { id },
+    where: { id: campaignId },
     data: {
       isFeatured: body.featured,
     },

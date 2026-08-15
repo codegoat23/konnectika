@@ -1,5 +1,6 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getCampaignPaidBudget } from "@/lib/campaign-budget";
 
 const LIMIT = 20;
 
@@ -65,6 +66,7 @@ if (user.role === "BRAND") {
             },
           },
           submission: true,
+          earning: true,
         },
       }),
 
@@ -77,7 +79,10 @@ if (user.role === "BRAND") {
 
   return Response.json({
     role: "BRAND",
-    campaign,
+    campaign: {
+      ...campaign,
+      budgetFunded: await getCampaignPaidBudget(campaign.id),
+    },
     applications,
     page,
     totalApplications,
@@ -124,7 +129,10 @@ if (user.role === "CREATOR") {
 
   return Response.json({
     role: "CREATOR",
-    campaign,
+    campaign: {
+      ...campaign,
+      budgetFunded: await getCampaignPaidBudget(campaign.id),
+    },
     application,
   });
 }
@@ -174,6 +182,7 @@ if (user.role === "ADMIN") {
             },
           },
           submission: true,
+          earning: true,
         },
       }),
 
@@ -186,7 +195,10 @@ if (user.role === "ADMIN") {
 
   return Response.json({
     role: "ADMIN",
-    campaign,
+    campaign: {
+      ...campaign,
+      budgetFunded: await getCampaignPaidBudget(campaign.id),
+    },
     applications,
     page,
     totalApplications,

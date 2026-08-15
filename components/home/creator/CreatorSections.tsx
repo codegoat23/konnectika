@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/home/Reveal";
@@ -68,7 +68,7 @@ function CampaignCard({ campaign }: { campaign: HomeCampaign }) {
             {campaign.category}
           </span>
           <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
-            {campaign.applicants} applicants
+            {campaign.applicants} <User size={14}/>
           </span>
         </div>
 

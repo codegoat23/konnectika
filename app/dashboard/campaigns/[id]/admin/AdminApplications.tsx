@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, X } from "lucide-react";
+import { Users, X, Loader2 } from "lucide-react";
 import {
   FaInstagram,
   FaYoutube,
@@ -13,11 +13,13 @@ import {
 import { SiTiktok } from "react-icons/si";
 import type { Prisma } from "@prisma/client";
 import type { IconType } from "react-icons";
+import { EARNING_STATUS_STYLES } from "@/lib/status-styles";
 
 type AdminApplicationDetails = Prisma.CampaignApplicationGetPayload<{
   include: {
     creator: { include: { socialAccounts: true } };
     submission: true;
+    earning: true;
   };
 }>;
 
@@ -33,28 +35,60 @@ const platformIcons: Record<string, IconType> = {
 
 const statusClass = (status: string) =>
   status === "APPROVED"
-    ? "bg-green-500/10 text-green-400 border-green-500/20"
+    ? "bg-green-50 text-green-700 border-green-200"
     : status === "REJECTED"
-      ? "bg-red-500/10 text-red-400 border-red-500/20"
-      : "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      ? "bg-red-50 text-red-700 border-red-200"
+      : "bg-amber-50 text-amber-700 border-amber-200";
 
 export default function AdminApplications({
+  campaignId,
   applications,
   page,
   totalPages,
   onPageChange,
+  onEarningApproved,
 }: {
+  campaignId: string;
   applications: AdminApplicationDetails[];
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onEarningApproved?: () => void | Promise<void>;
 }) {
   const [selected, setSelected] =
     useState<AdminApplicationDetails | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const makeAvailable = async (earningId: string) => {
+    setApprovingId(earningId);
+    setActionError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/campaign/${campaignId}/earnings/${earningId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "AVAILABLE" }),
+        }
+      );
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setActionError(data?.error ?? "Failed to make earning available.");
+        setApprovingId(null);
+        return;
+      }
+      await onEarningApproved?.();
+    } catch {
+      setActionError("Something went wrong. Please try again.");
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   return (
     <>
-      <div className="rounded-3xl border border-border bg-card/60 overflow-hidden">
+      <div className="rounded-3xl border border-border bg-card overflow-hidden">
         <div className="flex items-center justify-between p-6 pb-4">
           <h2 className="text-foreground font-semibold flex items-center gap-2">
             <Users size={16} />
@@ -64,6 +98,12 @@ export default function AdminApplications({
             </span>
           </h2>
         </div>
+
+        {actionError && (
+          <div className="mx-6 mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+            {actionError}
+          </div>
+        )}
 
         {applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -76,12 +116,13 @@ export default function AdminApplications({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-card text-muted-foreground text-xs">
+              <thead className="bg-[#FAFAF9] text-muted-foreground text-xs">
                 <tr>
-                  <th className="p-3 text-left w-[35%]">Creator</th>
-                  <th className="p-3 text-left w-[25%]">Status</th>
-                  <th className="p-3 text-left w-[25%]">Date</th>
-                  <th className="p-3 text-right w-[15%]">Action</th>
+                  <th className="p-3 text-left w-[28%]">Creator</th>
+                  <th className="p-3 text-left w-[18%]">Application</th>
+                  <th className="p-3 text-left w-[24%]">Earning</th>
+                  <th className="p-3 text-left w-[12%]">Date</th>
+                  <th className="p-3 text-right w-[18%]">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -89,7 +130,7 @@ export default function AdminApplications({
                   <tr
                     key={a.id}
                     onClick={() => setSelected(a)}
-                    className="border-t border-border cursor-pointer hover:bg-card/60 transition"
+                    className="border-t border-border cursor-pointer hover:bg-[#FAFAF9] transition"
                   >
                     <td className="p-3 text-foreground truncate">
                       {a.creator?.username || "Unknown"}
@@ -101,11 +142,47 @@ export default function AdminApplications({
                         {a.status}
                       </span>
                     </td>
+                    <td className="p-3">
+                      {a.earning ? (
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs border ${EARNING_STATUS_STYLES[a.earning.status] ?? ""}`}
+                          >
+                            {a.earning.status}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            TZS {a.earning.creatorAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">
+                          —
+                        </span>
+                      )}
+                    </td>
                     <td className="p-3 text-muted-foreground text-xs">
                       {new Date(a.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="p-3 text-right text-muted-foreground text-xs">
-                      View
+                    <td
+                      className="p-3 text-right text-muted-foreground text-xs"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {a.earning?.status === "APPROVED" ? (
+                        <button
+                          onClick={() => makeAvailable(a.earning!.id)}
+                          disabled={approvingId !== null}
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
+                        >
+                          {approvingId === a.earning!.id && (
+                            <Loader2 className="size-3 animate-spin" />
+                          )}
+                          Make Available
+                        </button>
+                      ) : (
+                        <span className="cursor-pointer hover:text-foreground">
+                          View
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -216,6 +293,39 @@ export default function AdminApplications({
                 </div>
               )}
             </div>
+
+            {selected.earning && (
+              <div className="bg-muted/40 border border-border rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-foreground font-medium">Earning</p>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs border ${EARNING_STATUS_STYLES[selected.earning.status] ?? ""}`}
+                  >
+                    {selected.earning.status}
+                  </span>
+                </div>
+                <div className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Gross</span>
+                    <span className="text-foreground font-medium">
+                      TZS {selected.earning.amount.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Platform Fee ({selected.earning.platformFeeRate}%)</span>
+                    <span className="text-foreground font-medium">
+                      TZS {selected.earning.platformFee.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-t border-border pt-1.5">
+                    <span>Creator Net</span>
+                    <span className="text-foreground font-semibold">
+                      TZS {selected.earning.creatorAmount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {selected.message && (
               <div className="p-3 bg-card border border-border rounded-xl">

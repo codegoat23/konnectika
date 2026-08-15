@@ -23,13 +23,23 @@ interface Props {
 }
 
 const TYPE_STYLES: Record<string, string> = {
-  CREATOR_FEE: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-  BRAND_FEE: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+  CREATOR_FEE:
+    "bg-orange-50 text-orange-700 border-orange-200 " +
+    "dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20",
+
+  BRAND_FEE:
+    "bg-blue-50 text-blue-700 border-blue-200 " +
+    "dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  ACCRUED: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-  PAID: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+  ACCRUED:
+    "bg-amber-50 text-amber-700 border-amber-200 " +
+    "dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
+
+  PAID:
+    "bg-emerald-50 text-emerald-700 border-emerald-200 " +
+    "dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
 };
 
 function formatDate(date: Date | string): string {
@@ -123,7 +133,7 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(summary.total)}
           </div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-[11px] text-white/80">
             All fees collected across the platform
           </div>
         </Card>
@@ -166,129 +176,224 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
       </div>
 
       {/* monthly chart */}
-      {monthly.length > 0 && (
-        <div className="px-4 lg:px-6">
-          <div
-            className="border border-border bg-card/40 p-5"
-            style={{ borderRadius: 24 }}
-          >
-            <h3 className="text-lg font-semibold text-foreground">
-              Revenue by month
-            </h3>
-            <div className="mt-4 h-56 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthly}>
-                  <CartesianGrid
-                    vertical={false}
-                    strokeDasharray="4 4"
-                    stroke="#ffffff1f"
-                  />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 12, fill: "#a1a1aa" }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 12, fill: "#a1a1aa" }}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
-                    width={44}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "#ffffff0a" }}
-                    contentStyle={{
-                      background: "#09090b",
-                      border: "1px solid #27272a",
-                      borderRadius: 12,
-                      color: "#fff",
-                    }}
-                    formatter={(value) => [
-                      `TZS ${Number(value).toLocaleString()}`,
-                      "Revenue",
-                    ]}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="#f97316"
-                    radius={[8, 8, 0, 0]}
-                    maxBarSize={48}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* history table */}
-      <div className="px-4 lg:px-6">
-        <div
-          className="border border-border overflow-hidden"
-          style={{ borderRadius: 24 }}
-        >
-          <table className="w-full text-sm">
-            <thead className="bg-card text-muted-foreground text-xs tracking-wider">
-              <tr>
-                <th className="p-3 text-left">Type</th>
-                <th className="p-3 text-left">Source</th>
-                <th className="p-3 text-left">Campaign</th>
-                <th className="p-3 text-left">Gross</th>
-                <th className="p-3 text-left">Fee</th>
-                <th className="p-3 text-left">Rate</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => (
-                <tr
-                  key={r.id}
-                  className="group border-t border-border transition-all duration-200 hover:bg-card/60"
-                >
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs border ${TYPE_STYLES[r.type]}`}
-                    >
-                      {r.type.replace("_", " ")}
-                    </span>
-                  </td>
-                  <td className="p-3 text-foreground">{sourceLabel(r)}</td>
-                  <td className="p-3 text-muted-foreground">{r.campaign.name}</td>
-                  <td className="p-3 text-muted-foreground">
-                    TZS {formatTZS(r.grossAmount)}
-                  </td>
-                  <td className="p-3 font-medium text-foreground">
-                    TZS {formatTZS(r.feeAmount)}
-                  </td>
-                  <td className="p-3 text-muted-foreground">{r.feeRate}%</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs border ${STATUS_STYLES[r.status]}`}
-                    >
-                      {r.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-muted-foreground">
-                    {formatDate(r.createdAt)}
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center">
-                    <div className="text-4xl mb-4">💸</div>
-                    <p className="text-sm text-muted-foreground">
-                      No platform revenue records match this filter.
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+     {monthly.length > 0 && (
+  <div className="px-4 lg:px-6">
+    <div className="overflow-hidden rounded-3xl border border-border bg-card p-5 lg:p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-semibold tracking-tight text-foreground">
+            Revenue by month
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Monthly revenue performance
+          </p>
         </div>
       </div>
+
+      {/* Chart */}
+      <div className="mt-6 h-64 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={monthly}
+            margin={{
+              top: 8,
+              right: 8,
+              left: 0,
+              bottom: 0,
+            }}
+            barCategoryGap="28%"
+          >
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 5"
+              stroke="#E7E5E4"
+            />
+
+            <XAxis
+              dataKey="label"
+              tick={{
+                fontSize: 11,
+                fill: "#a1a1aa",
+              }}
+              tickLine={false}
+              axisLine={false}
+              dy={10}
+            />
+
+            <YAxis
+              tick={{
+                fontSize: 11,
+                fill: "#a1a1aa",
+              }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value: number) =>
+                value >= 1000
+                  ? `${(value / 1000).toFixed(0)}k`
+                  : String(value)
+              }
+              width={42}
+            />
+
+            <Tooltip
+              cursor={{
+                fill: "#F5F5F4",
+              }}
+              contentStyle={{
+                background: "#FFFFFF",
+                border: "1px solid #E7E5E4",
+                borderRadius: 14,
+                padding: "10px 12px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+              }}
+              labelStyle={{
+                color: "#737373",
+                fontSize: 11,
+                marginBottom: 4,
+              }}
+              itemStyle={{
+                color: "#171717",
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+              formatter={(value) => [
+                `TZS ${Number(value).toLocaleString()}`,
+                "Revenue",
+              ]}
+            />
+
+            <Bar
+              dataKey="value"
+              fill="#f97316"
+              radius={[7, 7, 2, 2]}
+              maxBarSize={42}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* history table */}
+    <div className="px-4 lg:px-6">
+  <div className="overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[900px] text-sm">
+        <thead className="bg-card">
+          <tr className="border-b border-border">
+            <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Type
+            </th>
+            <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Source
+            </th>
+            <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Campaign
+            </th>
+            <th className="px-4 py-3.5 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Gross
+            </th>
+            <th className="px-4 py-3.5 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Fee
+            </th>
+            <th className="px-4 py-3.5 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Rate
+            </th>
+            <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Status
+            </th>
+            <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Date
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-border">
+          {filtered.map((r) => (
+           <tr
+  key={r.id}
+  className="group cursor-pointer transition-colors duration-150 hover:bg-muted/30"
+>
+              <td className="px-4 py-4">
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize ${TYPE_STYLES[r.type]}`}
+                >
+                  {r.type.replace("_", " ")}
+                </span>
+              </td>
+
+              <td className="px-4 py-4">
+                <span className="font-medium text-foreground">
+                  {sourceLabel(r)}
+                </span>
+              </td>
+
+              <td className="max-w-[220px] px-4 py-4">
+                <span className="block truncate text-muted-foreground">
+                  {r.campaign.name}
+                </span>
+              </td>
+
+              <td className="px-4 py-4 text-right whitespace-nowrap">
+                <span className="text-muted-foreground">
+                  TZS {formatTZS(r.grossAmount)}
+                </span>
+              </td>
+
+              <td className="px-4 py-4 text-right whitespace-nowrap">
+                <span className="font-medium text-foreground">
+                  TZS {formatTZS(r.feeAmount)}
+                </span>
+              </td>
+
+              <td className="px-4 py-4 text-right whitespace-nowrap">
+                <span className="text-muted-foreground">
+                  {r.feeRate}%
+                </span>
+              </td>
+
+              <td className="px-4 py-4">
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium ${STATUS_STYLES[r.status]}`}
+                >
+                  {r.status}
+                </span>
+              </td>
+
+              <td className="px-4 py-4 whitespace-nowrap">
+                <span className="text-muted-foreground">
+                  {formatDate(r.createdAt)}
+                </span>
+              </td>
+            </tr>
+          ))}
+
+          {filtered.length === 0 && (
+            <tr>
+              <td colSpan={8}>
+                <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+                  <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted/50 text-2xl">
+                    💸
+                  </div>
+
+                  <p className="font-medium text-foreground">
+                    No revenue records found
+                  </p>
+
+                  <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                    No platform revenue records match the current filter.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
     </div>
   );
 }

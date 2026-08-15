@@ -1,6 +1,49 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { computeBrandFee } from "@/lib/pricing";
+import { getCampaignPaidBudget } from "@/lib/campaign-budget";
+import type { Prisma } from "@prisma/client";
+import {
+  isMobileMoneyMethod,
+  normalizePhoneNumber,
+  validatePaymentPhone,
+} from "@/lib/payment";
+
+// Public campaign fields safe for any authenticated visitor (the apply page
+// renders these). Fee internals, the brand's payment phone and the brand's
+// full profile (contact details) are intentionally excluded.
+const PUBLIC_CAMPAIGN_FIELDS = {
+  id: true,
+  name: true,
+  description: true,
+  category: true,
+  campaignType: true,
+  badge: true,
+  paymentRate: true,
+  budgetTotal: true,
+  budgetFunded: true,
+  creatorsJoined: true,
+  paymentMethod: true,
+  daysLeft: true,
+  contentFormat: true,
+  duration: true,
+  applicationsClose: true,
+  isOpenToAll: true,
+  isFeatured: true,
+  tags: true,
+  requirements: true,
+  status: true,
+  thumbnailColor: true,
+  thumbnailPic: true,
+  thumbnailInitials: true,
+  platforms: true,
+  businessProfile: { select: { id: true, companyName: true } },
+  createdAt: true,
+} satisfies Prisma.CampaignSelect;
+
+const FULL_CAMPAIGN_INCLUDE = {
+  businessProfile: true,
+} satisfies Prisma.CampaignInclude;
 
 export async function GET(
   req: Request,
@@ -16,9 +59,7 @@ export async function GET(
 
   const campaign = await prisma.campaign.findUnique({
     where: { id },
-    include: {
-      businessProfile: true,
-    },
+    include: { businessProfile: { select: { id: true, userId: true } } },
   });
 
   if (!campaign) {
@@ -28,7 +69,35 @@ export async function GET(
     );
   }
 
-  return Response.json(campaign);
+  // Role-aware response:
+  //   - ADMIN always gets the full record
+  //   - the owning BRAND gets the full record (edit form / dashboard)
+  //   - everyone else (creators, other brands) gets only the public fields
+  //     needed to view and apply for the campaign.
+  if (
+    user.role === "ADMIN" ||
+    (user.role === "BRAND" && campaign.businessProfile.userId === user.userId)
+  ) {
+    const full = await prisma.campaign.findUnique({
+      where: { id },
+      include: FULL_CAMPAIGN_INCLUDE,
+    });
+    // Real budget: cash actually paid out to creators (not the stored column).
+    return Response.json({
+      ...full,
+      budgetFunded: await getCampaignPaidBudget(id),
+    });
+  }
+
+  const publicCampaign = await prisma.campaign.findUnique({
+    where: { id },
+    select: PUBLIC_CAMPAIGN_FIELDS,
+  });
+
+  return Response.json({
+    ...publicCampaign,
+    budgetFunded: await getCampaignPaidBudget(id),
+  });
 }
 
 export async function PATCH(
@@ -93,6 +162,23 @@ export async function PATCH(
       );
     }
 
+    const paymentMethod = body.paymentMethod?.trim() ?? null;
+    const paymentPhone = body.paymentPhone?.trim() ?? null;
+
+    if (
+      isMobileMoneyMethod(paymentMethod) &&
+      !normalizePhoneNumber(paymentPhone)
+    ) {
+      return Response.json(
+        {
+          error:
+            validatePaymentPhone(paymentMethod, paymentPhone) ??
+            "A valid phone number is required for mobile money payments.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Keep the payment snapshot in sync with the (possibly edited) budget.
     // The historical BRAND_FEE PlatformRevenue row is intentionally left
     // untouched — it is an immutable audit record of what was charged at
@@ -114,6 +200,9 @@ export async function PATCH(
         platformFeeRate: brandFee.feeRate,
         platformFee: brandFee.feeAmount,
         totalCharge: brandFee.totalCharge,
+
+        paymentMethod,
+        paymentPhone: normalizePhoneNumber(paymentPhone),
 
         contentFormat: body.contentFormat,
         duration: body.duration,

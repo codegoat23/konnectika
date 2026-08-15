@@ -107,7 +107,7 @@ export default function SubmitProofForm({
 
   if (loadError || !application) {
     return (
-      <div className="max-w-3xl mx-auto p-6 text-red-400 text-sm">
+      <div className="max-w-3xl mx-auto p-6 text-red-600 text-sm">
         {loadError ?? "Failed to load application"}
       </div>
     );
@@ -176,7 +176,7 @@ export default function SubmitProofForm({
         </h2>
 
         {submitError && (
-          <p className="text-red-400 text-sm">{submitError}</p>
+          <p className="text-red-600 text-sm">{submitError}</p>
         )}
 
         <div>
@@ -220,7 +220,7 @@ export default function SubmitProofForm({
 
         <button
           disabled={submitting}
-          className="w-full py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-400 transition"
+          className="w-full py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-600 transition"
         >
           {submitting ? "Submitting..." : "Submit Proof"}
         </button>

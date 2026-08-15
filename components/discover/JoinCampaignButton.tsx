@@ -46,7 +46,7 @@ export function JoinCampaignButton({ cta }: { cta: CampaignCta }) {
         size="lg"
         variant="outline"
         disabled
-        className="cursor-not-allowed"
+        className="cursor-not-allowed p-6 rounded-[24]"
         title="Brand accounts cannot apply to campaigns as creators"
       >
         Brand accounts can&apos;t apply

@@ -2,11 +2,24 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/getSessionUser";
 import { z } from "zod";
+import {
+  assertCampaignBudget,
+  createEarningForApprovedApplication,
+  BusinessRuleError,
+} from "@/lib/payment-flow";
+import { notify } from "@/lib/notification";
 
 const statusSchema = z.object({
   status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
 });
 
+// PATCH /api/applications/:id/status
+// Brand (owner) or Admin reviews a creator's application.
+//
+//   APPROVED -> the creator's Earning is created (status PENDING) atomically.
+//               Idempotent: re-approving never creates a second earning.
+//               Budget guard: the campaign cannot exceed budgetTotal/paymentRate.
+//   REJECTED -> no earning is created; the application can never be paid.
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -42,10 +55,13 @@ export async function PATCH(
       id: true,
       status: true,
       creatorId: true,
+      campaignId: true,
       creator: { select: { userId: true } },
       campaign: {
         select: {
           name: true,
+          paymentRate: true,
+          budgetTotal: true,
           businessProfile: { select: { userId: true } },
         },
       },
@@ -67,27 +83,73 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const updated = await prisma.campaignApplication.update({
-    where: { id },
-    data: { status: parsed.data.status },
-  });
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // Idempotent: applying the same status again is a no-op.
+      if (application.status === parsed.data.status) {
+        const existingEarning = await tx.earning.findUnique({
+          where: { applicationId: application.id },
+        });
+        return { application: { ...application, status: application.status }, earning: existingEarning, changed: false };
+      }
 
-  // Notify the creator about their application status.
-  if (parsed.data.status === "APPROVED" || parsed.data.status === "REJECTED") {
-    await prisma.notification.create({
-      data: {
-        userId: application.creator.userId,
-        title:
-          parsed.data.status === "APPROVED"
-            ? "Application Approved"
-            : "Application Rejected",
-        message: `Your application for "${application.campaign.name}" was ${
-          parsed.data.status === "APPROVED" ? "approved" : "rejected"
-        }.`,
-        type: parsed.data.status === "APPROVED" ? "SUCCESS" : "WARNING",
-      },
+      if (parsed.data.status === "APPROVED") {
+        const budget = await assertCampaignBudget(tx, {
+          id: application.campaignId,
+          budgetTotal: application.campaign.budgetTotal,
+          paymentRate: application.campaign.paymentRate,
+        });
+        if (!budget.ok) {
+          throw new BusinessRuleError(budget.error ?? "Campaign budget exceeded");
+        }
+      }
+
+      const updated = await tx.campaignApplication.update({
+        where: { id },
+        data: { status: parsed.data.status },
+      });
+
+      let earning = null;
+      if (parsed.data.status === "APPROVED") {
+        earning = await createEarningForApprovedApplication(
+          tx,
+          {
+            applicationId: id,
+            campaignId: application.campaignId,
+            creatorId: application.creatorId,
+            paymentRate: application.campaign.paymentRate,
+          },
+          new Date()
+        );
+      }
+
+      return { application: updated, earning, changed: true };
     });
-  }
 
-  return NextResponse.json(updated);
+    // Notify the creator about their application status.
+    if (result.changed) {
+      if (parsed.data.status === "APPROVED" || parsed.data.status === "REJECTED") {
+        await notify({
+          userId: application.creator.userId,
+          title:
+            parsed.data.status === "APPROVED"
+              ? "Application Approved"
+              : "Application Rejected",
+          message:
+            parsed.data.status === "APPROVED"
+              ? `Your application for "${application.campaign.name}" was approved. Submit your content to start earning.`
+              : `Your application for "${application.campaign.name}" was rejected.`,
+          type: parsed.data.status === "APPROVED" ? "SUCCESS" : "WARNING",
+        });
+      }
+    }
+
+    return NextResponse.json(result);
+  } catch (err) {
+    if (err instanceof BusinessRuleError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    console.error(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }

@@ -78,7 +78,7 @@ export default function NotificationDrawer({
 <div className="flex flex-row justify-between items-center">
    <span className="text-sm font-regular text-muted-foreground">recent notifications</span> 
    <Button
-    className="text-orange-500"
+    className="text-orange-500 bg-transparent"
     >Mark all Read</Button>
 </div>
 
@@ -88,42 +88,59 @@ export default function NotificationDrawer({
          {notifications.map((notification) => (
            
   <div
-    key={notification.id}
-    className={`
-      rounded-[14px]
-      cursor-pointer
-      flex
-      flex-col
-    bg-card
-      border border-border
-     transition-all duration-200
-   hover:border-orange-500/40
-   hover:bg-muted
-    hover:scale-[1.01]
-      border-l-1
-      ${notificationTypeStyles[notification.type as keyof typeof notificationTypeStyles] || ""}
-      p-4
-      gap-3
-      
-      ${
-        !notification.isRead
-          ? "bg-orange-500/10"
-          : ""
-      }
-    `}
-  >
-    <h3 className="font-semibold">
+  key={notification.id}
+  className={`
+    group
+    flex flex-col gap-3
+    rounded-[14px]
+    border
+    p-4
+    cursor-pointer
+    transition-all duration-200
+
+    ${
+      !notification.isRead
+        ? `
+          bg-orange-50
+          border-orange-200
+          dark:bg-orange-100/[0.08]
+          dark:border-orange-300/25
+        `
+        : `
+          bg-card
+          border-border
+          dark:bg-card
+          dark:border-border
+        `
+    }
+
+    hover:border-orange-300
+    hover:bg-orange-50/60
+    hover:shadow-sm
+
+    dark:hover:border-orange-500/40
+    dark:hover:bg-orange-500/[0.06]
+    dark:hover:shadow-none
+
+    hover:scale-[1.005]
+  `}
+>
+  <div className="flex items-center justify-between gap-3">
+    <h3 className="font-semibold text-foreground">
       {notification.title}
     </h3>
 
-    <p className="text-xs text-muted-foreground">
-      {notification.message}
-    </p>
-
-    <p className="text-xs mt-2 text-muted-foreground">
-      {new Date(notification.createdAt).toLocaleDateString()}
-    </p>
+    
   </div>
+
+  <p className="text-xs leading-relaxed text-muted-foreground">
+    {notification.message}
+  </p>
+
+  <p className="mt-1 text-xs text-muted-foreground/80">
+    {new Date(notification.createdAt).toLocaleDateString()}
+  </p>
+</div>
 ))}
 
         </div>

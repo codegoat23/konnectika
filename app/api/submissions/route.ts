@@ -18,6 +18,7 @@ import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 
 const SUBMISSION_STATUSES = [
+  "PENDING_REVIEW",
   "SUBMITTED",
   "UNDER_REVIEW",
   "APPROVED",
@@ -206,7 +207,7 @@ export async function POST(req: NextRequest) {
       screenshots,
       postLinks,
       caption,
-      status: "SUBMITTED",
+      status: "PENDING_REVIEW",
     },
   });
 

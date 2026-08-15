@@ -153,7 +153,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
   </div>
 
   {/* Progress Bar */}
-  <div className="absolute bottom-0 left-0 w-full h-1 bg-muted">
+  <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
     <div
       className="h-full bg-orange-500"
       style={{ width: `${progress}%` }}

@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDownIcon } from "lucide-react";
 // app/dashboard/submission/BrandSubmissionView.tsx
 //
 // Brand's view of /dashboard/submission:
@@ -14,7 +15,7 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 
 type Submission = {
   id: string;
-  status: "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+  status: "PENDING_REVIEW" | "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
   screenshots: string[];
   postLinks: string[];
   caption: string | null;
@@ -30,7 +31,8 @@ type Submission = {
 };
 
 const STATUS_STYLES: Record<Submission["status"], string> = {
-  SUBMITTED: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  PENDING_REVIEW: "bg-orange-50 text-orange-700 border-orange-200",
+  SUBMITTED: "bg-orange-50 text-orange-700 border-orange-200",
   UNDER_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
   APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
   CHANGES_REQUESTED: "bg-orange-50 text-orange-700 border-orange-200",
@@ -60,22 +62,13 @@ export default function BrandSubmissionView() {
   }
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/submissions");
-        if (!res.ok) throw new Error("Couldn't load submissions");
-        const data = await res.json();
-        if (!cancelled) setSubmissions(data.submissions ?? []);
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Something went wrong");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    // Initial load via the shared load() used by review actions, so the list
+    // always comes from one code path. Deferred so the effect doesn't call
+    // setState synchronously on mount.
+    const id = window.setTimeout(() => {
+      void load();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   const campaigns = useMemo(() => {
@@ -117,22 +110,45 @@ export default function BrandSubmissionView() {
             Proof submitted by creators across your campaigns.
           </p>
         </div>
-        <select
-          value={campaignFilter}
-          onChange={(e) => setCampaignFilter(e.target.value)}
-          className="rounded-[14] border border-border bg-background px-3 py-1.5 text-sm text-foreground"
-        >
-          <option value="all">All campaigns</option>
-          {campaigns.map(([id, name]) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
-        </select>
+     <div className="relative min-w-[180px]">
+  <select
+    value={campaignFilter}
+    onChange={(e) => setCampaignFilter(e.target.value)}
+    className="
+      h-10
+      w-full
+      appearance-none
+      rounded-[14px]
+      border border-border
+      bg-card
+      px-3 pr-9
+      text-sm font-medium
+      text-foreground
+      outline-none
+      transition-colors
+      hover:bg-muted/50
+      focus:border-foreground/20
+      focus:ring-2
+      focus:ring-foreground/10
+    "
+  >
+    <option value="all">All campaigns</option>
+
+    {campaigns.map(([id, name]) => (
+      <option key={id} value={id}>
+        {name}
+      </option>
+    ))}
+  </select>
+
+  <ChevronDownIcon
+    className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+  />
+</div>
       </header>
 
       {error && (
-        <div className="rounded-[14] border  border-red-500/10 bg-red-500/10 px-4 py-3 text-sm text-red-700 flex flex-row gap-3">
+        <div className="rounded-[14] border  border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex flex-row gap-3">
           <IoInformationCircleOutline size={20}/>
           {error}
         </div>
@@ -141,100 +157,202 @@ export default function BrandSubmissionView() {
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">No submissions yet for this view.</p>
       ) : (
-        <ul className="space-y-4">
-          {filtered.map((s) => (
-            <li key={s.id} className="rounded-[24] border border-border bg-card p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-medium text-foreground">
-                    {s.creator.displayName ?? s.creator.username ?? "Unnamed creator"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    @{s.creator.username ?? "unknown"} · {s.campaign.name}
-                  </p>
-                  {s.creator.socialAccounts.length > 0 && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {s.creator.socialAccounts
-                        .map((a) => `${a.platform} (${a.followers ?? 0})`)
-                        .join(" · ")}
-                    </p>
-                  )}
-                </div>
-                <span
-                  className={`rounded-full border px-3 py-1 text-xs font-medium ${STATUS_STYLES[s.status]}`}
-                >
-                  {s.status.replace("_", " ")}
+       <ul className="space-y-4">
+  {filtered.map((s) => (
+    <li
+      key={s.id}
+      className="overflow-hidden rounded-[24px] border border-border bg-card"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 p-5">
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
+              {(s.creator.displayName ??
+                s.creator.username ??
+                "U")[0].toUpperCase()}
+            </div>
+
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-foreground">
+                {s.creator.displayName ??
+                  s.creator.username ??
+                  "Unnamed creator"}
+              </p>
+
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                @{s.creator.username ?? "unknown"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <span>{s.campaign.name}</span>
+
+            {s.creator.socialAccounts.length > 0 && (
+              <>
+                <span className="text-border">•</span>
+
+                <span>
+                  {s.creator.socialAccounts
+                    .map(
+                      (a) =>
+                        `${a.platform} ${a.followers ?? 0} followers`
+                    )
+                    .join(" · ")}
                 </span>
-              </div>
+              </>
+            )}
+          </div>
+        </div>
 
-              {s.caption && <p className="mt-3 text-sm text-muted-foreground">{s.caption}</p>}
+        <span
+          className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium ${STATUS_STYLES[s.status]}`}
+        >
+          {s.status.replaceAll("_", " ")}
+        </span>
+      </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {s.screenshots.map((url, i) => (
-                  <a key={i} href={url} target="_blank" rel="noreferrer">
-                    <img
-                      src={url}
-                      alt={`Screenshot ${i + 1}`}
-                      className="h-20 w-20 rounded-[14] border border-border object-cover"
-                    />
-                  </a>
-                ))}
-              </div>
+      {/* Content */}
+      <div className="border-t border-border px-5 py-5">
+        {s.caption && (
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Caption
+            </p>
 
-              <ul className="mt-6 space-y-1 border border-border bg-black/20 p-2 rounded-[14]">
-                {s.postLinks.map((link, i) => (
-                  <li key={i} className="flex flex-row gap-3 items-center px-1">
-                    <FiLink2 />
-                    <a
-                      href={link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm text-muted-foreground underline"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            <p className="text-sm leading-6 text-foreground/80">
+              {s.caption}
+            </p>
+          </div>
+        )}
 
-              {(s.status === "SUBMITTED" || s.status === "UNDER_REVIEW") && (
-                <div className="mt-4 flex gap-2">
-                  <button
-                    disabled={actingOn === s.id}
-                    onClick={() => review(s.id, "APPROVED")}
-                    className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    disabled={actingOn === s.id}
-                    onClick={() => {
-                      const note = window.prompt("What needs to change?");
-                      if (note !== null) review(s.id, "CHANGES_REQUESTED", note);
-                    }}
-                    className="rounded-md bg-orange-100 px-3 py-1.5 text-sm font-medium text-orange-700 hover:bg-orange-200 disabled:opacity-50"
-                  >
-                    Request changes
-                  </button>
-                  <button
-                    disabled={actingOn === s.id}
-                    onClick={() => {
-                      const note = window.prompt("Reason for rejecting (optional)") ?? undefined;
-                      review(s.id, "REJECTED", note);
-                    }}
-                    className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
+        {/* Screenshots */}
+        {s.screenshots.length > 0 && (
+          <div className={s.caption ? "mt-5" : ""}>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Screenshots
+            </p>
 
-              {s.reviewNote && (
-                <p className="mt-3 text-sm text-muted-foreground">Your note: {s.reviewNote}</p>
-              )}
-            </li>
-          ))}
-        </ul>
+            <div className="flex flex-wrap gap-2">
+              {s.screenshots.map((url, i) => (
+                <a
+                  key={i}
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative overflow-hidden rounded-[14px] border border-border bg-muted"
+                >
+                  <img
+                    src={url}
+                    alt={`Screenshot ${i + 1}`}
+                    className="h-24 w-24 object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+                    <span className="text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+                      View
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Post links */}
+        {s.postLinks.length > 0 && (
+          <div className="mt-5">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Submitted links
+            </p>
+
+            <div className="space-y-2 rounded-[16px] border border-border bg-muted/30 p-2">
+              {s.postLinks.map((link, i) => (
+                <a
+                  key={i}
+                  href={link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-w-0 items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <FiLink2 className="size-4 shrink-0" />
+
+                  <span className="truncate">{link}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Review actions */}
+      {(s.status === "PENDING_REVIEW" ||
+        s.status === "SUBMITTED" ||
+        s.status === "UNDER_REVIEW" ||
+        s.status === "CHANGES_REQUESTED") && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-muted/20 px-5 py-4">
+          <p className="text-xs text-muted-foreground">
+            Review this submission
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              disabled={actingOn === s.id}
+              onClick={() => review(s.id, "APPROVED")}
+              className="rounded-[12px] bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Approve
+            </button>
+
+            <button
+              disabled={actingOn === s.id}
+              onClick={() => {
+                const note = window.prompt("What needs to change?");
+
+                if (note !== null) {
+                  review(s.id, "CHANGES_REQUESTED", note);
+                }
+              }}
+              className="rounded-[12px] border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
+            >
+              Request changes
+            </button>
+
+            <button
+              disabled={actingOn === s.id}
+              onClick={() => {
+                const note =
+                  window.prompt("Reason for rejecting (optional)") ??
+                  undefined;
+
+                review(s.id, "REJECTED", note);
+              }}
+              className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Reject
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Review note */}
+      {s.reviewNote && (
+        <div className="border-t border-border px-5 py-4">
+          <div className="rounded-[14px] bg-muted/40 px-4 py-3">
+            <p className="mb-1 text-xs font-medium text-muted-foreground">
+              Review note
+            </p>
+
+            <p className="text-sm leading-5 text-foreground/80">
+              {s.reviewNote}
+            </p>
+          </div>
+        </div>
+      )}
+    </li>
+  ))}
+</ul>
       )}
     </div>
   );

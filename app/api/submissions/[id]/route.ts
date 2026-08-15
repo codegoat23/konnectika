@@ -8,9 +8,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/getSessionUser";
 import { z } from "zod";
-import { SETTLEMENT_PERIOD_DAYS, addDays } from "@/lib/wallet";
-import { computeCreatorFeeSplit } from "@/lib/pricing";
-import { recordCreatorFee } from "@/lib/platform-revenue";
+import {
+  approveContentForEarning,
+  rejectContentForEarning,
+} from "@/lib/payment-flow";
+import { NotifyAdmin } from "@/lib/notification";
 
 async function loadSubmissionWithAccessCheck(
   id: string,
@@ -172,6 +174,7 @@ export async function PATCH(
     );
   }
 
+  let contentApproved = false;
   const updated = await prisma.$transaction(async (tx) => {
     const updated = await tx.submission.update({
       where: {
@@ -190,44 +193,40 @@ export async function PATCH(
       },
     });
 
-    // 💰 CREATE CREATOR EARNING + PLATFORM REVENUE AFTER BRAND APPROVAL
+    // Content approved -> the earning (created at application approval) flips
+    // PENDING -> APPROVED and the platform CREATOR_FEE is recorded. The money
+    // itself is settled later through the scheduled payout flow. Atomic +
+    // idempotent: re-approving already-approved content re-runs cleanly.
     if (parsed.data.status === "APPROVED") {
-      const existingEarning = await tx.earning.findUnique({
-        where: {
-          submissionId: updated.id,
-        },
+      const result = await approveContentForEarning(tx, {
+        submissionId: updated.id,
+        applicationId: updated.applicationId,
+        creatorId: updated.creatorId,
+        campaignId: updated.campaignId,
+        paymentRate: updated.campaign.paymentRate,
       });
+      contentApproved = result.contentApproved;
+    }
 
-      if (!existingEarning) {
-        const approvedAt = new Date();
-        const split = computeCreatorFeeSplit(updated.campaign.paymentRate);
-
-        const earning = await tx.earning.create({
-          data: {
-            submissionId: updated.id,
-            creatorId: updated.creatorId,
-            ...split,
-            status: "PENDING",
-            approvedAt,
-            availableAt: addDays(approvedAt, SETTLEMENT_PERIOD_DAYS),
-          },
-        });
-
-        // Permanent, immutable record of the platform's cut from this earning.
-        // Upserts on (earningId, CREATOR_FEE) so retries cannot duplicate it.
-        await recordCreatorFee(tx, {
-          earningId: earning.id,
-          creatorId: earning.creatorId,
-          campaignId: updated.campaignId,
-          grossAmount: split.amount,
-          feeRate: split.platformFeeRate,
-          feeAmount: split.platformFee,
-        });
-      }
+    // Content rejected -> a PENDING earning flips to REJECTED so it can never
+    // be paid. (Approved/paid earnings are left untouched.)
+    if (parsed.data.status === "REJECTED") {
+      await rejectContentForEarning(tx, updated.applicationId);
     }
 
     return updated;
   });
+
+  // Approval just makes the creator's earnings eligible for a scheduled
+  // payout; the admin settles them in the payout flow. Tell the admins a new
+  // creator earning is accruing toward their balance.
+  if (contentApproved) {
+    await NotifyAdmin({
+      title: "Creator Content Approved",
+      message: `A submission for "${updated.campaign.name}" was approved. The creator's earnings will now accrue toward their scheduled payout.`,
+      type: "INFO",
+    });
+  }
 
   return NextResponse.json({
     submission: updated,

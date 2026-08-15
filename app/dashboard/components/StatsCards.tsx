@@ -125,7 +125,7 @@ export function StatsCards({ stats }: { stats: StatCardData[] }) {
                   </Badge>
                 )}
                 {stat.footerSubtitle && (
-                  <span className="text-[11px] text-muted-foreground">{stat.footerSubtitle}</span>
+                  <span className="text-[11px] text-white/70">{stat.footerSubtitle}</span>
                 )}
               </div>
             </Card>

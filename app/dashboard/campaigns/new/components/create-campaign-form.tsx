@@ -13,6 +13,11 @@ import type { Prisma, CampaignTypeEnum } from "@prisma/client";
 import type { IconType } from "react-icons";
 import CoverImageUploader from "@/components/CoverImageUploader";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
+import {
+  PAYMENT_METHODS,
+  isMobileMoneyMethod,
+  normalizePhoneNumber,
+} from "@/lib/payment";
 
 type CampaignFormProps = {
   mode?: "create" | "edit";
@@ -45,7 +50,7 @@ type CampaignFormProps = {
 
 
     const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
-    <div className="rounded-3xl border border-border bg-card/40 p-6 space-y-4"
+    <div className="rounded-3xl border border-border bg-card p-6 space-y-4"
     style={{
       borderRadius:24
     }}
@@ -104,6 +109,8 @@ export default function CampaignForm({
     badge: initialData?.badge ?? "new",
     paymentRate: initialData?.paymentRate?.toString() ?? "",
     budgetTotal: initialData?.budgetTotal?.toString() ?? "",
+    paymentMethod: initialData?.paymentMethod ?? "",
+    paymentPhone: initialData?.paymentPhone ?? "",
     contentFormat: initialData?.contentFormat ?? "",
     duration: initialData?.duration ?? "",
     applicationsClose: initialData?.applicationsClose
@@ -152,6 +159,15 @@ export default function CampaignForm({
     const closeDate = new Date(form.applicationsClose);
     if (!form.applicationsClose || isNaN(closeDate.getTime())) {
       alert("Choose a valid applications close date");
+      setLoading(false);
+      return;
+    }
+
+    if (
+      isMobileMoneyMethod(form.paymentMethod) &&
+      !normalizePhoneNumber(form.paymentPhone)
+    ) {
+      alert("Enter the phone number you will use to pay for this campaign.");
       setLoading(false);
       return;
     }
@@ -312,6 +328,51 @@ export default function CampaignForm({
             />
           </div>
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2 flex flex-col gap-0.5">
+            <label className="text-sm text-muted-foreground">Payment Method</label>
+            <select
+              className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-foreground"
+              style={{ borderRadius: 14 }}
+              value={form.paymentMethod}
+              onChange={(e) =>
+                setForm({ ...form, paymentMethod: e.target.value })
+              }
+            >
+              <option value="">Select payment method</option>
+              {PAYMENT_METHODS.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {isMobileMoneyMethod(form.paymentMethod) && (
+            <div className="space-y-2 flex flex-col gap-0.5">
+              <label className="text-sm text-muted-foreground">
+                Phone Number <span className="text-red-400">*</span>
+              </label>
+              <Input
+                type="tel"
+                inputMode="tel"
+                placeholder="e.g. 0712 345 678 or +255 712 345 678"
+                value={form.paymentPhone}
+                onChange={(e) =>
+                  setForm({ ...form, paymentPhone: e.target.value })
+                }
+              />
+            </div>
+          )}
+        </div>
+
+        {isMobileMoneyMethod(form.paymentMethod) && (
+          <p className="text-xs text-muted-foreground">
+            The {form.paymentMethod} number the platform will match when
+            confirming your campaign payment.
+          </p>
+        )}
       </Section>
 
       {/* Content */}
@@ -366,7 +427,7 @@ export default function CampaignForm({
 
           ${
             active
-              ? "border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/15"
+              ? "border-orange-500 bg-orange-500 text-white"
               : "border-border bg-background hover:border-border"
           }
         `}
@@ -481,7 +542,7 @@ export default function CampaignForm({
       {/* Submit */}
       <button
         disabled={loading}
-        className=" bottom-4 h-12 w-2xl rounded-2xl bg-orange-500 font-medium text-white shadow-lg shadow-orange-600/20 transition hover:bg-orange-400 active:scale-[0.98] disabled:opacity-50"
+        className=" bottom-4 h-12 w-2xl rounded-2xl bg-orange-500 font-medium text-white transition hover:bg-orange-600 active:scale-[0.98] disabled:opacity-50"
         style={{
           borderRadius:14
         }}

@@ -12,9 +12,8 @@ export type PaymentBreakdownProps = {
 };
 
 const PAYMENT_STATUS_STYLES: Record<string, string> = {
-  UNPAID:
-    "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  PAID: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  UNPAID: "bg-amber-50 text-amber-700 border-amber-200",
+  PAID: "bg-green-50 text-green-700 border-green-200",
 };
 
 // Shared payment ticket. Rendered with live values in the creation form and
@@ -69,7 +68,7 @@ export default function PaymentBreakdown({
           <span className="text-foreground font-medium">
             Total Payment Required
           </span>
-          <span className="text-orange-400 font-semibold">
+          <span className="text-foreground font-semibold">
             TZS {formatTZS(total)}
           </span>
         </div>
@@ -78,7 +77,7 @@ export default function PaymentBreakdown({
       {showNote && (
         <p className="mt-4 text-xs text-muted-foreground">
           Payments are handled manually. Your campaign will be created as{" "}
-          <span className="text-amber-400">Unpaid</span> and becomes active
+          <span className="font-medium text-amber-600">Unpaid</span> and becomes active
           once an admin confirms payment.
         </p>
       )}

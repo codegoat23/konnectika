@@ -24,15 +24,15 @@ const APPLICATION_STATUS_CONFIG: Record<
 > = {
   PENDING: {
     label: "Application Pending Review",
-    className: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+    className: "bg-amber-50 text-amber-700 border border-amber-200",
   },
   APPROVED: {
     label: "You're In — Application Approved",
-    className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+    className: "bg-green-50 text-green-700 border border-green-200",
   },
   REJECTED: {
     label: "Application Not Accepted",
-    className: "bg-red-500/10 text-red-400 border border-red-500/20",
+    className: "bg-red-50 text-red-700 border border-red-200",
   },
 };
 
@@ -56,7 +56,7 @@ export default function CampaignModal({ campaign, onClose, applicationStatus }: 
       style={{ backdropFilter: "blur(8px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl scrollbar-custom "
+      <div className="relative bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl scrollbar-custom "
       style={{
         borderRadius: "24px"
       }}
@@ -186,7 +186,7 @@ export default function CampaignModal({ campaign, onClose, applicationStatus }: 
                 {statusConfig.label}
               </div>
             ) : (
-              <button className="flex-1 bg-orange-500 hover:bg-orange-400 text-white text-sm font-medium py-3  transition-colors"
+              <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-3  transition-colors"
               style={{
                 borderRadius: "9999px",
 
