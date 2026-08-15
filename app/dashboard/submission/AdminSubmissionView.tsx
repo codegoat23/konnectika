@@ -16,10 +16,10 @@ type Submission = {
 
 const STATUS_STYLES: Record<Submission["status"], string> = {
   SUBMITTED: "bg-orange-50 text-orange-700 border border-orange-200",
-  UNDER_REVIEW: "bg-amber-50 text-amber-700 border border-amber-200",
-  APPROVED: "bg-green-50 text-green-700 border border-green-200",
+  UNDER_REVIEW: "bg-warning/15 text-warning border border-warning/25",
+  APPROVED: "bg-success/15 text-success border border-success/25",
   CHANGES_REQUESTED: "bg-orange-50 text-orange-700 border border-orange-200",
-  REJECTED: "bg-red-50 text-red-700 border border-red-200",
+  REJECTED: "bg-destructive/15 text-destructive border border-destructive/25",
 };
 
 export default function AdminSubmissionView() {
@@ -85,7 +85,7 @@ export default function AdminSubmissionView() {
       </header>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-3 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -94,7 +94,7 @@ export default function AdminSubmissionView() {
   <div className="overflow-x-auto">
     <table className="w-full min-w-[900px] text-sm">
       <thead>
-        <tr className="border-b border-border bg-[#FAFAF9]">
+        <tr className="border-b border-border bg-muted">
           <th className="h-12 px-5 text-left text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
             Creator
           </th>
@@ -125,7 +125,7 @@ export default function AdminSubmissionView() {
             <tr
               key={s.id}
               onClick={() => setSelected(s)}
-              className="group cursor-pointer transition-colors duration-150 hover:bg-[#FAFAF9]"
+              className="group cursor-pointer transition-colors duration-150 hover:bg-muted"
             >
               {/* Creator */}
               <td className="px-5 py-4">

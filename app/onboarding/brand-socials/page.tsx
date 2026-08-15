@@ -138,7 +138,7 @@ export default function SocialsOnboardingPage() {
 
         {filledCount > 0 && (
           <div className="flex justify-center mt-4">
-            <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">
+            <span className="text-xs bg-success/15 text-success px-3 py-1 rounded-full">
               {filledCount} platform{filledCount > 1 ? "s" : ""} added
             </span>
           </div>
@@ -154,7 +154,7 @@ export default function SocialsOnboardingPage() {
               <div
                 key={p.key}
                 className={`border rounded-xl overflow-hidden transition-shadow ${
-                  hasValue ? "border-green-400 shadow-sm" : "border-border"
+                  hasValue ? "border-success shadow-sm" : "border-border"
                 }`}
               >
                 <button
@@ -171,7 +171,7 @@ export default function SocialsOnboardingPage() {
                     <span className="font-medium text-sm">{p.label}</span>
 
                     {hasValue && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      <span className="text-xs bg-success/15 text-success px-2 py-0.5 rounded-full">
                         @{handles[p.key]}
                       </span>
                     )}
@@ -222,7 +222,7 @@ export default function SocialsOnboardingPage() {
           })}
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+        {error && <p className="text-destructive text-sm mt-4">{error}</p>}
 
         <button
           onClick={handleSubmit}

@@ -420,6 +420,15 @@ export async function approvePayout(
     include: payoutWithCreator,
   });
 
+  await prisma.notification.create({
+    data: {
+      userId: updated.creator.userId,
+      title: "Payout Approved",
+      message: `Your payout of TZS ${updated.amount.toLocaleString()} has been approved and will be paid out shortly.`,
+      type: "SUCCESS",
+    },
+  });
+
   return { payout: updated };
 }
 

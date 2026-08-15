@@ -28,19 +28,19 @@ const platformIcons: Record<string, IconType> = {
 
 const statusClass = (status: string) =>
   status === "APPROVED"
-    ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+    ? "bg-success/15 text-success border-success/25"
     : status === "REJECTED"
-      ? "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20"
-      : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
+      ? "bg-destructive/15 text-destructive border-destructive/25"
+      : "bg-warning/15 text-warning border-warning/25";
 
 const submissionStatusClass = (status: string) =>
   status === "APPROVED"
-    ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+    ? "bg-success/15 text-success border-success/25"
     : status === "REJECTED"
-      ? "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20"
+      ? "bg-destructive/15 text-destructive border-destructive/25"
       : status === "CHANGES_REQUESTED"
         ? "bg-primary/10 text-primary border-primary/20"
-        : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
+        : "bg-warning/15 text-warning border-warning/25";
 
 interface BrandApplicantsProps {
   applications: ApplicantApplication[];
@@ -132,7 +132,7 @@ export default function BrandApplicants({
         </div>
 
         {error && (
-          <div className="mx-6 mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mx-6 mb-2 rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-2 text-sm text-destructive">
             {error}
           </div>
         )}
@@ -427,7 +427,7 @@ export default function BrandApplicants({
                       onClick={() =>
                         reviewSubmission("APPROVED", selected.submission!.id)
                       }
-                      className="flex-1 py-2 rounded-xl bg-green-500 text-white text-sm disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl bg-success text-success-foreground text-sm disabled:opacity-50"
                     >
                       Approve
                     </button>
@@ -448,7 +448,7 @@ export default function BrandApplicants({
                       onClick={() =>
                         reviewSubmission("REJECTED", selected.submission!.id)
                       }
-                      className="flex-1 py-2 rounded-xl bg-red-500 text-white text-sm disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm disabled:opacity-50"
                     >
                       Reject
                     </button>
@@ -461,8 +461,8 @@ export default function BrandApplicants({
               <div
                 className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium ${
                   selected.status === "APPROVED"
-                    ? "bg-green-50 text-green-700 border-green-200"
-                    : "bg-red-50 text-red-700 border-red-200"
+                    ? "bg-success/15 text-success border-success/25"
+                    : "bg-destructive/15 text-destructive border-destructive/25"
                 }`}
               >
                 {selected.status === "APPROVED" ? (
@@ -478,14 +478,14 @@ export default function BrandApplicants({
                 <button
                   disabled={actionLoading}
                   onClick={() => handleAction("APPROVED", selected.id)}
-                  className="flex-1 py-2 rounded-xl bg-green-500 text-white text-sm disabled:opacity-50"
+                  className="flex-1 py-2 rounded-xl bg-success text-success-foreground text-sm disabled:opacity-50"
                 >
                   Approve
                 </button>
                 <button
                   disabled={actionLoading}
                   onClick={() => handleAction("REJECTED", selected.id)}
-                  className="flex-1 py-2 rounded-xl bg-red-500 text-white text-sm disabled:opacity-50"
+                  className="flex-1 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm disabled:opacity-50"
                 >
                   Reject
                 </button>

@@ -112,7 +112,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
   onClick={() => {
     router.push(`/campaign/${campaign.id}/apply`);
   }}
-  className="flex-1 bg-white text-black text-sm font-medium py-3 rounded-full cursor-pointer hover:bg-orange-400 transition-colors"
+  className="flex-1 bg-foreground text-background text-sm font-medium py-3 rounded-full cursor-pointer hover:bg-foreground/90 transition-colors"
 >
   Join Campaign
 </button>

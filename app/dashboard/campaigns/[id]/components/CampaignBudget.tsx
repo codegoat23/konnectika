@@ -33,7 +33,7 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Spent</p>
-          <p className="text-emerald-600 font-semibold">
+          <p className="text-success font-semibold">
             TZS {funded.toLocaleString()}
           </p>
         </div>
@@ -43,7 +43,7 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Remaining</p>
-          <p className="text-amber-600 font-semibold">
+          <p className="text-warning font-semibold">
             TZS {(total - funded).toLocaleString()}
           </p>
         </div>

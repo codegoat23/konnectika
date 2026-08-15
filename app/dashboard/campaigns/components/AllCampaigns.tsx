@@ -4,17 +4,13 @@ import { AllCampaign } from "@/lib/campaigns";
 import { useRouter } from "next/navigation";
 
 const BADGE_STYLES: Record<string, string> = {
-  active:
-    "bg-emerald-50 text-emerald-700 border-emerald-200 " +
-    "dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
+  active: "bg-success/15 text-success border-success/25",
 
   hot:
     "bg-orange-50 text-orange-700 border-orange-200 " +
     "dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20",
 
-  new:
-    "bg-blue-50 text-blue-700 border-blue-200 " +
-    "dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
+  new: "bg-info/15 text-info border-info/25",
 
   featured:
     "bg-violet-50 text-violet-700 border-violet-200 " +
@@ -160,15 +156,15 @@ export default function AllCampaigns({
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${
                     isPaid
-                      ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
-                      : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400"
+                      ? "border-success/25 bg-success/15 text-success"
+                      : "border-warning/25 bg-warning/15 text-warning"
                   }`}
                 >
                   <span
                     className={`size-1.5 rounded-full ${
                       isPaid
-                        ? "bg-emerald-500 dark:bg-emerald-400"
-                        : "bg-amber-500 dark:bg-amber-400"
+                        ? "bg-success"
+                        : "bg-warning"
                     }`}
                   />
 

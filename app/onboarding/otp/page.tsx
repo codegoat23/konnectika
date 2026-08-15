@@ -195,7 +195,7 @@ export default function OtpOnboardingPage() {
               className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl outline-none transition-all
                 ${digit ? "border-orange-500 " : "border-border "}
                 focus:border-orange-500/20 focus:ring-2 focus:ring-orange-500/30
-                ${error ? "border-red-400 bg-red-50" : ""}
+                ${error ? "border-destructive bg-destructive/15" : ""}
               `}
             />
           ))}
@@ -203,7 +203,7 @@ export default function OtpOnboardingPage() {
 
         {/* Error */}
         {error && (
-          <p className="text-sm text-red-500 text-center mt-4">{error}</p>
+          <p className="text-sm text-destructive text-center mt-4">{error}</p>
         )}
 
         {/* Submit */}

@@ -98,7 +98,7 @@ export function CampaignMetrics({ campaign }: CampaignMetricsProps) {
         {/* Campaign badges */}
         <div className="flex flex-wrap items-center gap-2 px-6 py-5">
           {/* Earnings badge */}
-          <span className="rounded-full border border-blue-300/30 bg-blue-500/20 px-3 py-1.5 text-sm font-semibold text-blue-300">
+          <span className="rounded-full border border-info/30 bg-info/20 px-3 py-1.5 text-sm font-semibold text-info">
             TZS {formatTZS(campaign.paymentRate)} / post
           </span>
 

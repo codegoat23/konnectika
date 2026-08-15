@@ -1,6 +1,7 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCampaignPaidBudget } from "@/lib/campaign-budget";
+import { notify } from "@/lib/notification";
 
 const CAMPAIGN_STATUSES = [
   "PENDING_REVIEW",
@@ -38,7 +39,20 @@ export async function PATCH(
     return Response.json({ error: "Invalid status" }, { status: 400 });
   }
 
-  const campaign = await prisma.$transaction(async (tx) => {
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: campaignId },
+    select: {
+      name: true,
+      status: true,
+      businessProfile: { select: { userId: true } },
+    },
+  });
+
+  if (!campaign) {
+    return Response.json({ error: "Campaign not found" }, { status: 404 });
+  }
+
+  const updatedCampaign = await prisma.$transaction(async (tx) => {
     if (status === "APPROVED") {
       const updated = await tx.campaign.update({
         where: { id: campaignId },
@@ -66,8 +80,25 @@ export async function PATCH(
     });
   });
 
+  // Notify the campaign's brand about the admin review decision. Approving a
+  // campaign also confirms their payment (paymentStatus UNPAID -> PAID).
+  if (status === "APPROVED" || status === "REJECTED") {
+    await notify({
+      userId: campaign.businessProfile.userId,
+      title:
+        status === "APPROVED"
+          ? "Campaign Approved"
+          : "Campaign Rejected",
+      message:
+        status === "APPROVED"
+          ? `Your campaign "${campaign.name}" was approved and your payment was confirmed. Creators can now apply.`
+          : `Your campaign "${campaign.name}" was rejected by the admin team.`,
+      type: status === "APPROVED" ? "SUCCESS" : "ERROR",
+    });
+  }
+
   return Response.json({
-    ...campaign,
+    ...updatedCampaign,
     budgetFunded: await getCampaignPaidBudget(campaignId),
   });
 }

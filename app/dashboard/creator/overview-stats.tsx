@@ -25,7 +25,7 @@ export function SectionCards() {
             $1,250.00
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="text-green-500 rounded-full">
+            <Badge variant="outline" className="text-success rounded-full">
               <TrendingUpIcon
               />
               +12.5%
@@ -35,7 +35,7 @@ export function SectionCards() {
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Trending up this month{" "}
-            <TrendingUpIcon className="size-4 text-green-500" />
+            <TrendingUpIcon className="size-4 text-success" />
           </div>
           <div className="text-muted-foreground">
             Visitors for the last 6 months
@@ -49,7 +49,7 @@ export function SectionCards() {
             $234
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="text-red-500 rounded-full">
+            <Badge variant="outline" className="text-destructive rounded-full">
               <TrendingDownIcon
               />
               -20%
@@ -59,7 +59,7 @@ export function SectionCards() {
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Down 20% this period{" "}
-            <TrendingDownIcon className="size-4 text-red-500" />
+            <TrendingDownIcon className="size-4 text-destructive" />
           </div>
           <div className="text-muted-foreground">
             Pending earnings require review
@@ -73,7 +73,7 @@ export function SectionCards() {
             5
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="text-green-500 rounded-full">
+            <Badge variant="outline" className="text-success rounded-full">
               <TrendingUpIcon
               />
               +12.5%
@@ -83,7 +83,7 @@ export function SectionCards() {
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Strong user retention{" "}
-            <TrendingUpIcon className="size-4 text-green-500" />
+            <TrendingUpIcon className="size-4 text-success" />
           </div>
           <div className="text-muted-foreground">Engagement exceed targets</div>
         </CardFooter>
@@ -95,7 +95,7 @@ export function SectionCards() {
             2
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="text-green-500 rounded-full">
+            <Badge variant="outline" className="text-success rounded-full">
               <TrendingUpIcon
               />
               +4.5%
@@ -105,7 +105,7 @@ export function SectionCards() {
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Steady performance increase{" "}
-            <TrendingUpIcon className="size-4 text-green-500" />
+            <TrendingUpIcon className="size-4 text-success" />
           </div>
           <div className="text-muted-foreground">Meets growth projections</div>
         </CardFooter>

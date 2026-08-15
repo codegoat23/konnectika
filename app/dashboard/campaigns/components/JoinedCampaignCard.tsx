@@ -6,9 +6,9 @@ import PlatformIcons from "@/app/dashboard/creator/components/PlatformIcons";
 import { getProgressPercent, getDaysLeftColor } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-amber-400/50 text-amber-400 border border-amber-400/10 ",
-  APPROVED: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-  REJECTED: "bg-red-500/10 text-red-400 border border-red-500/20",
+  PENDING: "bg-warning/15 text-warning border border-warning/25",
+  APPROVED: "bg-success/15 text-success border border-success/25",
+  REJECTED: "bg-destructive/15 text-destructive border border-destructive/25",
 };
 
 interface JoinedCampaignCardProps {

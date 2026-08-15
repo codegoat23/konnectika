@@ -24,15 +24,15 @@ const APPLICATION_STATUS_CONFIG: Record<
 > = {
   PENDING: {
     label: "Application Pending Review",
-    className: "bg-amber-50 text-amber-700 border border-amber-200",
+    className: "bg-warning/15 text-warning border border-warning/25",
   },
   APPROVED: {
     label: "You're In — Application Approved",
-    className: "bg-green-50 text-green-700 border border-green-200",
+    className: "bg-success/15 text-success border border-success/25",
   },
   REJECTED: {
     label: "Application Not Accepted",
-    className: "bg-red-50 text-red-700 border border-red-200",
+    className: "bg-destructive/15 text-destructive border border-destructive/25",
   },
 };
 

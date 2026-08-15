@@ -75,7 +75,7 @@ export default function CampaignDetailPage() {
 
   if (loadingData) {
     return (
-      <div className="max-w-5xl mx-auto p-6 space-y-4">
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-4">
         <div className="h-52 bg-muted rounded-3xl animate-pulse" />
         <div className="h-6 bg-muted rounded w-1/3 animate-pulse" />
         <div className="h-40 bg-muted rounded-2xl animate-pulse" />
@@ -93,7 +93,7 @@ export default function CampaignDetailPage() {
   if (!campaign) {
     return (
       <DashboardShell>
-        <div className="max-w-5xl px-4 py-12 text-center text-muted-foreground">
+        <div className="max-w-[1400px] px-4 lg:px-8 py-12 text-center text-muted-foreground">
           Campaign not found.
         </div>
       </DashboardShell>
@@ -102,7 +102,7 @@ export default function CampaignDetailPage() {
 
   return (
     <DashboardShell>
-      <div className="max-w-5xl px-4 space-y-6">
+      <div className="max-w-[1400px] px-4 lg:px-8 space-y-6">
         {role === "ADMIN" ? (
         
           <AdminCampaignReview

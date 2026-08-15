@@ -487,7 +487,7 @@ export default function AdminPayouts({
                         variant="outline"
                         disabled={loading}
                         onClick={() => setRejectId(payout.id)}
-                        className="h-8 rounded-lg border-red-200 px-3 text-xs text-red-600 hover:bg-red-50 hover:text-red-600"
+                        className="h-8 rounded-lg border-destructive/25 px-3 text-xs text-destructive hover:bg-destructive/15 hover:text-destructive"
                       >
                         <X className="mr-1.5 h-3.5 w-3.5" />
                         Reject
@@ -501,7 +501,7 @@ export default function AdminPayouts({
                         size="sm"
                         disabled={loading}
                         onClick={() => setMarkPaidId(payout.id)}
-                        className="h-8 rounded-lg bg-emerald-500 px-3 text-xs font-medium hover:bg-emerald-600"
+                        className="h-8 rounded-lg bg-success text-success-foreground px-3 text-xs font-medium hover:bg-success/90"
                       >
                         <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                         Mark paid
@@ -512,7 +512,7 @@ export default function AdminPayouts({
                         variant="outline"
                         disabled={loading}
                         onClick={() => setRejectId(payout.id)}
-                        className="h-8 rounded-lg border-red-200 px-3 text-xs text-red-600 hover:bg-red-50 hover:text-red-600"
+                        className="h-8 rounded-lg border-destructive/25 px-3 text-xs text-destructive hover:bg-destructive/15 hover:text-destructive"
                       >
                         <X className="mr-1.5 h-3.5 w-3.5" />
                         Reject
@@ -521,14 +521,14 @@ export default function AdminPayouts({
                   )}
 
                   {payout.status === "PAID" && (
-                    <div className="flex items-center justify-end gap-1.5 text-xs text-emerald-500">
+                    <div className="flex items-center justify-end gap-1.5 text-xs text-success">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Paid {formatDate(payout.paidAt)}
                     </div>
                   )}
 
                   {payout.status === "REJECTED" && (
-                    <div className="flex max-w-[180px] items-center justify-end gap-1.5 text-right text-xs text-red-600">
+                    <div className="flex max-w-[180px] items-center justify-end gap-1.5 text-right text-xs text-destructive">
                       <XCircle className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">
                         {payout.rejectionReason || "Rejected"}
@@ -623,7 +623,7 @@ export default function AdminPayouts({
 
       {error && (
         <div className="px-4 lg:px-6">
-          <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          <p className="text-sm text-destructive bg-destructive/15 border border-destructive/25 rounded-lg px-3 py-2">
             {error}
           </p>
         </div>
@@ -674,7 +674,7 @@ export default function AdminPayouts({
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button
-              className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+              className="bg-success text-success-foreground hover:bg-success/90 cursor-pointer"
               disabled={loading || !paymentReference.trim()}
               onClick={() => markPaidId && updateStatus(markPaidId, "PAID")}
             >
@@ -703,7 +703,7 @@ export default function AdminPayouts({
 
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground">
-              Reason <span className="text-red-400">*</span>
+              Reason <span className="text-destructive">*</span>
             </label>
             <Input
               value={rejectionReason}

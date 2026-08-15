@@ -90,9 +90,9 @@ export default function CompanyNamePage() {
 
   const inputBorderColor =
     validation === "available"
-      ? "border-green-500 focus:ring-green-500"
+      ? "border-success focus:ring-success"
       : validation === "taken"
-      ? "border-red-400 focus:ring-red-400"
+      ? "border-destructive focus:ring-destructive"
       : "border-border focus:ring-orange-500/30";
 
   return (
@@ -141,10 +141,10 @@ export default function CompanyNamePage() {
                   <Loader2 size={16} className="animate-spin text-muted-foreground" />
                 )}
                 {validation === "available" && (
-                  <CheckCircle2 size={16} className="text-green-500" />
+                  <CheckCircle2 size={16} className="text-success" />
                 )}
                 {validation === "taken" && (
-                  <XCircle size={16} className="text-red-400" />
+                  <XCircle size={16} className="text-destructive" />
                 )}
               </div>
             </div>
@@ -159,10 +159,10 @@ export default function CompanyNamePage() {
 
           {/* Inline validation message */}
           {validation === "available" && (
-            <p className="text-sm text-green-600">✓ @{companyName} is available</p>
+            <p className="text-sm text-success">✓ @{companyName} is available</p>
           )}
           {validation === "taken" && (
-            <p className="text-sm text-red-500">✗ @{companyName} is already taken</p>
+            <p className="text-sm text-destructive">✗ @{companyName} is already taken</p>
           )}
 
           {/* Rules hint */}
@@ -171,7 +171,7 @@ export default function CompanyNamePage() {
           </p>
 
           {/* Error */}
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
 
           {/* Submit */}
           <button

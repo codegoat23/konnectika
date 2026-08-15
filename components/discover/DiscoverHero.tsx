@@ -193,7 +193,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
             
             <button
               onClick={() => onJoin(current)}
-              className="bg-white text-black text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-orange-400 active:scale-95 transition-all"
+              className="bg-foreground text-background text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-foreground/90 active:scale-95 transition-all"
             >
               Join Campaign
             </button>

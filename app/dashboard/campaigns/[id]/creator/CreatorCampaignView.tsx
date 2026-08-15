@@ -42,7 +42,7 @@ export default function CreatorCampaignView({
          <CampaignBudget
           campaign={campaign}
         />
-   <div className="grid lg:grid-cols-[1fr_380px] gap-6">
+   <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_440px] gap-6">
 
 
       {/* LEFT: CREATOR APPLICATION */}

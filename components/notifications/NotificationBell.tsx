@@ -3,53 +3,31 @@
 import { Bell } from "lucide-react";
 import { useState } from "react";
 import NotificationDrawer from "./NotificationDrawer";
+import { useUnreadCount } from "@/hooks/useNotifications";
 
+export default function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const { data: unread = 0 } = useUnreadCount();
 
-export default function NotificationBell(){
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label={
+          unread > 0 ? `Notifications, ${unread} unread` : "Notifications"
+        }
+        className="relative cursor-pointer p-1 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <Bell size={22} className="size-4 scale-100 transition-transform" />
 
+        {unread > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold leading-none text-white">
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
+      </button>
 
-const [open,setOpen]=useState(false);
-
-
-return (
-
-<>
-<button
-onClick={()=>setOpen(true)}
-className="relative cursor-pointer   p-1  text-muted-foreground hover:text-foreground transition-colors"
->
-
-<Bell size={22}  className="size-4 scale-100 transition-transform"/>
-
-
-<div
-className="
-absolute
-top-0
-right-0.5
-bg-orange-500
-text-white
-rounded-full
-text-xs
-px-1
-w-2
-h-2
-"
->
-
-</div>
-
-
-</button>
-
-
-<NotificationDrawer
-open={open}
-setOpen={setOpen}
-/>
-
-</>
-
-)
-
+      <NotificationDrawer open={open} setOpen={setOpen} />
+    </>
+  );
 }

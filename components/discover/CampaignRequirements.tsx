@@ -15,7 +15,7 @@ export function CampaignRequirements({ requirements }: CampaignRequirementsProps
               key={requirement}
               className="flex items-start gap-3 text-sm text-muted-foreground"
             >
-              <BadgeCheck className="mt-0.5 size-4 shrink-0 text-emerald-500" />
+              <BadgeCheck className="mt-0.5 size-4 shrink-0 text-success" />
               {requirement}
             </li>
           ))}

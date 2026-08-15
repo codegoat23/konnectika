@@ -3,9 +3,9 @@
 import { Edit } from "lucide-react";
 
 const creatorStatusStyles: Record<string, string> = {
-  APPROVED: "bg-green-50 text-green-700",
-  REJECTED: "bg-red-50 text-red-700",
-  CHANGES_REQUESTED: "bg-amber-50 text-amber-700",
+  APPROVED: "bg-success/15 text-success",
+  REJECTED: "bg-destructive/15 text-destructive",
+  CHANGES_REQUESTED: "bg-warning/15 text-warning",
 };
 
 interface CampaignHeaderData {
@@ -53,7 +53,7 @@ export default function CampaignHeader({
             <div
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 creatorStatusStyles[creatorStatus || ""] ||
-                "bg-amber-50 text-amber-700"
+                "bg-warning/15 text-warning"
               }`}
             >
               {creatorStatus || "PENDING"}
@@ -64,28 +64,26 @@ export default function CampaignHeader({
       </div>
 
       {/* CAMPAIGN HERO CARD */}
-  <div
-  className="rounded-3xl overflow-hidden border border-border bg-card"
-  style={{ borderRadius: 24 }}
->
-  <div
-    className="h-52 bg-cover bg-center relative"
-    style={{ backgroundImage: `url(${campaign?.thumbnailPic})` }}
-  >
-    {/* Bottom dark gradient */}
-    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      <div
+        className="rounded-3xl overflow-hidden border border-border bg-card"
+        style={{ borderRadius: 24 }}
+      >
+        <div
+          className="h-52 xl:h-64 2xl:h-72 bg-cover bg-center relative"
+          style={{ backgroundImage: `url(${campaign?.thumbnailPic})` }}
+        >
+          {/* Bottom dark gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-    <div className="absolute bottom-5 left-5 z-10">
-      <h1 className="text-2xl font-bold text-white">
-        {campaign?.name}
-      </h1>
+          <div className="absolute bottom-5 left-5 z-10">
+            <h1 className="text-5xl 2xl:text-6xl font-bold text-white">
+              {campaign?.name}
+            </h1>
 
-      <p className="text-zinc-300 text-sm">
-        {campaign?.businessProfile?.companyName}
-      </p>
-    </div>
-  </div>
-</div>
+           
+          </div>
+        </div>
+      </div>
     </>
   );
 }

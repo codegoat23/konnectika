@@ -32,9 +32,9 @@ type AdminApplicationDetails = Prisma.CampaignApplicationGetPayload<{
 }>;
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
-  APPROVED: "bg-green-50 text-green-700 border-green-200",
-  REJECTED: "bg-red-50 text-red-700 border-red-200",
+  PENDING_REVIEW: "bg-warning/15 text-warning border-warning/25",
+  APPROVED: "bg-success/15 text-success border-success/25",
+  REJECTED: "bg-destructive/15 text-destructive border-destructive/25",
   COMPLETED: "bg-orange-50 text-orange-700 border-orange-200",
 };
 
@@ -153,7 +153,7 @@ export default function AdminCampaignReview({
   return (
     <div className="space-y-6">
       {actionError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-3 text-sm text-destructive">
           {actionError}
         </div>
       )}
@@ -164,7 +164,7 @@ export default function AdminCampaignReview({
         style={{ borderRadius: 24 }}
       >
         <div
-          className="h-52 bg-cover bg-center relative"
+          className="h-52 xl:h-64 2xl:h-72 bg-cover bg-center relative"
           style={{
             backgroundImage: `url(${campaign.thumbnailPic})`,
           }}
@@ -207,7 +207,7 @@ export default function AdminCampaignReview({
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Funded</p>
-              <p className="text-emerald-600 font-semibold">
+              <p className="text-success font-semibold">
                 TZS {campaign.budgetFunded.toLocaleString()}
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function AdminCampaignReview({
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Remaining</p>
-              <p className="text-amber-600 font-semibold">
+              <p className="text-warning font-semibold">
                 TZS {(
                   campaign.budgetTotal - campaign.budgetFunded
                 ).toLocaleString()}
@@ -226,7 +226,7 @@ export default function AdminCampaignReview({
           </div>
 
           {/* Payment breakdown + status */}
-          <div className="mt-4">
+          <div className="mt-4 grid gap-4 xl:grid-cols-2">
             <PaymentBreakdown
               budget={campaign.budgetTotal}
               feeRate={campaign.platformFeeRate}
@@ -236,34 +236,35 @@ export default function AdminCampaignReview({
               showStatus
               title="Payment"
               showNote={false}
+              className={campaign.paymentMethod ? undefined : "xl:col-span-2"}
             />
-          </div>
 
-          {/* Brand payment source — how the brand will pay the platform */}
-          {campaign.paymentMethod && (
-            <div
-              className="mt-4 bg-muted/50 border border-border p-3 rounded-xl"
-              style={{ borderRadius: 16 }}
-            >
-              <p className="text-xs text-muted-foreground mb-2">
-                Brand Payment Source
-              </p>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Method</span>
-                <span className="text-foreground font-medium">
-                  {campaign.paymentMethod}
-                </span>
-              </div>
-              {campaign.paymentPhone && (
-                <div className="mt-1 flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Phone</span>
+            {/* Brand payment source — how the brand will pay the platform */}
+            {campaign.paymentMethod && (
+              <div
+                className="bg-muted/50 border border-border p-3 rounded-xl"
+                style={{ borderRadius: 16 }}
+              >
+                <p className="text-xs text-muted-foreground mb-2">
+                  Brand Payment Source
+                </p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Method</span>
                   <span className="text-foreground font-medium">
-                    {campaign.paymentPhone}
+                    {campaign.paymentMethod}
                   </span>
                 </div>
-              )}
-            </div>
-          )}
+                {campaign.paymentPhone && (
+                  <div className="mt-1 flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Phone</span>
+                    <span className="text-foreground font-medium">
+                      {campaign.paymentPhone}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -288,14 +289,14 @@ export default function AdminCampaignReview({
           <>
             <button
               onClick={() => openReview("APPROVED")}
-              className="bg-green-500 px-5 py-3 rounded-xl text-sm font-medium text-white hover:bg-green-600"
+              className="bg-success px-5 py-3 rounded-xl text-sm font-medium text-success-foreground hover:bg-success/90"
             >
               Approve
             </button>
 
             <button
               onClick={() => openReview("REJECTED")}
-              className="bg-red-500 px-5 py-3 rounded-xl text-sm font-medium text-white hover:bg-red-600"
+              className="bg-destructive px-5 py-3 rounded-xl text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
             >
               Reject
             </button>
@@ -345,9 +346,9 @@ export default function AdminCampaignReview({
             {result ? (
               <>
                 {result === "APPROVED" ? (
-                  <CheckCircle2 className="h-10 w-10 text-green-400" />
+                  <CheckCircle2 className="h-10 w-10 text-success" />
                 ) : (
-                  <XCircle className="h-10 w-10 text-red-400" />
+                  <XCircle className="h-10 w-10 text-destructive" />
                 )}
                 <DialogTitle className="text-lg font-semibold">
                   Campaign {result === "APPROVED" ? "Approved" : "Rejected"}
@@ -361,9 +362,9 @@ export default function AdminCampaignReview({
             ) : (
               <>
                 {approved ? (
-                  <CheckCircle2 className="h-10 w-10 text-green-400" />
+                  <CheckCircle2 className="h-10 w-10 text-success" />
                 ) : (
-                  <XCircle className="h-10 w-10 text-red-400" />
+                  <XCircle className="h-10 w-10 text-destructive" />
                 )}
                 <DialogTitle className="text-lg font-semibold">
                   {approved ? "Approve & Confirm Payment?" : "Reject Campaign?"}
@@ -400,8 +401,8 @@ export default function AdminCampaignReview({
                 disabled={submitting}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white disabled:opacity-50 ${
                   approved
-                    ? "bg-green-500 text-white hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-600"
+                    ? "bg-success text-success-foreground hover:bg-success/90"
+                    : "bg-destructive hover:bg-destructive/90"
                 }`}
               >
                 {submitting

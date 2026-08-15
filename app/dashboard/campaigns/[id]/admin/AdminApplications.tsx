@@ -35,10 +35,10 @@ const platformIcons: Record<string, IconType> = {
 
 const statusClass = (status: string) =>
   status === "APPROVED"
-    ? "bg-green-50 text-green-700 border-green-200"
+    ? "bg-success/15 text-success border-success/25"
     : status === "REJECTED"
-      ? "bg-red-50 text-red-700 border-red-200"
-      : "bg-amber-50 text-amber-700 border-amber-200";
+      ? "bg-destructive/15 text-destructive border-destructive/25"
+      : "bg-warning/15 text-warning border-warning/25";
 
 export default function AdminApplications({
   campaignId,
@@ -100,7 +100,7 @@ export default function AdminApplications({
         </div>
 
         {actionError && (
-          <div className="mx-6 mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mx-6 mb-2 rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-2 text-sm text-destructive">
             {actionError}
           </div>
         )}
@@ -171,7 +171,7 @@ export default function AdminApplications({
                         <button
                           onClick={() => makeAvailable(a.earning!.id)}
                           disabled={approvingId !== null}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:bg-success/90 disabled:opacity-50"
                         >
                           {approvingId === a.earning!.id && (
                             <Loader2 className="size-3 animate-spin" />

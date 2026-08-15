@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import NotificationBell from "./notifications/NotificationBell"
+import GlobalSearch from "./global-search"
 
 export function SiteHeader() {
   return (
@@ -13,7 +13,9 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4 bg-border"
         />
+        
         <div className="ml-auto flex flex-row gap-2 justify-center items-center">
+          <GlobalSearch />
           <ThemeToggle />
           <NotificationBell/>
         </div>

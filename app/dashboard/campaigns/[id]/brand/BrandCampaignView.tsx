@@ -43,47 +43,52 @@ export default function BrandCampaignView({
 
       <CampaignOverview campaign={campaign} />
 
-      <CampaignAnalytics
-        role="BRAND"
-        applicantsCount={campaign._count.applications}
-      />
+      <div className="grid gap-6 2xl:grid-cols-2">
+        <CampaignAnalytics
+          role="BRAND"
+          applicantsCount={campaign._count.applications}
+        />
 
-      <CampaignBudget campaign={campaign} />
+        <CampaignBudget campaign={campaign} />
+      </div>
 
-      <PaymentBreakdown
-        budget={campaign.budgetTotal}
-        feeRate={campaign.platformFeeRate}
-        fee={campaign.platformFee}
-        total={campaign.totalCharge}
-        paymentStatus={campaign.paymentStatus}
-        showStatus
-        title="Payment"
-      />
+      <div className="grid gap-6 xl:grid-cols-2">
+        <PaymentBreakdown
+          budget={campaign.budgetTotal}
+          feeRate={campaign.platformFeeRate}
+          fee={campaign.platformFee}
+          total={campaign.totalCharge}
+          paymentStatus={campaign.paymentStatus}
+          showStatus
+          title="Payment"
+          className={campaign.paymentMethod ? undefined : "xl:col-span-2"}
+        />
 
-      {campaign.paymentMethod && (
-        <div
-          className="bg-muted/50 border border-border p-4 rounded-[24]"
-          style={{ borderRadius: 24 }}
-        >
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
-            Payment Source
-          </p>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Method</span>
-            <span className="text-foreground font-medium">
-              {campaign.paymentMethod}
-            </span>
-          </div>
-          {campaign.paymentPhone && (
-            <div className="mt-1 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Phone</span>
+        {campaign.paymentMethod && (
+          <div
+            className="bg-muted/50 border border-border p-4 rounded-[24]"
+            style={{ borderRadius: 24 }}
+          >
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+              Payment Source
+            </p>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Method</span>
               <span className="text-foreground font-medium">
-                {campaign.paymentPhone}
+                {campaign.paymentMethod}
               </span>
             </div>
-          )}
-        </div>
-      )}
+            {campaign.paymentPhone && (
+              <div className="mt-1 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Phone</span>
+                <span className="text-foreground font-medium">
+                  {campaign.paymentPhone}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

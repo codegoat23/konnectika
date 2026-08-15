@@ -142,7 +142,7 @@ function RequestPayoutDialog({
         {needsPhone && (
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground">
-              Phone Number <span className="text-red-400">*</span>
+              Phone Number <span className="text-destructive">*</span>
             </label>
             <input
               type="tel"
@@ -159,7 +159,7 @@ function RequestPayoutDialog({
         )}
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+          <p className="text-sm text-destructive bg-destructive/15 border border-destructive/25 rounded-lg px-3 py-2">
             {error}
           </p>
         )}
@@ -228,8 +228,8 @@ export default function CreatorPayouts({
       <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3">
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-              <WalletIcon className="size-3.5 text-emerald-600" />
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/15">
+              <WalletIcon className="size-3.5 text-success" />
             </div>
             <span className="text-xs font-medium text-muted-foreground">
               Available Balance
@@ -264,8 +264,8 @@ export default function CreatorPayouts({
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
-              <span className="text-xs font-medium text-blue-600">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-info/15">
+              <span className="text-xs font-medium text-info">
                 {eligibility.eligible ? "✓" : "+"}
               </span>
             </div>
@@ -275,7 +275,7 @@ export default function CreatorPayouts({
           </div>
           <div className="mt-2 text-xl font-semibold tabular-nums">
             {eligibility.eligible ? (
-              <span className="text-emerald-600">Eligible</span>
+              <span className="text-success">Eligible</span>
             ) : (
               <>TZS {formatTZS(eligibility.remainingToEligible)}</>
             )}
@@ -317,7 +317,7 @@ export default function CreatorPayouts({
          <div className="mt-5 overflow-hidden rounded-2xl border border-border bg-card">
   <div className="overflow-x-auto">
     <table className="w-full min-w-[650px] text-sm">
-      <thead className="bg-[#FAFAF9]">
+        <thead className="bg-muted">
         <tr className="border-b border-border">
           <th className="px-4 py-3.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
             Amount

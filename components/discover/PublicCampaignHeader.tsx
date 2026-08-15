@@ -35,7 +35,7 @@ export function PublicCampaignHeader({
         <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span className="font-semibold text-foreground">{campaign.brand}</span>
           {campaign.brandVerified && (
-            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1 text-success">
               <BadgeCheck className="size-4" />
               Verified
             </span>

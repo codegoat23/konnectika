@@ -33,10 +33,10 @@ type Submission = {
 const STATUS_STYLES: Record<Submission["status"], string> = {
   PENDING_REVIEW: "bg-orange-50 text-orange-700 border-orange-200",
   SUBMITTED: "bg-orange-50 text-orange-700 border-orange-200",
-  UNDER_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
-  APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  UNDER_REVIEW: "bg-warning/15 text-warning border-warning/25",
+  APPROVED: "bg-success/15 text-success border-success/25",
   CHANGES_REQUESTED: "bg-orange-50 text-orange-700 border-orange-200",
-  REJECTED: "bg-red-50 text-red-700 border-red-200",
+  REJECTED: "bg-destructive/15 text-destructive border-destructive/25",
 };
 
 export default function BrandSubmissionView() {
@@ -148,7 +148,7 @@ export default function BrandSubmissionView() {
       </header>
 
       {error && (
-        <div className="rounded-[14] border  border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex flex-row gap-3">
+        <div className="rounded-[14] border  border-destructive/25 bg-destructive/15 px-4 py-3 text-sm text-destructive flex flex-row gap-3">
           <IoInformationCircleOutline size={20}/>
           {error}
         </div>
@@ -300,7 +300,7 @@ export default function BrandSubmissionView() {
             <button
               disabled={actingOn === s.id}
               onClick={() => review(s.id, "APPROVED")}
-              className="rounded-[12px] bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-50"
+              className="rounded-[12px] bg-success px-4 py-2 text-sm font-medium text-success-foreground transition-colors hover:bg-success/90 disabled:pointer-events-none disabled:opacity-50"
             >
               Approve
             </button>
@@ -328,7 +328,7 @@ export default function BrandSubmissionView() {
 
                 review(s.id, "REJECTED", note);
               }}
-              className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:pointer-events-none disabled:opacity-50"
+              className="rounded-[12px] border border-destructive/25 bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/25 disabled:pointer-events-none disabled:opacity-50"
             >
               Reject
             </button>

@@ -170,7 +170,7 @@ export default function ApplyPage() {
   // ❌ ERROR
   if (error || !campaign) {
     return (
-      <div className="min-h-screen bg-background p-6 text-red-400">
+      <div className="min-h-screen bg-background p-6 text-destructive">
         {error || "Campaign not available"}
       </div>
     );
@@ -213,7 +213,7 @@ export default function ApplyPage() {
 
     <button
       onClick={() => router.push("/dashboard")}
-      className="px-4 py-2 bg-white text-black rounded-full hover:bg-orange-400"
+      className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-foreground/90"
     >
       Dashboard
     </button>
@@ -315,7 +315,7 @@ export default function ApplyPage() {
     </div>
 
     <div className="ml-auto">
-      <span className="px-3 py-1 text-xs rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+      <span className="px-3 py-1 text-xs rounded-full bg-success/15 text-success border border-success/25">
         Active
       </span>
     </div>
@@ -371,7 +371,7 @@ export default function ApplyPage() {
             <button
               onClick={submitApplication}
               disabled={loading}
-              className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-white/80 transition disabled:opacity-50"
+              className="w-full bg-foreground text-background py-3 rounded-full font-medium hover:bg-foreground/90 transition disabled:opacity-50"
             >
               {loading ? "Submitting..." : "Submit Application"}
             </button>

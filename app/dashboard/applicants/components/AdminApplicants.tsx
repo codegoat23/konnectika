@@ -29,10 +29,10 @@ const platformIcons: Record<string, IconType> = {
 
 const statusClass = (status: string) =>
   status === "APPROVED"
-    ? "bg-green-50 text-green-700 border-green-200"
+    ? "bg-success/15 text-success border-success/25"
     : status === "REJECTED"
-      ? "bg-red-50 text-red-700 border-red-200"
-      : "bg-amber-50 text-amber-700 border-amber-200";
+      ? "bg-destructive/15 text-destructive border-destructive/25"
+      : "bg-warning/15 text-warning border-warning/25";
 
 interface AdminApplicantsProps {
   applications: ApplicantApplication[];
@@ -93,7 +93,7 @@ export default function AdminApplicants({
         </div>
 
         {actionError && (
-          <div className="mx-6 mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mx-6 mb-2 rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-2 text-sm text-destructive">
             {actionError}
           </div>
         )}
@@ -109,7 +109,7 @@ export default function AdminApplicants({
         ) : (
            <div className="overflow-x-auto rounded-xl border border-border bg-card">
   <table className="w-full text-sm">
-  <thead className="bg-[#FAFAF9] text-muted-foreground text-xs">
+  <thead className="bg-muted text-muted-foreground text-xs">
     <tr>
       <th className="w-[6%] px-4 py-3 text-left font-medium">No.</th>
       <th className="w-[20%] px-4 py-3 text-left font-medium">Creator</th>
@@ -126,7 +126,7 @@ export default function AdminApplicants({
       <tr
         key={a.id}
         onClick={() => setSelected(a)}
-        className="cursor-pointer border-t border-border/70 transition-colors hover:bg-[#FAFAF9]"
+        className="cursor-pointer border-t border-border/70 transition-colors hover:bg-muted"
       >
         {/* Number */}
         <td className="px-4 py-4 text-xs text-muted-foreground">
@@ -189,7 +189,7 @@ export default function AdminApplicants({
             <button
               onClick={() => makeAvailable(a)}
               disabled={approvingId !== null}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground transition-colors hover:bg-success/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {approvingId === a.earning!.id && (
                 <Loader2 className="size-3 animate-spin" />

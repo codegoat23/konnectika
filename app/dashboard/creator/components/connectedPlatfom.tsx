@@ -32,7 +32,7 @@ const platforms = [
     name: "TikTok",
     icon: FaTiktok,
     status: "Not Connected",
-    color: "text-zinc-700",
+    color: "text-muted-foreground",
   },
   {
     name: "GitHub",
@@ -82,7 +82,7 @@ export default function ConnectedPlatformsAccordion() {
                     <span
                       className={`h-2.5 w-2.5 rounded-full ${
                         platform.status === "Connected"
-                          ? "bg-emerald-500"
+                          ? "bg-success"
                           : "bg-muted-foreground/40"
                       }`}
                     />

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { TbFileDescription } from "react-icons/tb";
 
 const BADGE_STYLES: Record<string, string> = {
-  active: "bg-green-50 text-green-700 border border-green-200",
+  active: "bg-success/15 text-success border border-success/25",
   hot: "bg-orange-50 text-orange-700 border border-orange-200",
   new: "bg-orange-50 text-orange-700 border border-orange-200",
   featured: "bg-orange-50 text-orange-700 border border-orange-200",

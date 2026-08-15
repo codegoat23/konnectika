@@ -18,6 +18,15 @@ import {
   isMobileMoneyMethod,
   normalizePhoneNumber,
 } from "@/lib/payment";
+import { format, parseISO, startOfDay } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type CampaignFormProps = {
   mode?: "create" | "edit";
@@ -352,7 +361,7 @@ export default function CampaignForm({
           {isMobileMoneyMethod(form.paymentMethod) && (
             <div className="space-y-2 flex flex-col gap-0.5">
               <label className="text-sm text-muted-foreground">
-                Phone Number <span className="text-red-400">*</span>
+                Phone Number <span className="text-destructive">*</span>
               </label>
               <Input
                 type="tel"
@@ -490,16 +499,44 @@ export default function CampaignForm({
           <label className="text-sm text-muted-foreground">
             Applications Close
           </label>
-          <Input
-            type="date"
-            value={form.applicationsClose}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                applicationsClose: e.target.value,
-              })
-            }
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 w-full justify-start rounded-[14px] border border-border bg-background px-4 text-sm font-normal text-foreground transition-all outline-none hover:bg-background hover:text-foreground focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10 dark:bg-background dark:hover:bg-background"
+              >
+                {form.applicationsClose ? (
+                  format(parseISO(form.applicationsClose), "PPP")
+                ) : (
+                  <span className="text-muted-foreground">
+                    Select a date
+                  </span>
+                )}
+                <CalendarIcon className="ml-auto size-4 shrink-0 text-muted-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={
+                  form.applicationsClose
+                    ? parseISO(form.applicationsClose)
+                    : undefined
+                }
+                onSelect={(date) =>
+                  setForm({
+                    ...form,
+                    applicationsClose: date
+                      ? format(date, "yyyy-MM-dd")
+                      : "",
+                  })
+                }
+                disabled={(date) => date < startOfDay(new Date())}
+                autoFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-2 mt-4">

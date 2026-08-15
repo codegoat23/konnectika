@@ -201,7 +201,7 @@ export default function SocialFolderGrid() {
       <h2 className="text-lg font-semibold text-foreground">Social platforms</h2>
 
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-400">
+        <div className="rounded-xl border border-destructive/25 bg-destructive/15 px-4 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
@@ -304,7 +304,7 @@ export default function SocialFolderGrid() {
                     className="relative flex flex-col items-center justify-center rounded-[14px] border border-border p-4 transition hover:bg-muted/60"
                   >
                     {connected && (
-                      <span className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-sm" />
+                      <span className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full bg-success shadow-sm" />
                     )}
                     <Icon className="text-2xl text-muted-foreground" />
                     <span className="mt-2 text-[10px] text-muted-foreground">
@@ -330,7 +330,7 @@ export default function SocialFolderGrid() {
                 </p>
                 <p
                   className={`text-xs ${
-                    selectedAccount ? "text-emerald-400" : "text-muted-foreground"
+                    selectedAccount ? "text-success" : "text-muted-foreground"
                   }`}
                 >
                   {selectedAccount ? "Connected" : "Not Connected"}
@@ -378,13 +378,13 @@ export default function SocialFolderGrid() {
                   <button
                     onClick={() => removeSocial(selectedPlatform.id)}
                     disabled={saving}
-                    className="w-full rounded-xl border border-red-500/30 bg-red-500/10 py-2 text-sm text-red-400 hover:bg-red-500/20 disabled:opacity-50"
+                    className="w-full rounded-xl border border-destructive/30 bg-destructive/15 py-2 text-sm text-destructive hover:bg-destructive/25 disabled:opacity-50"
                   >
                     {saving ? "Removing..." : "Remove"}
                   </button>
                   <button
                     onClick={() => openAdd(selectedPlatform)}
-                    className="w-full rounded-xl bg-emerald-600 py-2 text-sm text-white hover:bg-emerald-700"
+                    className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90"
                   >
                     Edit
                   </button>
@@ -392,7 +392,7 @@ export default function SocialFolderGrid() {
               ) : (
                 <button
                   onClick={() => openAdd(selectedPlatform)}
-                  className="w-full rounded-xl bg-emerald-600 py-2 text-sm text-white hover:bg-emerald-700"
+                  className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90"
                 >
                   Connect
                 </button>

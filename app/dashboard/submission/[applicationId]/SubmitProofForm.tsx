@@ -107,7 +107,7 @@ export default function SubmitProofForm({
 
   if (loadError || !application) {
     return (
-      <div className="max-w-3xl mx-auto p-6 text-red-600 text-sm">
+      <div className="max-w-3xl mx-auto p-6 text-destructive text-sm">
         {loadError ?? "Failed to load application"}
       </div>
     );
@@ -176,7 +176,7 @@ export default function SubmitProofForm({
         </h2>
 
         {submitError && (
-          <p className="text-red-600 text-sm">{submitError}</p>
+          <p className="text-destructive text-sm">{submitError}</p>
         )}
 
         <div>

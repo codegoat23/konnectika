@@ -22,7 +22,7 @@ export type CampaignCta =
 export function JoinCampaignButton({ cta }: { cta: CampaignCta }) {
   if (cta.type === "login" || cta.type === "join") {
     return (
-      <Button   className="bg-white text-zinc-900 p-6 rounded-full ">
+      <Button   className="bg-foreground text-background p-6 rounded-full ">
         <Link href={cta.href} className="flex items-center gap-2 font-regular text-lg">
           Join Campaign
           
@@ -34,7 +34,7 @@ export function JoinCampaignButton({ cta }: { cta: CampaignCta }) {
   if (cta.type === "applied") {
     return (
       <Button size="lg" variant="secondary" disabled className="cursor-default">
-        <Check className="size-4 text-emerald-500" />
+        <Check className="size-4 text-success" />
         Application Submitted
       </Button>
     );

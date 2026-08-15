@@ -10,6 +10,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/getSessionUser";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import DashboardShell from "@/app/dashboard/components/dashboard-shell";
 import AdminApplicants from "./components/AdminApplicants";
 import BrandApplicants from "./components/BrandApplicants";
@@ -20,21 +21,48 @@ const LIMIT = 25;
 export default async function ApplicantsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const user = await getSessionUser();
   if (!user) {
     redirect("/login");
   }
 
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, q } = await searchParams;
   const page = Math.max(1, Number(pageParam ?? "1") || 1);
   const skip = (page - 1) * LIMIT;
+  const query = (q ?? "").trim();
 
-  const where =
+  const brandScope: Prisma.CampaignApplicationWhereInput[] =
     user.role === "BRAND"
-      ? { campaign: { businessProfile: { userId: user.id } } }
-      : {};
+      ? [{ campaign: { businessProfile: { userId: user.id } } }]
+      : [];
+
+  const queryFilter: Prisma.CampaignApplicationWhereInput[] = query
+    ? [
+        {
+          OR: [
+            {
+              campaign: { name: { contains: query, mode: "insensitive" } },
+            },
+            {
+              creator: {
+                username: { contains: query, mode: "insensitive" },
+              },
+            },
+            {
+              creator: {
+                displayName: { contains: query, mode: "insensitive" },
+              },
+            },
+          ],
+        },
+      ]
+    : [];
+
+  const where: Prisma.CampaignApplicationWhereInput = {
+    AND: [...brandScope, ...queryFilter],
+  };
 
   const [applications, totalApplications] = await Promise.all([
     prisma.campaignApplication.findMany({

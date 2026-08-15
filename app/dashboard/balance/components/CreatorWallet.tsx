@@ -30,7 +30,7 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
   return (
     <div className="border border-border bg-card overflow-hidden" style={{ borderRadius: 24 }}>
       <table className="w-full text-sm">
-        <thead className="bg-[#FAFAF9] text-muted-foreground text-xs tracking-wider">
+        <thead className="bg-muted text-muted-foreground text-xs tracking-wider">
           <tr>
             <th className="p-3 text-left">No.</th>
             <th className="p-3 text-left">Campaign</th>
@@ -45,7 +45,7 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
           {earnings.map((earning, index) => (
             <tr
               key={earning.id}
-              className="group border-t border-border transition-all duration-200 hover:bg-[#FAFAF9]"
+              className="group border-t border-border transition-all duration-200 hover:bg-muted"
             >
               <td className="p-3 text-muted-foreground">
                 <div className="flex justify-center items-center gap-2 border border-border rounded-full px-2 py-2 text-xs font-medium text-muted-foreground">
@@ -125,8 +125,8 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
       <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-2 xl:grid-cols-4">
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
-              <span className="text-xs font-medium text-amber-600">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-warning/15">
+              <span className="text-xs font-medium text-warning">
                 <LucideHourglass size={12} />
               </span>
             </div>
@@ -144,8 +144,8 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
-              <span className="text-xs font-medium text-blue-600">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-info/15">
+              <span className="text-xs font-medium text-info">
                 <LockKeyholeIcon size={12} />
               </span>
             </div>
@@ -182,8 +182,8 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-              <span className="text-xs font-medium text-emerald-600">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/15">
+              <span className="text-xs font-medium text-success">
                 <LuLandmark />
               </span>
             </div>

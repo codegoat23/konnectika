@@ -56,7 +56,7 @@ function fabricateSparkline(trend: "up" | "down" | undefined): number[] {
 const accentClasses: Record<NonNullable<StatCardData["accent"]>, string> = {
   orange: "bg-orange-500/10 text-orange-500",
   blue: "bg-orange-500/10 text-orange-500",
-  green: "bg-green-500/10 text-green-500",
+  green: "bg-success/15 text-success",
   violet: "bg-orange-500/10 text-orange-500",
   primary: "bg-primary/10 text-primary",
 };
@@ -136,8 +136,8 @@ export function StatsCards({ stats }: { stats: StatCardData[] }) {
         // just swapping the orange fill for a light card + colored icon ----
         const trendColor =
           stat.trend === "down"
-            ? "text-red-500 bg-red-500/10"
-            : "text-green-500 bg-green-500/10";
+            ? "text-destructive bg-destructive/15"
+            : "text-success bg-success/15";
         const accentClass = accentClasses[accent];
         const lineColor = strokeColor[accent];
         const isGreenAccent = accent === "green";
@@ -149,7 +149,7 @@ export function StatsCards({ stats }: { stats: StatCardData[] }) {
             className="relative overflow-hidden rounded-2xl  bg-card  p-4 shadow-xs gap-2"
           >
             <div className="relative flex items-center gap-2">
-              <div className={`flex size-7 shrink-0 items-center justify-center rounded-full ${isGreenAccent ? "bg-green-500/10 text-green-500" : "bg-orange-500/10 text-orange-500"}`}>
+              <div className={`flex size-7 shrink-0 items-center justify-center rounded-full ${isGreenAccent ? "bg-success/15 text-success" : "bg-orange-500/10 text-orange-500"}`}>
                 <Icon className="size-3.5" />
               </div>
               <span className="text-xs font-medium text-muted-foreground">{stat.label}</span>
