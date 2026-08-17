@@ -110,7 +110,7 @@ describe("marketplace lifecycle", () => {
     expect(approvedBody.status).toBe("APPROVED");
     expect(approvedBody.paymentStatus).toBe("PAID");
     // Approval funds nothing to creators yet — budgetFunded is the real
-    // paid-out total, so it stays 0 until a payout is actually paid.
+    // gross paid-out total, so it stays 0 until a payout is actually paid.
     expect(approvedBody.budgetFunded).toBe(0);
     const paidBrandFee = await prisma.platformRevenue.findFirst({
       where: { campaignId, type: "BRAND_FEE" },
@@ -293,7 +293,7 @@ describe("marketplace lifecycle", () => {
     expect(wallet.paid).toBe(225000);
     expect(wallet.lifetime).toBe(225000);
 
-    // The campaign's REAL budgetFunded = cash paid to creators so far.
+    // The campaign's REAL budgetFunded = gross amount funded for creators so far.
     const fundedCampaign = await prisma.campaign.findUniqueOrThrow({
       where: { id: campaignId },
     });
@@ -309,7 +309,7 @@ describe("marketplace lifecycle", () => {
     );
     expect(adminCampaign.status).toBe(200);
     const adminCampaignBody = await readJson(adminCampaign);
-    expect(adminCampaignBody.campaign.budgetFunded).toBe(225000); // live value
+    expect(adminCampaignBody.campaign.budgetFunded).toBe(250000); // live gross value
 
     const paidCreatorFee = await prisma.platformRevenue.findFirst({
       where: { earningId, type: "CREATOR_FEE" },

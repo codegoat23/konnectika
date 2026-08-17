@@ -15,7 +15,7 @@ const CAMPAIGN_STATUSES = [
 // BRAND_FEE revenue row as received. Both updates are atomic.
 //
 // Note: campaign.budgetFunded is intentionally NOT set here — it represents
-// the cash actually paid out to creators (sum of PAID earnings, computed at
+// the gross amount funded for creators (sum of PAID earnings, computed at
 // read time in lib/campaign-budget.ts). Approving a campaign funds nothing
 // to creators, so funded stays 0 until real payouts happen.
 export async function PATCH(

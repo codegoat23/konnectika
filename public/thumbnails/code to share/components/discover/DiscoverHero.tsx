@@ -5,12 +5,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Campaign } from "@/types";
 import { formatTZS } from "@/lib/utils";
 import PlatformIcons from "./PlatformIcons";
-import { Bricolage_Grotesque } from "next/font/google";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 interface DiscoverHeroProps {
   featuredCampaigns: Campaign[];
@@ -79,7 +73,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
       {/* CONTENT */}
       <div className="relative z-10 flex flex-col justify-between h-full px-8 py-10 min-h-[420px]">
         <div>
-        <a href="/" className={`text-white flex items-center gap-2 self-center font-bold text-[36px] ${bricolage.className}`}>
+        <a href="/" className={`text-white flex items-center gap-2 self-center font-bold text-[36px] font-sans`}>
           Konnectika
         </a>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Logo from "@/public/assets/logo.svg"
+import Logo from "@/public/assets/logo-expanded.svg"
 import Image from "next/image";
 
 
@@ -24,14 +24,8 @@ import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, Cam
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
 import { GoHome } from "react-icons/go";
 
-import { Bricolage_Grotesque } from "next/font/google";
 import { LogoutButton } from "./logoutButton"
 import { SidebarUser } from "./sidebarUser";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const data = {
   user: {
@@ -155,14 +149,7 @@ const data = {
         />
       ),
     },
-    {
-      title: "Search",
-      url: "#",
-      icon: (
-        <SearchIcon
-        />
-      ),
-    },
+  
   ],
   documents: [
     {

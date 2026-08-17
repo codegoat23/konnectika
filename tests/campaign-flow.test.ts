@@ -128,7 +128,7 @@ describe("campaign flow", () => {
     const updated = await readJson(res);
     expect(updated.status).toBe("APPROVED");
     expect(updated.paymentStatus).toBe("PAID");
-    // budgetFunded is the real cash paid out to creators — approval funds
+    // budgetFunded is the gross amount funded for creators — approval funds
     // nothing to creators, so it remains 0 here.
     expect(updated.budgetFunded).toBe(0);
   });

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, Bookmark, ChevronDown } from "lucide-react";
 
+import { sora } from "@/app/font";
+
 const navLinks = [
   { label: "Discover", href: "/discover" },
   { label: "Dashboard", href: "/dashboard" },
@@ -11,12 +13,6 @@ const navLinks = [
   { label: "Applications", href: "/applications" },
   { label: "Payments", href: "/payments" },
 ];
-import { Bricolage_Grotesque } from "next/font/google";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -24,7 +20,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-[#0a0a0a]/95 backdrop-blur border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center gap-8">
-        <Link href="/" className={`text-white flex items-center gap-2 self-center font-bold text-[36px] ${bricolage.className}`}>
+        <Link href="/" className={`text-white flex items-center gap-2 self-center font-bold text-[36px] ${sora.className}`}>
           Konnectika
         </Link>
 

@@ -9,9 +9,10 @@ import {
   validatePaymentPhone,
 } from "@/lib/payment";
 
-// Public campaign fields safe for any authenticated visitor (the apply page
-// renders these). Fee internals, the brand's payment phone and the brand's
-// full profile (contact details) are intentionally excluded.
+  // Public campaign fields safe for any authenticated visitor (the apply page
+  // renders these). Fee internals, the brand's payment phone and the brand's
+  // full profile (contact details) are intentionally excluded.
+  // budgetFunded = gross amount funded for creators (creatorEarnings + platformFee).
 const PUBLIC_CAMPAIGN_FIELDS = {
   id: true,
   name: true,
@@ -82,7 +83,7 @@ export async function GET(
       where: { id },
       include: FULL_CAMPAIGN_INCLUDE,
     });
-    // Real budget: cash actually paid out to creators (not the stored column).
+    // Real budget: gross amount funded for creators (not the stored column).
     return Response.json({
       ...full,
       budgetFunded: await getCampaignPaidBudget(id),

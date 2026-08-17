@@ -96,7 +96,7 @@ export const getCampaignDetail = cache(
     const business = campaign.businessProfile;
     const platforms = campaign.platforms as Platform[];
     const brand = business?.companyName ?? campaign.brand ?? "Unknown";
-    // Real budget progress: cash actually paid to creators so far.
+    // Real budget progress: gross amount funded for creators so far.
     const budgetFunded = await getCampaignPaidBudget(campaign.id);
 
     const resources: CampaignResource[] = [];

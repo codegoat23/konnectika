@@ -2,15 +2,8 @@
 
 import { Suspense } from "react"
 import { LoginForm } from "@/components/login-form"
-import { GalleryVerticalEndIcon } from "lucide-react"
-import { Bricolage_Grotesque } from "next/font/google";
 import Logo from "@/public/assets/logo-plain.svg"
 import Image from "next/image";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 
 export default function LoginPage() {

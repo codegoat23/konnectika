@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatTZS } from "@/lib/utils";
+import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import type {
   CreatorPayout,
   PayoutEligibility,
@@ -132,7 +133,7 @@ function RequestPayoutDialog({
             <SelectContent>
               {PAYMENT_METHODS.map((method) => (
                 <SelectItem key={method} value={method}>
-                  {method}
+                  <PaymentMethodDisplay method={method} />
                 </SelectItem>
               ))}
             </SelectContent>
@@ -153,7 +154,9 @@ function RequestPayoutDialog({
               className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
             />
             <p className="text-[11px] text-muted-foreground">
-              The {paymentMethod} number where your payout will be sent.
+              The{" "}
+              <PaymentMethodDisplay method={paymentMethod} size="sm" />{" "}
+              number where your payout will be sent.
             </p>
           </div>
         )}

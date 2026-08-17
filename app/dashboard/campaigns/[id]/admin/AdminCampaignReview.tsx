@@ -15,6 +15,7 @@ import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { SiTicktick } from "react-icons/si";
 import AdminApplications from "./AdminApplications";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
+import { PaymentMethodDisplay } from "@/components/payment-method-display";
 
 type CampaignDetails = Prisma.CampaignGetPayload<{
   include: {
@@ -84,9 +85,9 @@ export default function AdminCampaignReview({
     }
 
     setStatus(newStatus);
-    // Refresh the server-side campaign data so the real budgetFunded (cash
-    // paid out to creators) and paymentStatus render immediately instead of
-    // staying stuck at the value loaded on mount.
+    // Refresh the server-side campaign data so the real budgetFunded (gross
+    // amount funded for creators) and paymentStatus render immediately instead
+    // of staying stuck at the value loaded on mount.
     await onActionComplete();
   }
 
@@ -177,7 +178,7 @@ export default function AdminCampaignReview({
           )}
 
           <div className="absolute bottom-5 left-5">
-            <h1 className="text-2xl font-bold text-white">{campaign.name}</h1>
+            <h1 className="text-5xl font-bold text-white">{campaign.name}</h1>
 
             <p className="text-zinc-300 text-sm">
               {campaign.businessProfile?.companyName}
@@ -250,9 +251,10 @@ export default function AdminCampaignReview({
                 </p>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Method</span>
-                  <span className="text-foreground font-medium">
-                    {campaign.paymentMethod}
-                  </span>
+                  <PaymentMethodDisplay
+                    method={campaign.paymentMethod}
+                    className="font-medium"
+                  />
                 </div>
                 {campaign.paymentPhone && (
                   <div className="mt-1 flex items-center justify-between text-sm">

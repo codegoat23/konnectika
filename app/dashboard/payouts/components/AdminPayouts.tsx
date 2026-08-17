@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { formatTZS } from "@/lib/utils";
+import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { PAYOUT_STATUS_STYLES } from "@/lib/status-styles";
 import type {
   AdminPayout,
@@ -435,17 +436,14 @@ export default function AdminPayouts({
                 <td className="px-5 py-4">
                   {payout.paymentMethod ? (
                     <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted">
-                        <WalletCards className="h-3.5 w-3.5 text-muted-foreground" />
-                      </div>
-
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-foreground">
-                          {payout.paymentMethod}
-                        </p>
+                        <PaymentMethodDisplay
+                          method={payout.paymentMethod}
+                          size="sm"
+                        />
 
                         {payout.paymentPhone && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="mt-0.5 text-xs text-muted-foreground">
                             {payout.paymentPhone}
                           </p>
                         )}
@@ -521,9 +519,9 @@ export default function AdminPayouts({
                   )}
 
                   {payout.status === "PAID" && (
-                    <div className="flex items-center justify-end gap-1.5 text-xs text-success">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Paid {formatDate(payout.paidAt)}
+                    <div className="flex flex-col items-center justify-end gap-1.5 text-xs text-success">
+                      
+                     <span className="flex flex-row gap-2"><CheckCircle2 className="h-3.5 w-3.5" />Paid</span> <span>{formatDate(payout.paidAt)}</span>
                     </div>
                   )}
 

@@ -1,18 +1,20 @@
+import { Check, CheckCheck, Clock3, DollarSign, Dot, X } from "lucide-react";
+
 export const EARNING_STATUS_STYLES: Record<string, string> = {
   PENDING:
-    "bg-warning/15 text-warning border-warning/25",
+    " text-warning ",
 
   APPROVED:
-    "bg-info/15 text-info border-info/25",
+    " text-info ",
 
   AVAILABLE:
-    "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20",
+    " text-orange-700",
 
   PAID:
-    "bg-success/15 text-success border-success/25",
+    " text-success ",
 
   REJECTED:
-    "bg-destructive/15 text-destructive border-destructive/25",
+    " text-destructive ",
 };
 
 export const EARNING_STATUS_DOT: Record<string, string> = {
@@ -44,4 +46,12 @@ export const PAYOUT_STATUS_STYLES: Record<string, string> = {
 
   REJECTED:
     "bg-destructive/15 text-destructive border-destructive/25",
+};
+
+export const EARNING_STATUS_ICONS = {
+  PENDING: Clock3,
+  APPROVED: Check,
+  AVAILABLE: DollarSign,
+  PAID: CheckCheck,
+  REJECTED: X,
 };

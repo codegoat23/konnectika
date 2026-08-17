@@ -32,8 +32,8 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
           className="bg-muted/50 border border-border p-3 rounded-xl"
           style={{ borderRadius: 16 }}
         >
-          <p className="text-xs text-muted-foreground">Spent</p>
-          <p className="text-success font-semibold">
+          <p className="text-xs text-muted-foreground">Funded</p>
+          <p className="text-foreground font-semibold">
             TZS {funded.toLocaleString()}
           </p>
         </div>
@@ -43,7 +43,7 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Remaining</p>
-          <p className="text-warning font-semibold">
+          <p className="text-foreground font-semibold">
             TZS {(total - funded).toLocaleString()}
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
 
         <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-orange-500"
+            className="h-full bg-foreground"
             style={{ width: `${pct}%`, borderRadius: 50 }}
           />
         </div>

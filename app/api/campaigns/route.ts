@@ -50,8 +50,8 @@ export async function GET() {
     },
   });
 
-  // Override the stored budgetFunded column with the real paid-out total so
-  // the discover progress bars always reflect cash actually paid to creators.
+  // Override the stored budgetFunded column with the real gross paid-out total
+  // so the discover progress bars always reflect gross amount funded for creators.
   const paid = await getCampaignsPaidBudget(campaigns.map((c) => c.id));
   const campaignsWithRealBudget = campaigns.map((c) => ({
     ...c,

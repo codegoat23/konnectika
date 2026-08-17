@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, Eye, ImageIcon, Link2, X } from "lucide-react";
+import { Eye, ImageIcon, Link2, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Submission = {
   id: string;
@@ -63,25 +70,22 @@ export default function AdminSubmissionView() {
             Every submission across all brands and campaigns.
           </p>
         </div>
-        <div className="relative">
-  <select
-    value={statusFilter}
-    onChange={(e) => setStatusFilter(e.target.value)}
-    className="h-10 min-w-[170px] appearance-none rounded-xl border border-border bg-card px-3.5 pr-9 text-sm font-medium text-foreground outline-none transition-all hover:border-orange-500/30 focus:border-orange-500/40 focus:ring-4 focus:ring-orange-500/10"
-  >
-    <option value="all">All statuses</option>
-    <option value="SUBMITTED">Submitted</option>
-    <option value="UNDER_REVIEW">Under review</option>
-    <option value="APPROVED">Approved</option>
-    <option value="CHANGES_REQUESTED">Changes requested</option>
-    <option value="REJECTED">Rejected</option>
-  </select>
-
-  <ChevronDown
-    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-    strokeWidth={1.8}
-  />
-</div>
+        <Select
+          value={statusFilter}
+          onValueChange={setStatusFilter}
+        >
+          <SelectTrigger className="h-10 min-w-[170px] rounded-xl px-3.5">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="SUBMITTED">Submitted</SelectItem>
+            <SelectItem value="UNDER_REVIEW">Under review</SelectItem>
+            <SelectItem value="APPROVED">Approved</SelectItem>
+            <SelectItem value="CHANGES_REQUESTED">Changes requested</SelectItem>
+            <SelectItem value="REJECTED">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
       </header>
 
       {error && (

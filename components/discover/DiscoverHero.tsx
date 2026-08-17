@@ -5,14 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Campaign } from "@/types";
 import { formatTZS } from "@/lib/utils";
 import PlatformIcons from "./PlatformIcons";
-import { Bricolage_Grotesque } from "next/font/google";
 import Logo from "@/public/assets/logo.svg"
 import Image from "next/image";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 interface DiscoverHeroProps {
   featuredCampaigns: Campaign[];

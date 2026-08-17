@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDownIcon } from "lucide-react";
 // app/dashboard/submission/BrandSubmissionView.tsx
 //
 // Brand's view of /dashboard/submission:
@@ -12,6 +11,13 @@ import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { FiLink2 } from "react-icons/fi";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Submission = {
   id: string;
@@ -110,41 +116,23 @@ export default function BrandSubmissionView() {
             Proof submitted by creators across your campaigns.
           </p>
         </div>
-     <div className="relative min-w-[180px]">
-  <select
-    value={campaignFilter}
-    onChange={(e) => setCampaignFilter(e.target.value)}
-    className="
-      h-10
-      w-full
-      appearance-none
-      rounded-[14px]
-      border border-border
-      bg-card
-      px-3 pr-9
-      text-sm font-medium
-      text-foreground
-      outline-none
-      transition-colors
-      hover:bg-muted/50
-      focus:border-foreground/20
-      focus:ring-2
-      focus:ring-foreground/10
-    "
-  >
-    <option value="all">All campaigns</option>
+     <Select
+  value={campaignFilter}
+  onValueChange={setCampaignFilter}
+>
+  <SelectTrigger className="h-10 w-[30px] min-w-[150px] rounded-[14px]">
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All campaigns</SelectItem>
 
     {campaigns.map(([id, name]) => (
-      <option key={id} value={id}>
+      <SelectItem key={id} value={id}>
         {name}
-      </option>
+      </SelectItem>
     ))}
-  </select>
-
-  <ChevronDownIcon
-    className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-  />
-</div>
+  </SelectContent>
+</Select>
       </header>
 
       {error && (

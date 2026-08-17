@@ -2,14 +2,8 @@
 
 import { Suspense } from "react"
 import { SignupForm } from "@/components/signup-form"
-import { Bricolage_Grotesque } from "next/font/google";
 import Logo from "@/public/assets/logo-plain.svg"
 import Image from "next/image";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export default function SignupPage() {
   return (

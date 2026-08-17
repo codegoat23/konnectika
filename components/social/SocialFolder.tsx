@@ -6,6 +6,13 @@ import { FaInstagram, FaYoutube, FaTiktok, FaFacebook } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import { AiFillLinkedin } from "react-icons/ai";
 import type { SocialAccount, SocialPlatform } from "@prisma/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type PlatformConfig = {
   id: SocialPlatform;
@@ -427,23 +434,27 @@ export default function SocialFolderGrid() {
                 <label className="mb-1 block text-xs text-muted-foreground">
                   Platform
                 </label>
-                <select
+                <Select
                   value={form.platform}
                   disabled={!!editing}
-                  onChange={(e) =>
+                  onValueChange={(value) =>
                     setForm({
                       ...form,
-                      platform: e.target.value as SocialPlatform,
+                      platform: value as SocialPlatform,
                     })
                   }
-                  className={`${inputClass} bg-card disabled:opacity-50`}
                 >
-                  {PLATFORMS.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className={`${inputClass} bg-card`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PLATFORMS.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

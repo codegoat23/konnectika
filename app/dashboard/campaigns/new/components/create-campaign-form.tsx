@@ -14,12 +14,12 @@ import type { IconType } from "react-icons";
 import CoverImageUploader from "@/components/CoverImageUploader";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
 import {
-  PAYMENT_METHODS,
-  isMobileMoneyMethod,
-  normalizePhoneNumber,
-} from "@/lib/payment";
+  getPaymentMethodMeta,
+  PaymentMethodDisplay,
+} from "@/components/payment-method-display";
+import { isMobileMoneyMethod, normalizePhoneNumber } from "@/lib/payment";
 import { format, parseISO, startOfDay } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,6 +27,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type CampaignFormProps = {
   mode?: "create" | "edit";
@@ -34,6 +41,13 @@ type CampaignFormProps = {
     include: { businessProfile: { select: { userId: true } } };
   }>;
 };
+
+// Visual payment-method cards. `value` is the exact string stored in
+// form.paymentMethod (and validated by the backend); the logo and label come
+// from the shared payment-method mapping so the whole app stays consistent.
+const PAYMENT_OPTIONS = ["M-PESA", "Airtel Money", "Tigo Pesa", "HaloPesa"].map(
+  (value) => ({ value, meta: getPaymentMethodMeta(value)! })
+);
 
 
 
@@ -287,24 +301,25 @@ export default function CampaignForm({
 
             <div className="space-y-2 flex flex-col gap-0.5">
               <label className="text-sm text-muted-foreground">Campaign Type</label>
-              <select
-                className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-foreground"
+              <Select
                 value={form.campaignType}
-                 style={{
-        borderRadius:14
-      }}
-                onChange={(e) =>
+                onValueChange={(value) =>
                   setForm({
                     ...form,
-                    campaignType: e.target.value as CampaignTypeEnum,
+                    campaignType: value as CampaignTypeEnum,
                   })
                 }
               >
-                <option>UGC</option>
-                <option>Sponsored</option>
-                <option>Affiliate</option>
-                <option>Ambassador</option>
-              </select>
+                <SelectTrigger className="h-12 w-full rounded-2xl px-4">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="UGC">UGC</SelectItem>
+                  <SelectItem value="Sponsored">Sponsored</SelectItem>
+                  <SelectItem value="Affiliate">Affiliate</SelectItem>
+                  <SelectItem value="Ambassador">Ambassador</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -339,27 +354,59 @@ export default function CampaignForm({
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 flex flex-col gap-0.5">
+          <div className="col-span-2 space-y-2 flex flex-col gap-0.5">
             <label className="text-sm text-muted-foreground">Payment Method</label>
-            <select
-              className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-foreground"
-              style={{ borderRadius: 14 }}
-              value={form.paymentMethod}
-              onChange={(e) =>
-                setForm({ ...form, paymentMethod: e.target.value })
-              }
+            <div
+              role="radiogroup"
+              aria-label="Payment Method"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-4"
             >
-              <option value="">Select payment method</option>
-              {PAYMENT_METHODS.map((method) => (
-                <option key={method} value={method}>
-                  {method}
-                </option>
-              ))}
-            </select>
+              {PAYMENT_OPTIONS.map((option) => {
+                const active = form.paymentMethod === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() =>
+                      setForm({ ...form, paymentMethod: option.value })
+                    }
+                    className={`
+                      relative flex flex-col items-center justify-center gap-2
+                      rounded-2xl border bg-background px-2 py-4
+                      transition-all duration-200 cursor-pointer
+                      ${active
+                        ? "border-orange-500 bg-orange-500/5"
+                        : "border-border hover:border-orange-500/40"}
+                    `}
+                    style={{ borderRadius: 14 }}
+                  >
+                    <PaymentMethodDisplay
+                      method={option.value}
+                      size="lg"
+                      showLabel={false}
+                    />
+                    <span
+                      className={`text-sm font-medium ${
+                        active ? "text-orange-600" : "text-foreground"
+                      }`}
+                    >
+                      {option.meta.label}
+                    </span>
+                    {active && (
+                      <span className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-orange-500 text-white">
+                        <Check className="size-3" />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {isMobileMoneyMethod(form.paymentMethod) && (
-            <div className="space-y-2 flex flex-col gap-0.5">
+            <div className="col-span-2 space-y-2 flex flex-col gap-0.5">
               <label className="text-sm text-muted-foreground">
                 Phone Number <span className="text-destructive">*</span>
               </label>
@@ -378,8 +425,10 @@ export default function CampaignForm({
 
         {isMobileMoneyMethod(form.paymentMethod) && (
           <p className="text-xs text-muted-foreground">
-            The {form.paymentMethod} number the platform will match when
-            confirming your campaign payment.
+            The{" "}
+            <PaymentMethodDisplay method={form.paymentMethod} size="sm" />{" "}
+            number the platform will match when confirming your campaign
+            payment.
           </p>
         )}
       </Section>

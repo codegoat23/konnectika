@@ -23,10 +23,7 @@ export function PublicCampaignHeader({
 
       {/* Campaign information + actions */}
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{campaign.category}</Badge>
-          {campaign.isFeatured && <Badge>Featured</Badge>}
-        </div>
+       
 
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           {campaign.title}

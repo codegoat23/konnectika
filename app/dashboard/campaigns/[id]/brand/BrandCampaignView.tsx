@@ -5,6 +5,7 @@ import CampaignAnalytics from "../components/CampaignAnalytics";
 import CampaignBudget from "../components/CampaignBudget";
 import CampaignHeader from "../components/CampaignHeader";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
+import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { useParams, useRouter } from "next/navigation";
 import { Users } from "lucide-react";
 import type { Prisma } from "@prisma/client";
@@ -74,9 +75,10 @@ export default function BrandCampaignView({
             </p>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Method</span>
-              <span className="text-foreground font-medium">
-                {campaign.paymentMethod}
-              </span>
+              <PaymentMethodDisplay
+                method={campaign.paymentMethod}
+                className="font-medium"
+              />
             </div>
             {campaign.paymentPhone && (
               <div className="mt-1 flex items-center justify-between text-sm">

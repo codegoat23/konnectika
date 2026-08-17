@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 import { TbFileDescription } from "react-icons/tb";
 
 const BADGE_STYLES: Record<string, string> = {
-  active: "bg-success/15 text-success border border-success/25",
-  hot: "bg-orange-50 text-orange-700 border border-orange-200",
-  new: "bg-orange-50 text-orange-700 border border-orange-200",
-  featured: "bg-orange-50 text-orange-700 border border-orange-200",
+  active: "text-success",
+  hot: "text-orange-700",
+  new: " text-orange-700",
+  featured: "text-orange-700",
 };
 
 export default function CreatedCampaigns({

@@ -4,7 +4,16 @@ import { OverviewHeader } from "./Overviewheader";
 import { Card } from "@/components/ui/card";
 import type { Prisma } from "@prisma/client";
 import { formatTZS } from "@/lib/utils";
-import { EARNING_STATUS_STYLES } from "@/lib/status-styles";
+import {
+  Check,
+  CheckCheck,
+  Clock3,
+  CircleDollarSign,
+  X,
+} from "lucide-react";
+
+
+import { EARNING_STATUS_STYLES, EARNING_STATUS_ICONS } from "@/lib/status-styles";
 
 type BrandPayment = Prisma.EarningGetPayload<{
   include: {
@@ -156,13 +165,18 @@ export default function BrandBalance({ payments }: Props) {
 
             {/* Status */}
             <td className="p-3">
-              <span
-                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
-                  EARNING_STATUS_STYLES[payment.status] ?? ""
-                }`}
-              >
-                {payment.status}
-              </span>
+             <span
+  className={`inline-flex items-center gap-1.5 rounded-full  px-2.5 py-1 text-xs font-medium ${
+    EARNING_STATUS_STYLES[payment.status] ?? ""
+  }`}
+>
+  {(() => {
+    const Icon = EARNING_STATUS_ICONS[payment.status];
+    return Icon ? <Icon className="h-3.5 w-3.5" /> : null;
+  })()}
+
+  {payment.status}
+</span>
             </td>
 
             {/* Settlement */}

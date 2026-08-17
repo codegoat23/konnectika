@@ -12,6 +12,13 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { formatTZS } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type {
   PlatformRevenueRecord,
   PlatformRevenueSummary,
@@ -99,28 +106,7 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
             Fees collected from brands and creators. Each record is immutable.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className={selectClass}
-            aria-label="Filter by type"
-          >
-            <option value="all">All types</option>
-            <option value="CREATOR_FEE">Creator fee</option>
-            <option value="BRAND_FEE">Brand fee</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className={selectClass}
-            aria-label="Filter by status"
-          >
-            <option value="all">All statuses</option>
-            <option value="ACCRUED">Accrued</option>
-            <option value="PAID">Paid</option>
-          </select>
-        </div>
+        
       </header>
 
       {/* summary cards */}
@@ -275,6 +261,34 @@ export default function PlatformRevenueDashboard({ records, summary }: Props) {
 
       {/* history table */}
     <div className="px-4 lg:px-6">
+      <div className="flex items-center gap-3 justify-end mb-6">
+          <Select
+            value={typeFilter}
+            onValueChange={setTypeFilter}
+          >
+            <SelectTrigger className={selectClass} aria-label="Filter by type">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="CREATOR_FEE">Creator fee</SelectItem>
+              <SelectItem value="BRAND_FEE">Brand fee</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+          >
+            <SelectTrigger className={selectClass} aria-label="Filter by status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="ACCRUED">Accrued</SelectItem>
+              <SelectItem value="PAID">Paid</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
   <div className="overflow-hidden rounded-2xl border border-border bg-card">
     <div className="overflow-x-auto">
       <table className="w-full min-w-[900px] text-sm">

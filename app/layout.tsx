@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Sora } from "next/font/google";
 import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,9 +7,9 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const bricolage = Bricolage_Grotesque({
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-bricolage",
+  variable: "--font-sora",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${bricolage.variable} h-full antialiased bg-background text-foreground`}
+      className={`${sora.variable} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider

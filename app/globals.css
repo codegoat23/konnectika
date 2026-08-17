@@ -216,9 +216,9 @@ Dark hierarchy:
   --color-foreground: var(--foreground);
 
   /* Fonts */
-  --font-sans: var(--font-bricolage);
+  --font-sans: var(--font-sora);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-bricolage);
+  --font-heading: var(--font-sora);
 
   /* Sidebar */
   --color-sidebar-ring: var(--sidebar-ring);

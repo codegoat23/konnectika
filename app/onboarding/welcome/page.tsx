@@ -1,5 +1,5 @@
 "use client"
-import { bricolage } from '@/app/font'
+import { sora } from '@/app/font'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import Star1 from'@/public/stars/star1.svg'
@@ -33,7 +33,7 @@ export default function Welcome() {
         <div className='border border-border w-[450px] h-[350px] bg-card p-6 rounded-[24] flex flex-col items-center justify-between'>
              <div className='flex flex-row gap-2 justify-center items-center'>
             <span className='text-xl'>Welcome to</span>
-            <span className={`${bricolage.className} text-3xl font-extrabold tracking-tight bg-orange-500 p-2 rotate-2`}>Konnectika</span>
+            <span className={`${sora.className} text-3xl font-extrabold tracking-tight bg-orange-500 p-2 rotate-2`}>Konnectika</span>
         </div>
         <div className='flex flex-col justify-center items-center mt-9 font-medium text-lg'>
             <span>Your brand profile is ready.</span>
