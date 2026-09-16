@@ -38,6 +38,9 @@ import {
   Loader2Icon,
   CalendarDaysIcon,
   LockKeyholeIcon,
+  InfoIcon,
+  CheckIcon,
+  PlusIcon,
 } from "lucide-react";
 
 function formatDate(date: Date | null | undefined): string {
@@ -108,83 +111,136 @@ function RequestPayoutDialog({
           Request Payout
         </Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Request Monthly Payout</DialogTitle>
-          <DialogDescription>
-            Your available balance will be batched into a payout and reviewed
-            by an admin. This cannot be undone while it is under review.
-          </DialogDescription>
-        </DialogHeader>
+     <DialogContent className="w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl p-2">
+  <DialogHeader className="border-b border-border px-6 py-5">
+    <DialogTitle className="text-lg font-semibold tracking-tight">
+      Request Monthly Payout
+    </DialogTitle>
+    
+  </DialogHeader>
 
-        <div className="flex items-center justify-between rounded-xl border border-border bg-card/50 px-4 py-3">
-          <span className="text-sm text-muted-foreground">Payout Amount</span>
-          <span className="text-lg font-semibold text-foreground">
-            TZS {formatTZS(eligibility.availableBalance)}
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground">Payment Method</label>
-          <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-            <SelectTrigger>
-              <SelectValue placeholder="Where should you be paid?" />
-            </SelectTrigger>
-            <SelectContent>
-              {PAYMENT_METHODS.map((method) => (
-                <SelectItem key={method} value={method}>
-                  <PaymentMethodDisplay method={method} />
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {needsPhone && (
-          <div className="space-y-2">
-            <label className="text-xs text-muted-foreground">
-              Phone Number <span className="text-destructive">*</span>
-            </label>
-            <input
-              type="tel"
-              inputMode="tel"
-              placeholder="e.g. 0712 345 678 or +255 712 345 678"
-              value={paymentPhone}
-              onChange={(e) => setPaymentPhone(e.target.value)}
-              className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
-            />
-            <p className="text-[11px] text-muted-foreground">
-              The{" "}
-              <PaymentMethodDisplay method={paymentMethod} size="sm" />{" "}
-              number where your payout will be sent.
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <p className="text-sm text-destructive bg-destructive/15 border border-destructive/25 rounded-lg px-3 py-2">
-            {error}
+  <div className="space-y-5 px-6 py-5">
+    {/* Payout amount */}
+    <div className="rounded-2xl border border-border bg-muted/30 p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Available payout
           </p>
-        )}
+          <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+            TZS {formatTZS(eligibility.availableBalance)}
+          </p>
+        </div>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button
-            onClick={submit}
-            disabled={
-              submitting ||
-              !paymentMethod ||
-              (needsPhone && !paymentPhone.trim())
-            }
-            className="cursor-pointer"
-          >
-            {submitting && <Loader2Icon className="animate-spin" />}
-            Confirm Payout
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
+          <WalletIcon className="h-5 w-5" />
+        </div>
+      </div>
+    </div>
+
+    {/* Payment method */}
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
+        Payment method
+      </label>
+
+      <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+        <SelectTrigger className="min-h-15 w-full rounded-lg mt-2 p-2">
+          <SelectValue placeholder="Select payment method" />
+        </SelectTrigger>
+
+        <SelectContent className="rounded-xl p-3">
+          {PAYMENT_METHODS.map((method) => (
+            <SelectItem
+              key={method}
+              value={method}
+              className="rounded-lg py-2.5"
+            >
+              <PaymentMethodDisplay method={method} />
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Phone number */}
+    {needsPhone && (
+      <div className="space-y-2">
+        <label
+          htmlFor="payment-phone"
+          className="text-sm font-medium text-foreground"
+        >
+          Phone number <span className="text-destructive">*</span>
+        </label>
+
+        <input
+          id="payment-phone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          placeholder="0712 345 678"
+          value={paymentPhone}
+          onChange={(e) => setPaymentPhone(e.target.value)}
+          className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground shadow-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/10 mt-2"
+        />
+
+        <div className="flex items-start gap-2 rounded-lg bg-muted/40 px-3 py-2">
+          <InfoIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Enter the{" "}
+            <span className="font-medium text-foreground">
+              <PaymentMethodDisplay method={paymentMethod} size="sm" />
+            </span>{" "}
+            number where your payout will be sent.
+          </p>
+        </div>
+      </div>
+    )}
+
+    {/* Error */}
+    {error && (
+      <div
+        role="alert"
+        className="rounded-xl border border-destructive/25 bg-destructive/10 px-3.5 py-3 text-sm text-destructive"
+      >
+        {error}
+      </div>
+    )}
+  </div>
+
+  {/* Footer */}
+  <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:justify-between">
+    <DialogClose asChild>
+      <Button
+        variant="ghost"
+        className="cursor-pointer rounded-xl"
+        disabled={submitting}
+      >
+        Cancel
+      </Button>
+    </DialogClose>
+
+    <Button
+      onClick={submit}
+      disabled={
+        submitting ||
+        !paymentMethod ||
+        (needsPhone && !paymentPhone.trim())
+      }
+      className="w-full cursor-pointer rounded-xl bg-orange-500 text-white hover:bg-orange-600 sm:w-auto"
+    >
+      {submitting ? (
+        <>
+          <Loader2Icon className="h-4 w-4 animate-spin" />
+          Processing...
+        </>
+      ) : (
+        "Confirm Payout"
+      )}
+    </Button>
+  </DialogFooter>
+</DialogContent>
     </Dialog>
   );
 }
@@ -269,7 +325,7 @@ export default function CreatorPayouts({
           <div className="flex items-center gap-2">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-info/15">
               <span className="text-xs font-medium text-info">
-                {eligibility.eligible ? "✓" : "+"}
+                {eligibility.eligible ? (<CheckIcon size={12} />) : (<PlusIcon size={12} />)}
               </span>
             </div>
             <span className="text-xs font-medium text-muted-foreground">

@@ -73,7 +73,7 @@ export default async function CampaignDetailPage({ params }: PageProps) {
 
   if (!campaign) {
     return (
-      <main className="min-h-screen bg-background">
+      <main className="discover-dark min-h-screen bg-background">
         <Navbar />
         <div className="mx-auto w-full max-w-5xl px-6 py-16">
           <BackLink />
@@ -135,7 +135,7 @@ export default async function CampaignDetailPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="discover-dark min-h-screen bg-background">
       
 
       <div className="mx-auto w-full max-w-6xl px-6 py-8">

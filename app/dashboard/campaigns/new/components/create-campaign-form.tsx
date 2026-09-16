@@ -51,32 +51,34 @@ const PAYMENT_OPTIONS = ["M-PESA", "Airtel Money", "Tigo Pesa", "HaloPesa"].map(
 
 
 
- const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+ const Input = ({ id, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
+      id={id}
       {...props}
-      className="h-12 w-full text-sm rounded-2xl border border-border bg-background px-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
+      className="h-12 w-full text-sm rounded-2xl border border-border bg-background px-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
       style={{
-        borderRadius:14
+        borderRadius: 14,
       }}
     />
   );
 
-   const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+  const Textarea = ({ id, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
     <textarea
+      id={id}
       {...props}
-      className="w-full text-sm rounded-2xl border border-border bg-background p-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10"
-       style={{
-        borderRadius:14
+      className="w-full text-sm rounded-2xl border border-border bg-background p-4 text-foreground outline-none transition-all focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+      style={{
+        borderRadius: 14,
       }}
     />
   );
 
-
-    const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
-    <div className="rounded-3xl border border-border bg-card p-6 space-y-4"
-    style={{
-      borderRadius:24
-    }}
+  const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
+    <div
+      className="rounded-3xl border border-border bg-card p-4 sm:p-6 space-y-4"
+      style={{
+        borderRadius: 24,
+      }}
     >
       <div className="space-y-1">
         <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -246,13 +248,13 @@ export default function CampaignForm({
 
 
   return (
-    <form onSubmit={handleSubmit} className="w-3xl mx-auto space-y-8">
+    <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-0">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
           {mode === "edit" ? "Edit Campaign" : "Create Campaign"}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Publish a campaign and start receiving creator applications.
         </p>
       </div>
@@ -261,12 +263,14 @@ export default function CampaignForm({
       <Section
         title="Campaign Details"
         desc="Basic information about your campaign"
-        
       >
         <div className="space-y-4">
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-muted-foreground">Campaign Title</label>
+            <label htmlFor="campaign-title" className="text-sm font-medium text-muted-foreground">
+              Campaign Title
+            </label>
             <Input
+              id="campaign-title"
               placeholder="Nike Summer Collection"
               value={form.name}
               onChange={(e) =>
@@ -276,8 +280,11 @@ export default function CampaignForm({
           </div>
 
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-muted-foreground">Description</label>
+            <label htmlFor="campaign-desc" className="text-sm font-medium text-muted-foreground">
+              Description
+            </label>
             <Textarea
+              id="campaign-desc"
               rows={5}
               placeholder="Describe your campaign..."
               value={form.description}
@@ -287,10 +294,13 @@ export default function CampaignForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 flex flex-col gap-0.5">
-              <label className="text-sm text-muted-foreground">Category</label>
+              <label htmlFor="campaign-category" className="text-sm font-medium text-muted-foreground">
+                Category
+              </label>
               <Input
+                id="campaign-category"
                 placeholder="Fashion, Tech, Fitness..."
                 value={form.category}
                 onChange={(e) =>
@@ -300,7 +310,9 @@ export default function CampaignForm({
             </div>
 
             <div className="space-y-2 flex flex-col gap-0.5">
-              <label className="text-sm text-muted-foreground">Campaign Type</label>
+              <label id="campaign-type-label" className="text-sm font-medium text-muted-foreground">
+                Campaign Type
+              </label>
               <Select
                 value={form.campaignType}
                 onValueChange={(value) =>
@@ -310,7 +322,7 @@ export default function CampaignForm({
                   })
                 }
               >
-                <SelectTrigger className="h-12 w-full rounded-2xl px-4">
+                <SelectTrigger aria-labelledby="campaign-type-label" className="h-12 w-full rounded-2xl px-4 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -327,10 +339,13 @@ export default function CampaignForm({
 
       {/* Budget */}
       <Section title="Budget & Payment">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 flex flex-col gap-0.5" >
-            <label className="text-sm text-muted-foreground">Payment Rate</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2 flex flex-col gap-0.5">
+            <label htmlFor="payment-rate" className="text-sm font-medium text-muted-foreground">
+              Payment Rate
+            </label>
             <Input
+              id="payment-rate"
               type="number"
               placeholder="150,000"
               value={form.paymentRate}
@@ -341,8 +356,11 @@ export default function CampaignForm({
           </div>
 
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-muted-foreground">Budget Total</label>
+            <label htmlFor="budget-total" className="text-sm font-medium text-muted-foreground">
+              Budget Total
+            </label>
             <Input
+              id="budget-total"
               type="number"
               placeholder="2,000,000"
               value={form.budgetTotal}
@@ -353,12 +371,14 @@ export default function CampaignForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2 space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-muted-foreground">Payment Method</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2 space-y-2 flex flex-col gap-0.5">
+            <label id="payment-method-label" className="text-sm font-medium text-muted-foreground">
+              Payment Method
+            </label>
             <div
               role="radiogroup"
-              aria-label="Payment Method"
+              aria-labelledby="payment-method-label"
               className="grid grid-cols-2 gap-3 sm:grid-cols-4"
             >
               {PAYMENT_OPTIONS.map((option) => {
@@ -374,8 +394,8 @@ export default function CampaignForm({
                     }
                     className={`
                       relative flex flex-col items-center justify-center gap-2
-                      rounded-2xl border bg-background px-2 py-4
-                      transition-all duration-200 cursor-pointer
+                      rounded-2xl border bg-background px-2 py-4 min-h-[88px]
+                      transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                       ${active
                         ? "border-orange-500 bg-orange-500/5"
                         : "border-border hover:border-orange-500/40"}
@@ -389,7 +409,7 @@ export default function CampaignForm({
                     />
                     <span
                       className={`text-sm font-medium ${
-                        active ? "text-orange-600" : "text-foreground"
+                        active ? "text-orange-600 dark:text-orange-400" : "text-foreground"
                       }`}
                     >
                       {option.meta.label}
@@ -406,11 +426,12 @@ export default function CampaignForm({
           </div>
 
           {isMobileMoneyMethod(form.paymentMethod) && (
-            <div className="col-span-2 space-y-2 flex flex-col gap-0.5">
-              <label className="text-sm text-muted-foreground">
+            <div className="sm:col-span-2 space-y-2 flex flex-col gap-0.5">
+              <label htmlFor="payment-phone" className="text-sm font-medium text-muted-foreground">
                 Phone Number <span className="text-destructive">*</span>
               </label>
               <Input
+                id="payment-phone"
                 type="tel"
                 inputMode="tel"
                 placeholder="e.g. 0712 345 678 or +255 712 345 678"
@@ -437,102 +458,106 @@ export default function CampaignForm({
       <Section title="Content Requirements">
         <div className="space-y-4">
           <div className="space-y-2 flex flex-col gap-0.5">
-                  <label className="text-sm text-muted-foreground">Content Format</label>
-          <Input
-            placeholder="Content format (Reels, Shorts, Posts...)"
-            value={form.contentFormat}
-            onChange={(e) =>
-              setForm({ ...form, contentFormat: e.target.value })
-            }
-          />
+            <label htmlFor="content-format" className="text-sm font-medium text-muted-foreground">
+              Content Format
+            </label>
+            <Input
+              id="content-format"
+              placeholder="Content format (Reels, Shorts, Posts...)"
+              value={form.contentFormat}
+              onChange={(e) =>
+                setForm({ ...form, contentFormat: e.target.value })
+              }
+            />
           </div>
-       <div className="space-y-2 flex flex-col gap-0.5">
-            <label className="text-sm text-muted-foreground">Content Duration</label>
-             <Input
-            placeholder="Duration (e.g. 7 days, 1 month)"
-            value={form.duration}
-            onChange={(e) =>
-              setForm({ ...form, duration: e.target.value })
-            }
-          />
+          <div className="space-y-2 flex flex-col gap-0.5">
+            <label htmlFor="content-duration" className="text-sm font-medium text-muted-foreground">
+              Content Duration
+            </label>
+            <Input
+              id="content-duration"
+              placeholder="Duration (e.g. 7 days, 1 month)"
+              value={form.duration}
+              onChange={(e) =>
+                setForm({ ...form, duration: e.target.value })
+              }
+            />
+          </div>
 
-       </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {["instagram", "tiktok", "youtube", "facebook", "x"].map((p) => {
+              const Icon = platformIcons[p];
+              const active = form.platforms.includes(p);
 
-         
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() =>
+                    setForm({
+                      ...form,
+                      platforms: active
+                        ? form.platforms.filter((x) => x !== p)
+                        : [...form.platforms, p],
+                    })
+                  }
+                  className={`
+                    relative flex items-center gap-4
+                    rounded-[16px] border
+                    p-4 sm:p-5 transition-all duration-200 min-h-[56px]
+                    hover:scale-[1.01] active:scale-[0.98]
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+                    ${
+                      active
+                        ? "border-orange-500 bg-orange-500 text-white"
+                        : "border-border bg-background hover:border-border"
+                    }
+                  `}
+                >
+                  {/* Icon bubble */}
+                  <div
+                    className={`
+                      flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full shrink-0
+                      ${
+                        active
+                          ? " text-white"
+                          : " text-muted-foreground"
+                      }
+                    `}
+                  >
+                    <Icon size={20} className="sm:text-[22px]" />
+                  </div>
 
-        <div className="grid grid-cols-2 gap-4">
-  {["instagram", "tiktok", "youtube", "facebook", "x"].map((p) => {
-    const Icon = platformIcons[p];
-    const active = form.platforms.includes(p);
+                  {/* Text */}
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className={`text-sm font-semibold capitalize ${
+                        active
+                          ? " text-white"
+                          : " text-foreground"
+                      }`}>
+                      {p}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">
+                      {active ? "Selected" : "Tap to select"}
+                    </span>
+                  </div>
 
-    return (
-      <button
-        key={p}
-        type="button"
-        onClick={() =>
-          setForm({
-            ...form,
-            platforms: active
-              ? form.platforms.filter((x) => x !== p)
-              : [...form.platforms, p],
-          })
-        }
-        className={`
-          relative flex items-center gap-4
-          rounded-[16px] border
-          p-5 transition-all duration-200
-          hover:scale-[1.02] active:scale-[0.98]
-
-          ${
-            active
-              ? "border-orange-500 bg-orange-500 text-white"
-              : "border-border bg-background hover:border-border"
-          }
-        `}
-      >
-        {/* Icon bubble */}
-        <div
-          className={`
-            flex h-12 w-12 items-center justify-center rounded-full
-            ${
-              active
-                ? " text-white"
-                : " text-muted-foreground"
-            }
-          `}
-        >
-          <Icon size={22} />
-        </div>
-
-        {/* Text */}
-        <div className="flex flex-col items-start">
-          <span className={`text-sm font-semibold capitalize  ${
-              active
-                ? " text-white"
-                : " text-foreground"
-            }`}>
-            {p}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {active ? "Selected" : "Tap to select"}
-          </span>
-        </div>
-
-        {/* Selected indicator */}
-        {active && (
-          <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-white" />
-        )}
-      </button>
-    );
-  })}
-</div>
+                  {/* Selected indicator */}
+                  {active && (
+                    <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-white" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </Section>
 
       {/* Media */}
       <Section title="Cover Image">
         <div className="space-y-2">
-          <label className="text-sm text-muted-foreground">Cover Image</label>
+          <label className="text-sm font-medium text-muted-foreground">Cover Image</label>
           <CoverImageUploader
             value={form.thumbnailPic}
             onChange={(url) =>
@@ -545,7 +570,7 @@ export default function CampaignForm({
       {/* Final */}
       <Section title="Final Settings">
         <div className="space-y-2">
-          <label className="text-sm text-muted-foreground">
+          <label id="app-close-label" className="text-sm font-medium text-muted-foreground">
             Applications Close
           </label>
           <Popover>
@@ -553,7 +578,8 @@ export default function CampaignForm({
               <Button
                 type="button"
                 variant="outline"
-                className="h-12 w-full justify-start rounded-[14px] border border-border bg-background px-4 text-sm font-normal text-foreground transition-all outline-none hover:bg-background hover:text-foreground focus:border-orange-500/20 focus:ring-4 focus:ring-orange-500/10 dark:bg-background dark:hover:bg-background"
+                aria-labelledby="app-close-label"
+                className="h-12 w-full justify-start rounded-[14px] border border-border bg-background px-4 text-sm font-normal text-foreground transition-all outline-none hover:bg-background hover:text-foreground focus-visible:border-orange-500/20 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none dark:bg-background dark:hover:bg-background"
               >
                 {form.applicationsClose ? (
                   format(parseISO(form.applicationsClose), "PPP")
@@ -589,8 +615,11 @@ export default function CampaignForm({
         </div>
 
         <div className="space-y-2 mt-4">
-          <label className="text-sm text-muted-foreground">Tags</label>
+          <label htmlFor="campaign-tags" className="text-sm font-medium text-muted-foreground">
+            Tags
+          </label>
           <Textarea
+            id="campaign-tags"
             rows={3}
             placeholder="marketing, influencer, viral..."
             value={form.tags}
@@ -601,10 +630,11 @@ export default function CampaignForm({
         </div>
 
         <div className="space-y-2 mt-4">
-          <label className="text-sm text-muted-foreground">
+          <label htmlFor="campaign-requirements" className="text-sm font-medium text-muted-foreground">
             Requirements (one per line)
           </label>
           <Textarea
+            id="campaign-requirements"
             rows={4}
             placeholder="Must have 10k followers..."
             value={form.requirements}
@@ -627,10 +657,11 @@ export default function CampaignForm({
 
       {/* Submit */}
       <button
+        type="submit"
         disabled={loading}
-        className=" bottom-4 h-12 w-2xl rounded-2xl bg-orange-500 font-medium text-white transition hover:bg-orange-600 active:scale-[0.98] disabled:opacity-50"
+        className="h-12 w-full rounded-2xl bg-orange-500 font-medium text-white transition hover:bg-orange-600 active:scale-[0.98] disabled:opacity-50 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         style={{
-          borderRadius:14
+          borderRadius: 14,
         }}
       >
         {loading

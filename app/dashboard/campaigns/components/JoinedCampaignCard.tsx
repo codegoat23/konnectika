@@ -22,20 +22,34 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`View joined campaign: ${campaign.name} by ${campaign.businessProfile.companyName}`}
       onClick={() => onClick(campaign)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(campaign);
+        }
+      }}
       className="
         group
         relative
         h-[180px]
         hover:h-[210px]
+        focus-visible:h-[210px]
         transition-all
         duration-500
         ease-out
         overflow-hidden
         cursor-pointer
         border border-border
+        rounded-3xl
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-primary
+        focus-visible:ring-offset-2
       "
-      style={{ borderRadius: "20px" }}
     >
       {/* Background */}
       <div
@@ -46,43 +60,42 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-transparent" />
 
-      {/* Application status badge */}
-     
-
       {/* Always Visible */}
       <div className="absolute bottom-4 left-4 right-4 z-10 flex flex-row items-center justify-between">
         <p className="text-zinc-300 font-bold text-xs">{campaign.businessProfile.companyName}</p>
 
-        <div className=" z-10">
-        <span
-          className={`text-[8px] font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-            STATUS_STYLES[campaign.status] ??
-            "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
-          }`}
-        >
-          {campaign.status}
-        </span>
-      </div>
+        <div className="z-10">
+          <span
+            className={`text-[8px] font-medium px-2 py-1 rounded-full whitespace-nowrap ${
+              STATUS_STYLES[campaign.status] ??
+              "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
+            }`}
+          >
+            {campaign.status}
+          </span>
+        </div>
       </div>
 
-      {/* Hidden Content */}
+      {/* Campaign Details Content */}
       <div
         className="
           absolute
           left-4
           right-4
           bottom-12
-          opacity-0
-          translate-y-4
+          opacity-100 sm:opacity-0
+          sm:translate-y-4
           group-hover:opacity-100
           group-hover:translate-y-0
+          group-focus-visible:opacity-100
+          group-focus-visible:translate-y-0
           transition-all
           duration-500
           delay-150
           z-10
         "
       >
-        <h3 className="text-white font-semibold text-sm">{campaign.name}</h3>
+        <h3 className="text-white font-semibold text-sm line-clamp-1">{campaign.name}</h3>
 
         <div className="mt-1">
           <PlatformIcons platforms={campaign.platforms} />
@@ -92,7 +105,7 @@ export default function JoinedCampaignCard({ campaign, onClick }: JoinedCampaign
           {campaign.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="px-2 py-1 rounded-full bg-orange-500/10 text-[10px] text-orange-400"
+              className="px-2 py-0.5 rounded-full bg-orange-500/20 text-[10px] text-orange-300 font-medium"
             >
               {tag}
             </span>

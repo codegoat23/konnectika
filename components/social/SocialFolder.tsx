@@ -214,7 +214,7 @@ export default function SocialFolderGrid() {
       )}
 
       {/* CARD */}
-      <div className="w-[225px] overflow-hidden rounded-[28px] bg-card p-2.5">
+      <div className="w-full max-w-[240px] sm:w-[225px] overflow-hidden rounded-[28px] bg-card p-2.5 border border-border">
         <div className="relative rounded-[20px] bg-[#ff6900] shadow-xs px-6 py-6">
           <CornerDot className="left-3 top-3" />
           <CornerDot className="right-3 top-3" />
@@ -244,7 +244,7 @@ export default function SocialFolderGrid() {
             {/* Connected count */}
             <div className="text-4xl font-extrabold tracking-tight text-white">
               {loading ? (
-                <span className="inline-block h-9 w-10 animate-pulse rounded bg-muted align-middle" />
+                <span className="inline-block h-9 w-10 animate-pulse rounded bg-white/20 align-middle" />
               ) : (
                 <>
                   {socials.length}
@@ -262,10 +262,11 @@ export default function SocialFolderGrid() {
         </div>
 
         {/* Bottom action bar */}
-        <div className="flex items-center justify-center gap-4 py-4 text-foreground">
+        <div className="flex items-center justify-center gap-4 py-3 sm:py-4 text-foreground">
           <button
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-2 text-sm font-medium transition hover:text-muted-foreground"
+            aria-label="View platform details"
+            className="flex items-center gap-2 text-sm font-medium transition hover:text-muted-foreground min-h-[44px] px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
           >
             <InfoIcon className="size-4" />
             Detail
@@ -275,7 +276,8 @@ export default function SocialFolderGrid() {
 
           <button
             onClick={() => openAdd()}
-            className="flex items-center gap-2 text-sm font-medium text-orange-500 transition hover:text-orange-400"
+            aria-label="Add a social platform"
+            className="flex items-center gap-2 text-sm font-medium text-orange-500 transition hover:text-orange-400 min-h-[44px] px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
           >
             <PlusIcon className="size-4" />
             Add
@@ -285,13 +287,22 @@ export default function SocialFolderGrid() {
 
       {/* ALL PLATFORMS MODAL */}
       {showAll && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="all-platforms-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm"
+          onClick={(e) => e.target === e.currentTarget && setShowAll(false)}
+        >
+          <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-xs rounded-[24px] border border-border bg-popover p-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">All platforms</p>
+              <h3 id="all-platforms-title" className="text-sm font-semibold text-foreground">
+                All platforms
+              </h3>
               <button
                 onClick={() => setShowAll(false)}
-                className="text-muted-foreground transition hover:text-foreground"
+                aria-label="Close all platforms dialog"
+                className="size-8 flex items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <X className="size-4" />
               </button>
@@ -308,13 +319,13 @@ export default function SocialFolderGrid() {
                       setSelectedPlatform(p);
                       setShowAll(false);
                     }}
-                    className="relative flex flex-col items-center justify-center rounded-[14px] border border-border p-4 transition hover:bg-muted/60"
+                    className="relative flex flex-col items-center justify-center rounded-[14px] border border-border p-3 sm:p-4 transition hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-[70px]"
                   >
                     {connected && (
                       <span className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full bg-success shadow-sm" />
                     )}
                     <Icon className="text-2xl text-muted-foreground" />
-                    <span className="mt-2 text-[10px] text-muted-foreground">
+                    <span className="mt-2 text-[10px] text-muted-foreground truncate max-w-full">
                       {p.name}
                     </span>
                   </button>
@@ -327,14 +338,20 @@ export default function SocialFolderGrid() {
 
       {/* PLATFORM DETAIL MODAL */}
       {selectedPlatform && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="platform-detail-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm"
+          onClick={(e) => e.target === e.currentTarget && setSelectedPlatform(null)}
+        >
+          <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-xs rounded-[24px] border border-border bg-popover p-5 shadow-xl">
             <div className="flex items-center gap-3">
               <selectedPlatform.icon className="text-2xl text-muted-foreground" />
               <div>
-                <p className="text-sm font-semibold text-foreground">
+                <h3 id="platform-detail-title" className="text-sm font-semibold text-foreground">
                   {selectedPlatform.name}
-                </p>
+                </h3>
                 <p
                   className={`text-xs ${
                     selectedAccount ? "text-success" : "text-muted-foreground"
@@ -348,7 +365,7 @@ export default function SocialFolderGrid() {
             <div className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 text-sm text-muted-foreground">
               {selectedAccount ? (
                 <>
-                  <p>
+                  <p className="break-all">
                     <span className="text-muted-foreground">Handle: </span>
                     {selectedAccount.handle}
                   </p>
@@ -375,7 +392,7 @@ export default function SocialFolderGrid() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setSelectedPlatform(null)}
-                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60"
+                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 Close
               </button>
@@ -385,13 +402,13 @@ export default function SocialFolderGrid() {
                   <button
                     onClick={() => removeSocial(selectedPlatform.id)}
                     disabled={saving}
-                    className="w-full rounded-xl border border-destructive/30 bg-destructive/15 py-2 text-sm text-destructive hover:bg-destructive/25 disabled:opacity-50"
+                    className="w-full rounded-xl border border-destructive/30 bg-destructive/15 py-2 text-sm text-destructive hover:bg-destructive/25 disabled:opacity-50 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
                   >
                     {saving ? "Removing..." : "Remove"}
                   </button>
                   <button
                     onClick={() => openAdd(selectedPlatform)}
-                    className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90"
+                    className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
                   >
                     Edit
                   </button>
@@ -399,7 +416,7 @@ export default function SocialFolderGrid() {
               ) : (
                 <button
                   onClick={() => openAdd(selectedPlatform)}
-                  className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90"
+                  className="w-full rounded-xl bg-success py-2 text-sm text-success-foreground hover:bg-success/90 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
                 >
                   Connect
                 </button>
@@ -411,19 +428,26 @@ export default function SocialFolderGrid() {
 
       {/* ADD / EDIT FORM MODAL */}
       {formOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="social-form-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm"
+          onClick={(e) => e.target === e.currentTarget && setFormOpen(false)}
+        >
           <form
             onSubmit={saveSocial}
-            className="w-[320px] rounded-[24px] border border-border bg-popover p-5 shadow-xl"
+            className="w-full max-w-[calc(100vw-2rem)] sm:max-w-xs rounded-[24px] border border-border bg-popover p-5 shadow-xl"
           >
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">
+              <h3 id="social-form-title" className="text-sm font-semibold text-foreground">
                 {editing ? `Edit ${editing.name}` : "Add platform"}
-              </p>
+              </h3>
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="text-muted-foreground transition hover:text-foreground"
+                aria-label="Close form dialog"
+                className="size-8 flex items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <X className="size-4" />
               </button>
@@ -431,7 +455,7 @@ export default function SocialFolderGrid() {
 
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">
+                <label id="platform-select-label" className="mb-1 block text-xs font-medium text-muted-foreground">
                   Platform
                 </label>
                 <Select
@@ -444,7 +468,7 @@ export default function SocialFolderGrid() {
                     })
                   }
                 >
-                  <SelectTrigger className={`${inputClass} bg-card`}>
+                  <SelectTrigger aria-labelledby="platform-select-label" className={`${inputClass} bg-card focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none`}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -458,28 +482,30 @@ export default function SocialFolderGrid() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">
+                <label htmlFor="social-handle-input" className="mb-1 block text-xs font-medium text-muted-foreground">
                   Handle
                 </label>
                 <input
+                  id="social-handle-input"
                   value={form.handle}
                   onChange={(e) =>
                     setForm({ ...form, handle: e.target.value })
                   }
                   placeholder="@yourhandle"
-                  className={inputClass}
+                  className={`${inputClass} focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none`}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">
+                <label htmlFor="social-url-input" className="mb-1 block text-xs font-medium text-muted-foreground">
                   Profile URL (optional)
                 </label>
                 <input
+                  id="social-url-input"
                   value={form.url}
                   onChange={(e) => setForm({ ...form, url: e.target.value })}
                   placeholder="https://..."
-                  className={inputClass}
+                  className={`${inputClass} focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none`}
                 />
               </div>
             </div>
@@ -488,14 +514,14 @@ export default function SocialFolderGrid() {
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60"
+                className="w-full rounded-xl border border-border py-2 text-sm text-muted-foreground hover:bg-muted/60 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving || !form.handle.trim()}
-                className="w-full rounded-xl bg-orange-500 py-2 text-sm text-white hover:bg-orange-400 disabled:opacity-50"
+                className="w-full rounded-xl bg-orange-500 py-2 text-sm text-white hover:bg-orange-400 disabled:opacity-50 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {saving ? "Saving..." : editing ? "Save Changes" : "Add"}
               </button>

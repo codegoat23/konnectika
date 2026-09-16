@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function DiscoverPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="discover-dark min-h-screen bg-background">
       
       <DiscoverClient />
     </main>

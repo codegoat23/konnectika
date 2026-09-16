@@ -1,56 +1,64 @@
 "use client"
+import { useMemo, useState } from "react";
 import { CreatedCampaign } from "@/lib/campaigns";
 import DashboardShell from "@/app/dashboard/components/dashboard-shell";
 import { StatsCards, StatCardData } from "@/app/dashboard/components/StatsCards";
 import CreatedCampaigns from "@/app/dashboard/campaigns/components/CreatedCampaigns";
 import { formatTZS } from "@/lib/utils";
 import SocialFolderGrid from "@/components/social/SocialFolder";
+import { getRangeBounds } from "../components/Overviewheader";
 
-type DashboardProps ={ 
+type DashboardProps = {
   campaigns: CreatedCampaign[];
 }
 
-function BrandDashboard({campaigns}:DashboardProps) {
- 
-  const totalBudget = campaigns.reduce((sum, c) => sum + c.budgetTotal, 0);
-  const totalFunded = campaigns.reduce((sum, c) => sum + c.budgetFunded, 0);
-  const totalApplications = campaigns.reduce(
-    (sum, c) => sum + c._count.applications,
-    0
-  );
-  const activeCount = campaigns.filter(
-    (c) => c.badge === "active" || c.badge === "hot"
-  ).length;
+function BrandDashboard({ campaigns }: DashboardProps) {
+  const [range, setRange] = useState("This Week");
 
-  const stats: StatCardData[] = [
+  const stats = useMemo<StatCardData[]>(() => {
+    const { start, end } = getRangeBounds(range);
+    const inRange = campaigns.filter(
+      (c) => c.createdAt >= start && c.createdAt <= end
+    );
+
+    const totalBudget = inRange.reduce((sum, c) => sum + c.budgetTotal, 0);
+    const totalFunded = inRange.reduce((sum, c) => sum + c.budgetFunded, 0);
+    const totalApplications = inRange.reduce(
+      (sum, c) => sum + c._count.applications,
+      0
+    );
+    const activeCount = inRange.filter(
+      (c) => c.badge === "active" || c.badge === "hot"
+    ).length;
+
+    return [
       {
-      label: "Budget Funded",
-      value: `TZS ${formatTZS(totalFunded)}`,
-      footerSubtitle: `of $${totalBudget} total budgeted`,
-      highlight:true
-      
-    },
-    {
-      label: "Campaigns Created",
-      value: campaigns.length,
-      footerTitle: "Total campaigns launched",
-    },
-  
-    {
-      label: "Active Campaigns",
-      value: activeCount,
-      trend: "up",
-    },
-    {
-      label: "Total Applications",
-      value: totalApplications,
-      footerSubtitle: "Across all campaigns",
-    },
-  ];
+        label: "Budget Funded",
+        value: `TZS ${formatTZS(totalFunded)}`,
+        footerSubtitle: `of TZS ${formatTZS(totalBudget)} total budgeted`,
+        highlight: true,
+      },
+      {
+        label: "Campaigns Created",
+        value: inRange.length,
+        footerTitle: "Total campaigns launched",
+      },
+      {
+        label: "Active Campaigns",
+        value: activeCount,
+        trend: "up",
+      },
+      {
+        label: "Total Applications",
+        value: totalApplications,
+        footerSubtitle: "Across all campaigns",
+      },
+    ];
+  }, [campaigns, range]);
 
   return (
     <DashboardShell>
-      <StatsCards stats={stats} />
+      <StatsCards stats={stats} range={range} onRangeChange={setRange} />
       <div className="flex w-full flex-col gap-6 lg:flex-row">
         <div className="min-w-0 flex-1">
           <CreatedCampaigns campaigns={campaigns} limit={3} />

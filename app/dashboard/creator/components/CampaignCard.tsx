@@ -20,6 +20,7 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
 <div
   onClick={() => onClick(campaign)}
   className="
+    bg-card
     group
     relative
     h-[190px]
@@ -32,6 +33,8 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
     cursor-pointer
     border border-border
     z-20
+    hover:border-border
+    hover:-translate-y-0.5
   "
  
 >

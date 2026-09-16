@@ -162,7 +162,7 @@ export default function NotificationDrawer({
                   handleClick(notification);
                 }
               }}
-              className={`group flex flex-col gap-3 rounded-[14px] border p-4 cursor-pointer transition-all duration-200 ${notificationTypeStyles[notification.type]} ${
+              className={`group flex flex-col gap-3 rounded-[14px] border p-4 cursor-pointer transition-all duration-200  ${
                 !notification.isRead
                   ? `bg-orange-50 border-orange-200 dark:bg-orange-100/[0.08] dark:border-orange-300/25`
                   : `bg-card border-border dark:bg-card dark:border-border`

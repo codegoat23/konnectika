@@ -93,7 +93,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
                     : "bg-primary text-primary-foreground hover:bg-orange-400"
                 )}
               >
-                {brand ? "Launch a Campaign" : "Get Started"}
+                {brand ? "Launch a Campaign" : "Start earning"}
               </Button>
             </Link>
           </div>
