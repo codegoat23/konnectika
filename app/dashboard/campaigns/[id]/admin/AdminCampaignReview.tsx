@@ -14,6 +14,7 @@ import type { Prisma } from "@prisma/client";
 import { CheckCircle2, Star, XCircle } from "lucide-react";
 import { SiTicktick } from "react-icons/si";
 import AdminApplications from "./AdminApplications";
+import AdminPaymentProofPanel from "./AdminPaymentProofPanel";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
 import { PaymentMethodDisplay } from "@/components/payment-method-display";
 
@@ -269,6 +270,14 @@ export default function AdminCampaignReview({
           </div>
         </div>
       </div>
+
+      {/* PAYMENT PROOFS
+          Shown only when the brand has submitted proofs (panel renders null
+          otherwise). Verifying a proof marks the campaign as paid. */}
+      <AdminPaymentProofPanel
+        campaignId={campaign.id}
+        onReviewed={onActionComplete}
+      />
 
       {/* ACTIONS */}
       <div className="flex flex-wrap items-center gap-3">

@@ -14,13 +14,23 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { formatTZS } from "@/lib/utils";
 import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { PAYOUT_STATUS_STYLES } from "@/lib/status-styles";
+import { PAYMENT_METHODS } from "@/lib/payment";
 import type {
   AdminPayout,
   PayoutSettings,
 } from "./types";
+import PaymentProofUploader from "@/components/PaymentProofUploader";
 import {
   Loader2Icon,
   ChevronDownIcon,
@@ -33,6 +43,8 @@ import {
   CheckCircle2,
   Check,
   XCircle,
+  Landmark,
+  Smartphone,
 } from "lucide-react";
 
 function formatDate(date: Date | null | undefined): string {
@@ -57,6 +69,9 @@ export default function AdminPayouts({
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [markPaidId, setMarkPaidId] = useState<string | null>(null);
   const [paymentReference, setPaymentReference] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
+  const [paymentNote, setPaymentNote] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +108,9 @@ export default function AdminPayouts({
           status,
           paymentReference:
             status === "PAID" ? paymentReference.trim() : undefined,
+          paymentMethod: status === "PAID" ? paymentMethod || undefined : undefined,
+          proofUrl: status === "PAID" && proofUrl ? proofUrl : undefined,
+          note: status === "PAID" && paymentNote.trim() ? paymentNote.trim() : undefined,
           rejectionReason:
             status === "REJECT" ? rejectionReason.trim() : undefined,
         }),
@@ -106,12 +124,24 @@ export default function AdminPayouts({
       setMarkPaidId(null);
       setRejectId(null);
       setPaymentReference("");
+      setPaymentMethod("");
+      setProofUrl(null);
+      setPaymentNote("");
       setRejectionReason("");
       window.location.reload();
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
+  };
+
+  const openMarkPaid = (payout: AdminPayout) => {
+    setMarkPaidId(payout.id);
+    setPaymentReference("");
+    setPaymentMethod(payout.paymentMethod ?? payout.creator.payoutAccount?.method ?? "");
+    setProofUrl(null);
+    setPaymentNote("");
+    setError(null);
   };
 
   const saveSettings = async () => {
@@ -498,7 +528,7 @@ export default function AdminPayouts({
                       <Button
                         size="sm"
                         disabled={loading}
-                        onClick={() => setMarkPaidId(payout.id)}
+                        onClick={() => openMarkPaid(payout)}
                         className="h-8 rounded-lg bg-success text-success-foreground px-3 text-xs font-medium hover:bg-success/90"
                       >
                         <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
@@ -634,45 +664,165 @@ export default function AdminPayouts({
           if (!open) setMarkPaidId(null);
         }}
       >
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl p-2">
+          <DialogHeader className="border-b border-border px-6 py-5">
             <DialogTitle>Mark Payout as Paid</DialogTitle>
             <DialogDescription>
-              After paying the creator externally, enter the payment reference
-              and confirm. Their earnings will be marked as paid.
+              After paying the creator externally, record the transaction. Their
+              earnings will be marked as paid once this proof is saved.
             </DialogDescription>
           </DialogHeader>
 
           {(() => {
             const p = payouts.find((x) => x.id === markPaidId);
             if (!p) return null;
+            const recipient = p.creator.payoutAccount;
+
             return (
-              <div className="flex items-center justify-between rounded-xl border border-border bg-card/50 px-4 py-3">
-                <span className="text-sm text-muted-foreground">Payout Amount</span>
-                <span className="text-lg font-semibold text-foreground">
-                  TZS {formatTZS(p.amount)}
-                </span>
+              <div className="space-y-4 px-6 py-5">
+                {/* Payout amount */}
+                <div className="flex items-center justify-between rounded-xl border border-border bg-card/50 px-4 py-3">
+                  <span className="text-sm text-muted-foreground">Payout Amount</span>
+                  <span className="text-lg font-semibold text-foreground">
+                    TZS {formatTZS(p.amount)}
+                  </span>
+                </div>
+
+                {/* Recipient payout account — show creator's saved destination */}
+                <div className="rounded-xl border border-border bg-muted/30 p-4">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Recipient ({p.creator.displayName || p.creator.username})
+                  </p>
+
+                  {recipient ? (
+                    <div className="mt-3 space-y-1.5 text-sm">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-muted-foreground">Destination</span>
+                        <PaymentMethodDisplay
+                          method={recipient.method}
+                          size="sm"
+                        />
+                      </div>
+
+                      {recipient.phone && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-muted-foreground">Phone</span>
+                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                            <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+                            {recipient.phone}
+                          </span>
+                        </div>
+                      )}
+
+                      {recipient.bankName && recipient.accountNumber && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-muted-foreground">Account</span>
+                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                            <Landmark className="h-3.5 w-3.5 text-muted-foreground" />
+                            {recipient.bankName} · {recipient.accountNumber}
+                          </span>
+                        </div>
+                      )}
+
+                      {recipient.accountName && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-muted-foreground">Account name</span>
+                          <span className="font-medium text-foreground">
+                            {recipient.accountName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-warning">
+                      This creator has not saved a payout account. Confirm the
+                      destination they provided.
+                    </p>
+                  )}
+                </div>
+
+                {/* Payment method */}
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">
+                    Payment method
+                  </label>
+                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <SelectTrigger className="min-h-10 w-full rounded-xl">
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl p-3">
+                      {PAYMENT_METHODS.map((m) => (
+                        <SelectItem key={m} value={m} className="rounded-lg py-2">
+                          <PaymentMethodDisplay method={m} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Payment reference */}
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">
+                    Payment Reference <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={paymentReference}
+                    onChange={(e) => setPaymentReference(e.target.value)}
+                    placeholder="e.g. M-PESA transaction ID"
+                    className="h-11 rounded-xl"
+                  />
+                </div>
+
+                {/* Proof upload */}
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">
+                    Proof / receipt
+                  </label>
+                  <div className="rounded-xl border border-dashed border-border bg-muted/30 p-3">
+                    <PaymentProofUploader
+                      onUploadComplete={(urls) => setProofUrl(urls[0] ?? null)}
+                      label="Upload proof of payout"
+                    />
+                    {proofUrl && (
+                      <p className="mt-2 flex items-center gap-1 text-xs text-success">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Proof uploaded
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Note */}
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground">
+                    Note <span className="text-muted-foreground">(optional)</span>
+                  </label>
+                  <Textarea
+                    value={paymentNote}
+                    onChange={(e) => setPaymentNote(e.target.value)}
+                    placeholder="Anything creators should know"
+                    rows={2}
+                    className="rounded-xl"
+                  />
+                </div>
+
+                {error && (
+                  <p className="rounded-lg border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    {error}
+                  </p>
+                )}
               </div>
             );
           })()}
 
-          <div className="space-y-2">
-            <label className="text-xs text-muted-foreground">
-              Payment Reference
-            </label>
-            <Input
-              value={paymentReference}
-              onChange={(e) => setPaymentReference(e.target.value)}
-              placeholder="e.g. M-PESA transaction ID"
-            />
-          </div>
-
-          <DialogFooter>
+          <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:justify-between">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="rounded-xl">
+                Cancel
+              </Button>
             </DialogClose>
             <Button
-              className="bg-success text-success-foreground hover:bg-success/90 cursor-pointer"
+              className="w-full cursor-pointer rounded-xl bg-success text-success-foreground hover:bg-success/90 sm:w-auto"
               disabled={loading || !paymentReference.trim()}
               onClick={() => markPaidId && updateStatus(markPaidId, "PAID")}
             >

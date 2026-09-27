@@ -6,7 +6,7 @@ export type PaymentBreakdownProps = {
   feeRate: number;
   fee: number;
   total: number;
-  paymentStatus?: "UNPAID" | "PAID" | null;
+  paymentStatus?: "UNPAID" | "PROOF_SUBMITTED" | "PAID" | null;
   title?: string;
   showStatus?: boolean;
   showNote?: boolean;
@@ -15,6 +15,7 @@ export type PaymentBreakdownProps = {
 
 const PAYMENT_STATUS_STYLES: Record<string, string> = {
   UNPAID: "bg-warning/15 text-warning border-warning/25",
+  PROOF_SUBMITTED: "bg-info/15 text-info border-info/25",
   PAID: "bg-success/15 text-success border-success/25",
 };
 
@@ -46,7 +47,7 @@ export default function PaymentBreakdown({
               PAYMENT_STATUS_STYLES[paymentStatus]
             }`}
           >
-            {paymentStatus === "PAID" ? "Paid" : "Unpaid"}
+            {paymentStatus === "PAID" ? "Paid" : paymentStatus === "PROOF_SUBMITTED" ? "Proof Submitted" : "Unpaid"}
           </span>
         )}
       </div>

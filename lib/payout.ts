@@ -376,7 +376,22 @@ export async function runScheduledPayouts(
 
 const payoutWithCreator = {
   creator: {
-    select: { id: true, userId: true, username: true, displayName: true },
+    select: {
+      id: true,
+      userId: true,
+      username: true,
+      displayName: true,
+      payoutAccount: {
+        select: {
+          id: true,
+          method: true,
+          phone: true,
+          accountName: true,
+          bankName: true,
+          accountNumber: true,
+        },
+      },
+    },
   },
 } satisfies Prisma.PayoutInclude;
 
@@ -493,6 +508,9 @@ export interface MarkPayoutPaidInput {
   adminUserId: string;
   role: "ADMIN";
   paymentReference?: string;
+  paymentMethod?: string;
+  proofUrl?: string;
+  note?: string;
 }
 
 export type MarkPayoutPaidResult =
@@ -521,7 +539,9 @@ export async function markPayoutPaid(
 
   const payout = await prisma.payout.findUnique({
     where: { id: input.payoutId },
-    include: { creator: { select: { userId: true } } },
+    include: {
+      creator: { select: { userId: true } },
+    },
   });
   if (!payout) {
     return { ok: false, error: "Payout not found.", code: "NOT_FOUND" };
@@ -576,6 +596,26 @@ export async function markPayoutPaid(
       },
     });
 
+    // Record the payment proof — the payout only becomes PAID once this exists.
+    await tx.paymentProof.create({
+      data: {
+        payoutId: input.payoutId,
+        submittedById: input.adminUserId,
+        amount: payout.amount,
+        paymentMethod:
+          input.paymentMethod?.trim() || payout.paymentMethod || "Other",
+        transactionReference:
+          input.paymentReference?.trim() ||
+          payout.paymentReference ||
+          "Manual payment",
+        proofUrl: input.proofUrl?.trim() || null,
+        note: input.note?.trim() || null,
+        status: "VERIFIED",
+        reviewedById: input.adminUserId,
+        reviewedAt: now,
+      },
+    });
+
     return tx.payout.findUniqueOrThrow({
       where: { id: input.payoutId },
       include: payoutWithCreator,
@@ -609,7 +649,21 @@ export async function markPayoutPaid(
 
 const payoutListInclude = {
   creator: {
-    select: { id: true, username: true, displayName: true },
+    select: {
+      id: true,
+      username: true,
+      displayName: true,
+      payoutAccount: {
+        select: {
+          id: true,
+          method: true,
+          phone: true,
+          accountName: true,
+          bankName: true,
+          accountNumber: true,
+        },
+      },
+    },
   },
   earnings: {
     select: {

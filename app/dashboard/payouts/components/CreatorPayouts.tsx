@@ -32,6 +32,9 @@ import {
   PAYMENT_METHODS,
   isMobileMoneyMethod,
 } from "@/lib/payment";
+import PayoutAccountSection, {
+  type PayoutAccount,
+} from "./PayoutAccountSection";
 import {
   WalletIcon,
   ArrowUpRightIcon,
@@ -60,17 +63,34 @@ interface CreatorPayoutsProps {
 
 function RequestPayoutDialog({
   eligibility,
+  account,
   onDone,
 }: {
   eligibility: PayoutEligibility;
+  account: PayoutAccount | null;
   onDone: () => void;
 }) {
-  const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
-  const [paymentPhone, setPaymentPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<string | undefined>(
+    account?.method ?? undefined
+  );
+  const [paymentPhone, setPaymentPhone] = useState(
+    account && isMobileMoneyMethod(account.method)
+      ? account.phone ?? ""
+      : ""
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const needsPhone = isMobileMoneyMethod(paymentMethod);
+
+  const handleMethodChange = (m: string) => {
+    setPaymentMethod(m);
+    setPaymentPhone(
+      account && account.method === m && isMobileMoneyMethod(m)
+        ? account.phone ?? ""
+        : ""
+    );
+  };
 
   const submit = async () => {
     setSubmitting(true);
@@ -144,7 +164,7 @@ function RequestPayoutDialog({
         Payment method
       </label>
 
-      <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+      <Select value={paymentMethod} onValueChange={handleMethodChange}>
         <SelectTrigger className="min-h-15 w-full rounded-lg mt-2 p-2">
           <SelectValue placeholder="Select payment method" />
         </SelectTrigger>
@@ -250,6 +270,8 @@ export default function CreatorPayouts({
   eligibility,
   payouts,
 }: CreatorPayoutsProps) {
+  const [account, setAccount] = useState<PayoutAccount | null>(null);
+
   return (
     <div className="space-y-6">
       <div className="px-4 lg:px-6">
@@ -272,7 +294,11 @@ export default function CreatorPayouts({
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <RequestPayoutDialog eligibility={eligibility} onDone={() => {}} />
+              <RequestPayoutDialog
+                eligibility={eligibility}
+                account={account}
+                onDone={() => {}}
+              />
               {eligibility.hasActivePayout && (
                 <span className="text-[11px] text-white/70 flex items-center gap-1">
                   <LockKeyholeIcon className="size-3" />
@@ -282,6 +308,10 @@ export default function CreatorPayouts({
             </div>
           </div>
         </Card>
+      </div>
+
+      <div className="px-4 lg:px-6">
+        <PayoutAccountSection setAccount={setAccount} />
       </div>
 
       <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3">

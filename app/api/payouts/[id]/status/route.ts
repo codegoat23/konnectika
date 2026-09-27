@@ -21,6 +21,9 @@ import { z } from "zod";
 const bodySchema = z.object({
   status: z.enum(["APPROVE", "REJECT", "PAID"]),
   paymentReference: z.string().trim().max(200).optional(),
+  paymentMethod: z.string().trim().max(100).optional(),
+  proofUrl: z.string().trim().max(500).optional(),
+  note: z.string().trim().max(500).optional(),
   rejectionReason: z.string().trim().max(500).optional(),
 });
 
@@ -74,6 +77,9 @@ export async function PATCH(
         adminUserId: user.userId,
         role: user.role,
         paymentReference: parsed.data.paymentReference,
+        paymentMethod: parsed.data.paymentMethod,
+        proofUrl: parsed.data.proofUrl,
+        note: parsed.data.note,
       });
       if (!result.ok) {
         const status =

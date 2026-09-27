@@ -90,6 +90,50 @@ export const ourFileRouter = {
 
   }),
 
+  paymentProof: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+
+  .middleware(async () => {
+
+    const user = await getSessionUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Brands upload proof for their campaign payment; admins upload proof
+    // that they paid a creator payout.
+    if (user.role !== "BRAND" && user.role !== "ADMIN") {
+      throw new Error("Only brands and admins can upload payment proof");
+    }
+
+    return {
+      uploadedBy: user.id,
+    };
+
+  })
+
+
+  .onUploadComplete(async ({ metadata, file }) => {
+
+
+    console.log("Payment proof uploaded", {
+      uploadedBy: metadata.uploadedBy,
+      url: file.url,
+    });
+
+
+    return {
+      uploadedBy: metadata.uploadedBy,
+      url: file.url,
+    };
+
+  }),
+
 } satisfies FileRouter;
 
 

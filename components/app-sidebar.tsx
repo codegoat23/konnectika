@@ -216,6 +216,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     if (role === "ADMIN") {
       items.push({
+        title: "Payments",
+        url: "/dashboard/payments",
+        icon: <Landmark />,
+      });
+    }
+    if (role === "ADMIN") {
+      items.push({
         title: "Revenue",
         url: "/dashboard/revenue",
         icon: <Landmark />,

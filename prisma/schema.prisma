@@ -26,6 +26,9 @@ model User {
   creatorProfile  CreatorProfile?
   businessProfile BusinessProfile?
   notifications   Notification[]
+
+  submittedPaymentProofs PaymentProof[] @relation("PaymentProofSubmittedBy")
+  reviewedPaymentProofs  PaymentProof[] @relation("PaymentProofReviewedBy")
 }
 
 model CreatorProfile {
@@ -45,6 +48,7 @@ model CreatorProfile {
   socialAccounts  SocialAccount[]
   applications    CampaignApplication[]
   platformRevenue PlatformRevenue[]
+  payoutAccount   PayoutAccount?
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
 
@@ -167,6 +171,7 @@ model Campaign {
   applications      CampaignApplication[]
   platformRevenue   PlatformRevenue[]
   earnings          Earning[]
+  paymentProofs     PaymentProof[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -184,7 +189,8 @@ enum CampaignStatus {
 
 enum CampaignPaymentStatus {
   UNPAID // created but the brand has not paid yet
-  PAID // admin approved => funds received (manual payment)
+  PROOF_SUBMITTED // the brand submitted a payment proof, awaiting admin verification
+  PAID // admin verified the proof / confirmed funds received (manual payment)
 }
 
 enum BadgeType {
@@ -522,6 +528,8 @@ model Payout {
 
   earnings Earning[]
 
+  paymentProofs PaymentProof[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -543,5 +551,109 @@ model PlatformSetting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// MANUAL PAYMENT SYSTEM
+// ============================================================
+//
+// One reusable payment-proof model drives BOTH money flows so there is a
+// single, auditable trail:
+//   - BRAND -> KONNEKTIKA campaign payment: a PaymentProof linked to the
+//     campaign is created when the brand submits proof of payment; the admin
+//     verifies or rejects it. Verification flips the campaign paymentStatus
+//     to PAID (reusing the existing campaign-funding logic).
+//   - KONNEKTIKA -> CREATOR payout: the admin records the proof they created
+//     while processing a payout; the payout only becomes PAID once that
+//     proof is stored (status VERIFIED).
+//
+// Lifecycle (campaign proofs):  UNPAID > submit proof > PROOF_SUBMITTED >
+// admin verifies (PAID) or rejects (back to UNPAID with a reason).
+
+enum PaymentProofStatus {
+  PROOF_SUBMITTED // proof submitted, awaiting admin verification
+  VERIFIED // admin confirmed the payment
+  REJECTED // admin rejected the proof with a reason
+}
+
+enum ReceivingAccountType {
+  MOBILE_MONEY
+  BANK
+}
+
+model PaymentProof {
+  id String @id @default(cuid())
+
+  // Links: either a campaign (brand paying the platform) or a payout
+  // (platform paying a creator). Exactly one of these is set.
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  payoutId String?
+  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+
+  // who submitted/recorded the proof
+  submittedById String?
+  submittedBy   User?   @relation("PaymentProofSubmittedBy", fields: [submittedById], references: [id], onDelete: SetNull)
+
+  amount               Int
+  paymentMethod        String
+  transactionReference String
+  proofUrl             String?
+  note                 String?
+  status               PaymentProofStatus @default(PROOF_SUBMITTED)
+
+  // admin review fields
+  reviewedById    String?
+  reviewedBy      User?     @relation("PaymentProofReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime?
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([payoutId])
+  @@index([status])
+}
+
+// Konnectika's admin-configured receiving accounts. Brands never type these
+// numbers themselves — the UI reads the active account matching the payment
+// method, so nothing is ever hardcoded in campaign components.
+model ReceivingAccount {
+  id String @id @default(cuid())
+
+  type          ReceivingAccountType
+  provider      String // mobile money method ("M-PESA", …) or bank name
+  accountName   String
+  phone         String? // mobile money receiving number
+  accountNumber String? // bank account number
+  branchDetail  String? // branch / reference details
+  extraDetails  String? // other relevant bank details
+  isActive      Boolean              @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+}
+
+// A creator's saved payout destination, managed from their dashboard. The
+// admin uses this when processing a creator payout so the money goes to the
+// account the creator specified.
+model PayoutAccount {
+  id        String         @id @default(cuid())
+  creatorId String         @unique
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  method        String // "M-PESA" | "Airtel Money" | "Tigo Pesa" | "Bank Transfer" | …
+  phone         String? // mobile money receiving phone
+  accountName   String? // payee name (mobile money or bank)
+  bankName      String? // bank transfer
+  accountNumber String? // bank transfer
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

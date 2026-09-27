@@ -5,6 +5,7 @@ import CampaignAnalytics from "../components/CampaignAnalytics";
 import CampaignBudget from "../components/CampaignBudget";
 import CampaignHeader from "../components/CampaignHeader";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
+import BrandPaymentSection from "./BrandPaymentSection";
 import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { useParams, useRouter } from "next/navigation";
 import { Users } from "lucide-react";
@@ -91,6 +92,14 @@ export default function BrandCampaignView({
           </div>
         )}
       </div>
+
+      <BrandPaymentSection
+        campaignId={campaign.id}
+        campaignName={campaign.name}
+        totalCharge={campaign.totalCharge}
+        paymentMethod={campaign.paymentMethod}
+        initialStatus={campaign.paymentStatus}
+      />
     </div>
   );
 }
