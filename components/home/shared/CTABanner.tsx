@@ -97,7 +97,7 @@ export function CTABanner({
                       "h-12 w-full rounded-full px-7 text-base font-semibold sm:w-auto",
                       creator
                         ? "bg-white text-foreground hover:bg-white/90"
-                        : "bg-black text-white ring-1 ring-inset ring-white/25 hover:bg-zinc-900"
+                        : "bg-white text-black hover:bg-zinc-200"
                     )}
                   >
                     {primaryLabel}

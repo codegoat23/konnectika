@@ -149,7 +149,7 @@ export function CreatorSections() {
         headline="Your next brand collaboration is waiting"
         subtext="Create a free profile and start discovering campaigns that fit your creativity today."
         primaryLabel="Create your profile"
-        primaryHref="/signup"
+        primaryHref="/signup?role=CREATOR"
         secondaryLabel="Explore campaigns"
         secondaryHref="/discover"
       />

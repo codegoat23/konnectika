@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import { useRouter } from "next/navigation";
 import { OverviewHeader } from "@/app/dashboard/balance/components/Overviewheader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,25 +15,16 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { formatTZS } from "@/lib/utils";
 import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { PAYOUT_STATUS_STYLES } from "@/lib/status-styles";
-import { PAYMENT_METHODS } from "@/lib/payment";
 import type {
   AdminPayout,
   PayoutSettings,
 } from "./types";
-import PaymentProofUploader from "@/components/PaymentProofUploader";
 import {
   Loader2Icon,
+  Send,
   ChevronDownIcon,
   ChevronRightIcon,
   Settings2Icon,
@@ -43,8 +35,6 @@ import {
   CheckCircle2,
   Check,
   XCircle,
-  Landmark,
-  Smartphone,
 } from "lucide-react";
 
 function formatDate(date: Date | null | undefined): string {
@@ -65,15 +55,12 @@ export default function AdminPayouts({
   payouts,
   settings: initialSettings,
 }: AdminPayoutsProps) {
+  const router = useRouter();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectId, setRejectId] = useState<string | null>(null);
-  const [markPaidId, setMarkPaidId] = useState<string | null>(null);
-  const [paymentReference, setPaymentReference] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
-  const [proofUrl, setProofUrl] = useState<string | null>(null);
-  const [paymentNote, setPaymentNote] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sendingId, setSendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Settings state
@@ -94,10 +81,36 @@ export default function AdminPayouts({
     .filter((p) => p.status === "PAID")
     .reduce((s, p) => s + p.amount, 0);
 
-  const updateStatus = async (
-    id: string,
-    status: "APPROVE" | "REJECT" | "PAID"
-  ) => {
+  /**
+   * Hand an approved payout to Snippe. This does NOT mark it paid — Snippe's
+   * webhook does that. The row lands in PROCESSING once the transfer is
+   * accepted, and the list is refreshed to show it.
+   */
+  const sendPayout = async (id: string) => {
+    setSendingId(id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/payouts/${id}/send`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.error ?? "Could not send the payout. Please try again.");
+        setSendingId(null);
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError("Could not send the payout. Please try again.");
+    } finally {
+      setSendingId(null);
+    }
+  };
+
+  /**
+   * Admin review of a payout: APPROVE hands it to the payout queue, REJECT
+   * returns the frozen earnings to the creator. Settlement itself is never done
+   * here — it happens through Snippe (see sendPayout).
+   */
+  const updateStatus = async (id: string, status: "APPROVE" | "REJECT") => {
     setLoading(true);
     setError(null);
     try {
@@ -106,11 +119,6 @@ export default function AdminPayouts({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status,
-          paymentReference:
-            status === "PAID" ? paymentReference.trim() : undefined,
-          paymentMethod: status === "PAID" ? paymentMethod || undefined : undefined,
-          proofUrl: status === "PAID" && proofUrl ? proofUrl : undefined,
-          note: status === "PAID" && paymentNote.trim() ? paymentNote.trim() : undefined,
           rejectionReason:
             status === "REJECT" ? rejectionReason.trim() : undefined,
         }),
@@ -121,27 +129,13 @@ export default function AdminPayouts({
         setLoading(false);
         return;
       }
-      setMarkPaidId(null);
       setRejectId(null);
-      setPaymentReference("");
-      setPaymentMethod("");
-      setProofUrl(null);
-      setPaymentNote("");
       setRejectionReason("");
-      window.location.reload();
+      router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
-  };
-
-  const openMarkPaid = (payout: AdminPayout) => {
-    setMarkPaidId(payout.id);
-    setPaymentReference("");
-    setPaymentMethod(payout.paymentMethod ?? payout.creator.payoutAccount?.method ?? "");
-    setProofUrl(null);
-    setPaymentNote("");
-    setError(null);
   };
 
   const saveSettings = async () => {
@@ -376,7 +370,7 @@ export default function AdminPayouts({
           ) : (
            <div className="mt-5 overflow-hidden rounded-[24px] border border-border bg-card">
   <div className="overflow-x-auto">
-    <table className="w-full min-w-[1100px] text-sm">
+            <table className="w-full min-w-[1100px] text-sm">
       <thead>
         <tr className="border-b border-border bg-card">
           <th className="h-12 px-5 text-left text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
@@ -525,14 +519,21 @@ export default function AdminPayouts({
 
                   {payout.status === "APPROVED" && (
                     <div className="flex items-center justify-end gap-2">
+                      {/* Sending is the settlement action: it hands the money to
+                          Snippe, which confirms via webhook. There is no
+                          manual "mark paid" for an approved payout. */}
                       <Button
                         size="sm"
                         disabled={loading}
-                        onClick={() => openMarkPaid(payout)}
-                        className="h-8 rounded-lg bg-success text-success-foreground px-3 text-xs font-medium hover:bg-success/90"
+                        onClick={() => void sendPayout(payout.id)}
+                        className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                       >
-                        <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-                        Mark paid
+                        {sendingId === payout.id ? (
+                          <Loader2Icon className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Send className="mr-1.5 h-3.5 w-3.5" />
+                        )}
+                        Send
                       </Button>
 
                       <Button
@@ -548,10 +549,38 @@ export default function AdminPayouts({
                     </div>
                   )}
 
+                  {payout.status === "PROCESSING" && (
+                    <div className="flex flex-col items-center justify-end gap-1.5 text-xs text-info">
+                      <span className="flex flex-row items-center gap-2">
+                        <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
+                        Sending
+                      </span>
+                      <span className="text-muted-foreground">
+                        Sent {formatDate(payout.sentAt)}
+                      </span>
+                    </div>
+                  )}
+
+                  {payout.status === "FAILED" && (
+                    <div className="flex max-w-[220px] flex-col items-end justify-end gap-1 text-right text-xs text-destructive">
+                      <span className="flex flex-row items-center gap-2">
+                        <XCircle className="h-3.5 w-3.5" />
+                        Failed
+                      </span>
+                      <span className="truncate text-destructive/80">
+                        {payout.failureReason ||
+                          "Returned to the creator's balance."}
+                      </span>
+                    </div>
+                  )}
+
                   {payout.status === "PAID" && (
                     <div className="flex flex-col items-center justify-end gap-1.5 text-xs text-success">
-                      
-                     <span className="flex flex-row gap-2"><CheckCircle2 className="h-3.5 w-3.5" />Paid</span> <span>{formatDate(payout.paidAt)}</span>
+                      <span className="flex flex-row gap-2">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Paid
+                      </span>
+                      <span>{formatDate(payout.paidAt)}</span>
                     </div>
                   )}
 
@@ -656,182 +685,6 @@ export default function AdminPayouts({
           </p>
         </div>
       )}
-
-      {/* Mark Paid dialog */}
-      <Dialog
-        open={markPaidId !== null}
-        onOpenChange={(open) => {
-          if (!open) setMarkPaidId(null);
-        }}
-      >
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl p-2">
-          <DialogHeader className="border-b border-border px-6 py-5">
-            <DialogTitle>Mark Payout as Paid</DialogTitle>
-            <DialogDescription>
-              After paying the creator externally, record the transaction. Their
-              earnings will be marked as paid once this proof is saved.
-            </DialogDescription>
-          </DialogHeader>
-
-          {(() => {
-            const p = payouts.find((x) => x.id === markPaidId);
-            if (!p) return null;
-            const recipient = p.creator.payoutAccount;
-
-            return (
-              <div className="space-y-4 px-6 py-5">
-                {/* Payout amount */}
-                <div className="flex items-center justify-between rounded-xl border border-border bg-card/50 px-4 py-3">
-                  <span className="text-sm text-muted-foreground">Payout Amount</span>
-                  <span className="text-lg font-semibold text-foreground">
-                    TZS {formatTZS(p.amount)}
-                  </span>
-                </div>
-
-                {/* Recipient payout account — show creator's saved destination */}
-                <div className="rounded-xl border border-border bg-muted/30 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Recipient ({p.creator.displayName || p.creator.username})
-                  </p>
-
-                  {recipient ? (
-                    <div className="mt-3 space-y-1.5 text-sm">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">Destination</span>
-                        <PaymentMethodDisplay
-                          method={recipient.method}
-                          size="sm"
-                        />
-                      </div>
-
-                      {recipient.phone && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Phone</span>
-                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                            <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
-                            {recipient.phone}
-                          </span>
-                        </div>
-                      )}
-
-                      {recipient.bankName && recipient.accountNumber && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Account</span>
-                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                            <Landmark className="h-3.5 w-3.5 text-muted-foreground" />
-                            {recipient.bankName} · {recipient.accountNumber}
-                          </span>
-                        </div>
-                      )}
-
-                      {recipient.accountName && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Account name</span>
-                          <span className="font-medium text-foreground">
-                            {recipient.accountName}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="mt-2 text-xs text-warning">
-                      This creator has not saved a payout account. Confirm the
-                      destination they provided.
-                    </p>
-                  )}
-                </div>
-
-                {/* Payment method */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">
-                    Payment method
-                  </label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="min-h-10 w-full rounded-xl">
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl p-3">
-                      {PAYMENT_METHODS.map((m) => (
-                        <SelectItem key={m} value={m} className="rounded-lg py-2">
-                          <PaymentMethodDisplay method={m} />
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Payment reference */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">
-                    Payment Reference <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    value={paymentReference}
-                    onChange={(e) => setPaymentReference(e.target.value)}
-                    placeholder="e.g. M-PESA transaction ID"
-                    className="h-11 rounded-xl"
-                  />
-                </div>
-
-                {/* Proof upload */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">
-                    Proof / receipt
-                  </label>
-                  <div className="rounded-xl border border-dashed border-border bg-muted/30 p-3">
-                    <PaymentProofUploader
-                      onUploadComplete={(urls) => setProofUrl(urls[0] ?? null)}
-                      label="Upload proof of payout"
-                    />
-                    {proofUrl && (
-                      <p className="mt-2 flex items-center gap-1 text-xs text-success">
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        Proof uploaded
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Note */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">
-                    Note <span className="text-muted-foreground">(optional)</span>
-                  </label>
-                  <Textarea
-                    value={paymentNote}
-                    onChange={(e) => setPaymentNote(e.target.value)}
-                    placeholder="Anything creators should know"
-                    rows={2}
-                    className="rounded-xl"
-                  />
-                </div>
-
-                {error && (
-                  <p className="rounded-lg border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                    {error}
-                  </p>
-                )}
-              </div>
-            );
-          })()}
-
-          <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:justify-between">
-            <DialogClose asChild>
-              <Button variant="outline" className="rounded-xl">
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button
-              className="w-full cursor-pointer rounded-xl bg-success text-success-foreground hover:bg-success/90 sm:w-auto"
-              disabled={loading || !paymentReference.trim()}
-              onClick={() => markPaidId && updateStatus(markPaidId, "PAID")}
-            >
-              {loading && <Loader2Icon className="animate-spin" />}
-              Confirm Payment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Reject dialog */}
       <Dialog

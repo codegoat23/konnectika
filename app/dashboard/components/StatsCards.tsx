@@ -152,22 +152,23 @@ function StatSkeleton() {
 function StatsSkeleton() {
   return (
     <>
-      {/* Mobile placeholder */}
-      <div className="lg:hidden">
-        <div className="px-4 pb-3">
-          <div className="min-h-[160px]">
-            <StatSkeleton />
+      {/* Mobile placeholder: match the single-card overview layout. */}
+      <div className="px-4 lg:hidden">
+        <Card className="overflow-hidden rounded-3xl bg-card p-5 shadow-xs gap-4">
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-4 w-36" />
           </div>
-        </div>
-        <div className="overflow-hidden">
-          <div className="flex gap-3 overflow-hidden px-4 pb-2">
+          <div className="space-y-3 border-t border-border pt-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="w-[78%] shrink-0">
-                <StatSkeleton />
+              <div key={i} className="flex items-center justify-between gap-4">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-5 w-20" />
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Desktop placeholder */}
@@ -209,7 +210,6 @@ export function StatsCards({
   };
 
   const hero = stats.find((s) => s.highlight);
-  const rest = stats.filter((s) => !s.highlight);
 
   return (
     <>
@@ -223,30 +223,50 @@ export function StatsCards({
         <StatsSkeleton />
       ) : (
         <>
-          {/* Mobile: featured hero card + swipeable remaining cards */}
-          <div className="lg:hidden">
-            {hero && (
-              <div className="px-4 pb-3">
-                <div className="min-h-[160px]">
-                  <StatCard stat={hero} />
-                </div>
-              </div>
-            )}
+          {/* Mobile: one payout-style summary card keeps the overview compact. */}
+          <div className="px-4 lg:hidden">
+            {(() => {
+              const featured = hero ?? stats[0];
+              const secondary = stats.filter((stat) => stat !== featured);
+              const FeaturedIcon = featured ? (featured.icon ?? inferIcon(featured.label)) : null;
 
-            {rest.length > 0 && (
-              <div className="overflow-hidden">
-                <div
-                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth px-4 pb-2
-                             [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                >
-                  {rest.map((stat) => (
-                    <div key={stat.label} className="w-[78%] shrink-0 snap-start">
-                      <StatCard stat={stat} />
+              return featured ? (
+                <Card className="relative overflow-hidden rounded-3xl border-0 bg-zinc-900 p-5 text-white shadow-lg gap-4">
+                  <div className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full border border-white/5" />
+                  <div className="relative">
+                    <div className="flex items-center gap-2 text-xs font-medium text-white/65">
+                      {FeaturedIcon && <FeaturedIcon className="size-3.5" />}
+                      <span>{featured.label}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">
+                      {featured.value}
+                    </p>
+                    {featured.footerSubtitle && (
+                      <p className="mt-2 text-xs text-white/65">{featured.footerSubtitle}</p>
+                    )}
+                  </div>
+
+                  {secondary.length > 0 && (
+                    <div className="relative divide-y divide-white/10 border-t border-white/10">
+                      {secondary.map((stat) => {
+                        const Icon = stat.icon ?? inferIcon(stat.label);
+                        return (
+                          <div key={stat.label} className="flex items-center justify-between gap-4 py-3 first:pt-4 last:pb-0">
+                            <div className="flex min-w-0 items-center gap-2 text-xs text-white/65">
+                              <Icon className="size-3.5 shrink-0" />
+                              <span className="truncate">{stat.label}</span>
+                            </div>
+                            <span className="shrink-0 text-sm font-semibold tabular-nums text-white">
+                              {stat.value}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </Card>
+              ) : null;
+            })()}
           </div>
 
           {/* Desktop: 4-column grid */}

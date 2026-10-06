@@ -10,13 +10,15 @@ import { ApprovedCampaigns } from "@/lib/campaigns";
 import { CreatorEarnings } from "@/lib/earnings";
 import { getRangeBounds } from "../components/Overviewheader";
 import { RevenueAnalyticsChart } from "../components/revenueAnaltyicsChart";
+import SocialFolderGrid from "@/components/social/SocialFolder";
 
 type DashboardProps = {
   campaigns: ApprovedCampaigns[];
   earnings: CreatorEarnings;
+  submissionCount: number;
 };
 
-function CreatorDashboard({ campaigns, earnings }: DashboardProps) {
+function CreatorDashboard({ campaigns, earnings, submissionCount }: DashboardProps) {
   const [range, setRange] = useState("This Week");
 
   const statCardsData = useMemo<StatCardData[]>(() => {
@@ -39,7 +41,7 @@ function CreatorDashboard({ campaigns, earnings }: DashboardProps) {
         trend: "up",
         footerTitle: "All-time revenue",
         highlight: true,
-        footerSubtitle: "Across all campaigns",
+        footerSubtitle: "",
       },
       {
         label: "Pending Earnings",
@@ -60,17 +62,20 @@ function CreatorDashboard({ campaigns, earnings }: DashboardProps) {
       },
       {
         label: "Submissions",
-        value: 24,
+        value: submissionCount,
         trend: "down",
-        footerTitle: "Finished campaigns",
-        footerSubtitle: "Lifetime completed work",
+        footerTitle: "Lifetime submissions",
+        footerSubtitle: "Across all campaigns",
       },
     ];
-  }, [campaigns, earnings, range]);
+  }, [campaigns, earnings, range, submissionCount]);
 
   return (
     <DashboardShell>
       <StatsCards stats={statCardsData} range={range} onRangeChange={setRange} />
+      <div className="md:hidden">
+        <SocialFolderGrid mobileFavoritesOnly />
+      </div>
       <ActiveCampaigns active_campaigns={campaigns} />
       <div className="px-4 lg:px-6 py-10">
         <RevenueAnalyticsChart />

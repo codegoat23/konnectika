@@ -41,10 +41,10 @@ export default function FilterToolbar({
     <div className="space-y-4 mb-6">
 
       {/* TOP ROW */}
-      <div className="flex gap-3 items-center">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-3 sm:flex sm:items-center">
 
         {/* SEARCH */}
-        <div className="relative flex-1">
+        <div className="relative col-span-2 flex-1 sm:col-span-1">
           <Search
             size={15}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -70,12 +70,12 @@ export default function FilterToolbar({
         </button>
 
         {/* SORT */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center justify-between gap-2 sm:shrink-0 sm:justify-start">
           <span className="text-muted-foreground text-sm">Sort</span>
           <select
             value={filters.sortBy}
             onChange={(e) => onChange({ sortBy: e.target.value })}
-            className="bg-card border border-border rounded-full px-3 py-2.5 text-sm text-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer"
+            className="min-w-0 flex-1 bg-card border border-border rounded-full px-3 py-2.5 text-sm text-foreground outline-none focus:border-orange-500 transition-colors cursor-pointer sm:flex-none"
           >
             {sortOptions.map((opt) => (
               <option key={opt} value={opt}>

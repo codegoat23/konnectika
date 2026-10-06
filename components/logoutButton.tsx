@@ -1,28 +1,21 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { LogOut, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export function LogoutButton() {
-  const router = useRouter();
+  const { signOut } = useClerk();
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        throw new Error("Logout failed");
-      }
-
-      router.replace("/login");
-      router.refresh();
+      // Let Clerk clear its client state and revoke the active session before
+      // navigating. A router-only redirect leaves Clerk's provider signed in,
+      // which can bounce /login straight back into the authenticated app.
+      await signOut({ redirectUrl: "/login" });
     } catch (error) {
       console.error("LOGOUT ERROR:", error);
     } finally {

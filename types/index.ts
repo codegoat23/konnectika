@@ -6,6 +6,7 @@ export interface Campaign {
   id: number | string;
   name: string;
   brand: string;
+  brandLogo?: string | null;
   category: string;
   campaignType: CampaignType;
   description: string;

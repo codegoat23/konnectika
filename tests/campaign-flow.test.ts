@@ -97,17 +97,18 @@ describe("campaign flow", () => {
     const campaign = await readJson(res);
     expect(campaign.status).toBe("PENDING_REVIEW");
     expect(campaign.paymentStatus).toBe("UNPAID");
-    expect(campaign.platformFeeRate).toBe(5);
-    expect(campaign.platformFee).toBe(100000); // 5% of 2,000,000
-    expect(campaign.totalCharge).toBe(2100000);
+    // 10% — the default brand fee rate (PLATFORM_BRAND_FEE_PERCENT).
+    expect(campaign.platformFeeRate).toBe(10);
+    expect(campaign.platformFee).toBe(200000); // 10% of 2,000,000
+    expect(campaign.totalCharge).toBe(2200000);
     expect(campaign.paymentMethod).toBe("Bank Transfer");
 
     const revenue = await prisma.platformRevenue.findFirst({
       where: { campaignId: campaign.id, type: "BRAND_FEE" },
     });
-    expect(revenue?.feeRate).toBe(5);
+    expect(revenue?.feeRate).toBe(10);
     expect(revenue?.grossAmount).toBe(2000000);
-    expect(revenue?.feeAmount).toBe(100000);
+    expect(revenue?.feeAmount).toBe(200000);
     expect(revenue?.status).toBe("ACCRUED");
   });
 

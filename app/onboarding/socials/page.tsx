@@ -2,50 +2,49 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
-  X,
-  Camera,
-  PlayCircle,
-  Music2,
   ChevronDown,
   ChevronUp,
   ArrowRight,
   Loader2,
 } from "lucide-react";
+import { FaInstagram, FaTiktok, FaYoutube, FaXTwitter } from "react-icons/fa6";
 import { LogoutButton } from "@/components/logoutButton";
+import Logo from "@/public/assets/logo-plain.svg";
 
 const platforms = [
   {
     key: "TWITTER",
     label: "Twitter / X",
-    icon: X,
+    icon: FaXTwitter,
     placeholder: "yourhandle",
     base: "https://x.com/",
-    color: "bg-black",
+    iconColor: "text-black dark:text-white",
   },
   {
     key: "INSTAGRAM",
     label: "Instagram",
-    icon: Camera,
+    icon: FaInstagram,
     placeholder: "yourhandle",
     base: "https://instagram.com/",
-    color: "bg-pink-500",
+    iconColor: "text-[#E4405F]",
   },
   {
     key: "YOUTUBE",
     label: "YouTube",
-    icon: PlayCircle,
+    icon: FaYoutube,
     placeholder: "yourchannel",
     base: "https://youtube.com/@",
-    color: "bg-red-500",
+    iconColor: "text-[#FF0000]",
   },
   {
     key: "TIKTOK",
     label: "TikTok",
-    icon: Music2,
+    icon: FaTiktok,
     placeholder: "yourhandle",
     base: "https://tiktok.com/@",
-    color: "bg-gray-900",
+    iconColor: "text-black dark:text-white",
   },
 ];
 
@@ -68,7 +67,7 @@ export default function SocialsOnboardingPage() {
     setError("");
 
     const socials = Object.entries(handles)
-      .filter(([_, value]) => value?.trim())
+      .filter(([, value]) => value?.trim())
       .map(([platform, handle]) => ({ platform, handle }));
 
     if (socials.length === 0) {
@@ -93,7 +92,7 @@ export default function SocialsOnboardingPage() {
         return;
       }
 
-      router.push("/onboarding/phone");
+      router.push("/dashboard");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -104,11 +103,9 @@ export default function SocialsOnboardingPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-       <LogoutButton/>
+        <LogoutButton/>
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center">
-            <Camera size={28} className="text-orange-500" />
-          </div>
+          <Image src={Logo} alt="Konnectika" priority className="size-16" />
         </div>
 
         <h1 className="text-3xl font-bold text-center">
@@ -145,11 +142,7 @@ export default function SocialsOnboardingPage() {
                   className="w-full flex items-center justify-between p-4 hover:bg-muted hover:text-foreground transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 rounded-lg ${p.color} flex items-center justify-center`}
-                    >
-                      <Icon size={16} className="text-white" />
-                    </div>
+                    <Icon size={20} className={p.iconColor} aria-hidden="true" />
 
                     <span className="font-medium text-sm">{p.label}</span>
 
@@ -226,18 +219,18 @@ export default function SocialsOnboardingPage() {
         </button>
 
         <div className="flex justify-center gap-2 mt-10">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3].map((step) => (
             <div
               key={step}
               className={`h-1.5 rounded-full transition-all ${
-                step === 2 ? "w-6 bg-orange-500" : "w-3 "
+              step === 3 ? "w-6 bg-orange-500" : "w-3 "
               }`}
             />
           ))}
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          Step 2 of 4
+          Step 3 of 3
         </p>
       </div>
     </div>

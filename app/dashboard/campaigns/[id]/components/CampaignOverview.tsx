@@ -1,6 +1,7 @@
 "use client";
 
 import PlatformIcons from "@/components/discover/PlatformIcons";
+import { RiVerifiedBadgeLine } from "react-icons/ri";
 import type { Platform } from "@/types";
 
 interface CampaignOverviewData {
@@ -29,7 +30,7 @@ export default function CampaignOverview({ campaign }: { campaign: CampaignOverv
                 key={index}
                 className="flex items-start gap-3 text-sm text-muted-foreground"
               >
-                <div className="w-2 h-2 rounded-full bg-orange-500 mt-2" />
+                <RiVerifiedBadgeLine className="mt-0.5 size-4 shrink-0 text-green-500" aria-hidden="true" />
                 <span>{req}</span>
               </div>
             ))}

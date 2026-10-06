@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken } from "@/lib/auth";
-
+import { getAuthUser } from "@/lib/auth";
 
 export async function POST(
  req:Request
@@ -10,7 +9,6 @@ export async function POST(
  try {
 
   const user = await getAuthUser();
-
 
   if(!user){
     return NextResponse.json(
@@ -23,11 +21,11 @@ export async function POST(
     )
   }
 
-
+  if (user.role !== "BRAND") {
+    return NextResponse.json({ error: "Only brands can update a brand profile" }, { status: 403 });
+  }
 
   const body = await req.json();
-
-
 
   const profile =
     await prisma.businessProfile.upsert({
@@ -37,7 +35,7 @@ export async function POST(
       },
 
       update:{
-        
+        logo: typeof body.logo === "string" ? body.logo.trim() || null : undefined,
         website:body.website,
         industry:body.industry,
         description:body.description
@@ -45,14 +43,13 @@ export async function POST(
 
       create:{
         userId:user.userId,
+        logo: typeof body.logo === "string" ? body.logo.trim() || null : null,
         website:body.website,
         industry:body.industry,
         description:body.description
       }
 
     });
-
-
 
   await prisma.user.update({
 
@@ -67,34 +64,14 @@ export async function POST(
 
   });
 
-
-
-   // ✅ Re-issue JWT with updated onboardingStep
-     const newToken = await signToken({
-       userId: user.userId,
-       role: user.role,
-       onboardingDone: false,
-       onboardingStep: 4,
-       type: "access",
-     });
  
      const res = NextResponse.json({
        success: true,
        nextStep: "/onboarding/welcome",
      });
  
-     // ✅ Overwrite the stale cookie
-     res.cookies.set("token", newToken, {
-       httpOnly: true,
-       secure: process.env.NODE_ENV === "production",
-       sameSite: "lax",
-       maxAge: 60 * 60 * 24 * 7,
-       path: "/",
-     });
  
      return res;
-
-
 
  } catch(error){
 

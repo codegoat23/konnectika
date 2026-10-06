@@ -2,8 +2,11 @@
 
 import { OverviewHeader } from "./Overviewheader";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Prisma } from "@prisma/client";
 import { formatTZS } from "@/lib/utils";
+import { useState, type ReactNode } from "react";
 import {
   Check,
   CheckCheck,
@@ -42,6 +45,13 @@ function formatDate(date: Date | null | undefined): string {
 }
 
 export default function BrandBalance({ payments }: Props) {
+  const [selectedMetric, setSelectedMetric] = useState<{
+    title: string;
+    amount: string;
+    description: string;
+    icon: ReactNode;
+  } | null>(null);
+
   const active = payments.filter((x) => x.status !== "REJECTED");
   const totalSpending = active.reduce((sum, item) => sum + item.amount, 0);
   const pendingCount = active.filter((x) => PAYABLE.includes(x.status)).length;
@@ -49,12 +59,45 @@ export default function BrandBalance({ payments }: Props) {
   const paidTotal = active
     .filter((x) => x.status === "PAID")
     .reduce((sum, item) => sum + item.amount, 0);
+  const mobileMetrics = [
+    { title: "Payments Pending", amount: String(pendingCount), description: "Approved creator payments awaiting payout.", icon: <Clock3 className="size-5" /> },
+    { title: "Creators Paid", amount: String(paidCount), description: "Creators with completed payouts.", icon: <CheckCheck className="size-5" /> },
+    { title: "Amount Settled", amount: `TZS ${formatTZS(paidTotal)}`, description: "Total paid to creators through payouts.", icon: <CircleDollarSign className="size-5" /> },
+  ];
 
   return (
     <div className="space-y-6">
       <OverviewHeader title="Campaign Payments" />
 
-      <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3">
+      <div className="px-4 md:hidden">
+        <Card className="relative overflow-hidden rounded-3xl border-0 bg-zinc-900 p-5 text-white shadow-lg gap-4">
+          <div className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full border border-white/5" />
+          <div className="relative">
+            <p className="text-xs font-medium text-white/65">Total Spending</p>
+            <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">TZS {formatTZS(totalSpending)}</p>
+            <p className="mt-2 text-xs text-white/65">Campaign commitments</p>
+          </div>
+          <div className="relative grid grid-cols-3 gap-2 border-t border-white/10 pt-4">
+            {mobileMetrics.map((metric) => (
+              <Button key={metric.title} variant="ghost" className="flex h-auto flex-col gap-2 bg-transparent px-0 py-0 text-white shadow-none hover:bg-transparent hover:text-white" onClick={() => setSelectedMetric(metric)}>
+                <span className="flex size-11 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm">{metric.icon}</span>
+                <span className="text-center text-[10px] font-medium leading-tight">{metric.title}</span>
+              </Button>
+            ))}
+          </div>
+        </Card>
+        <Dialog open={selectedMetric !== null} onOpenChange={(open) => !open && setSelectedMetric(null)}>
+          <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl">
+            <DialogHeader>
+              <DialogTitle>{selectedMetric?.title}</DialogTitle>
+              <DialogDescription>{selectedMetric?.description}</DialogDescription>
+            </DialogHeader>
+            <p className="text-2xl font-semibold tabular-nums">{selectedMetric?.amount}</p>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="hidden grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3 md:grid">
         <Card className="rounded-2xl bg-orange-500 p-4 text-white shadow-xs gap-2">
           <div className="text-xs font-medium">Total Spending</div>
           <div className="mt-2 text-xl font-semibold tabular-nums">

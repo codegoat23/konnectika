@@ -17,6 +17,12 @@ model User {
   email    String  @unique
   password String?
 
+  // Clerk owns identity and credentials. This is the link between a Clerk
+  // user id and the Konnectika user row, and is the unique key every sync
+  // path (signup, webhook, sign-in) keys off. Nullable so pre-Clerk rows and
+  // env-bootstrapped admins can still exist and be linked later.
+  clerkUserId String? @unique
+
   role           Role     @default(CREATOR)
   onboardingStep Int      @default(1)
   onboardingDone Boolean  @default(false)
@@ -172,6 +178,7 @@ model Campaign {
   platformRevenue   PlatformRevenue[]
   earnings          Earning[]
   paymentProofs     PaymentProof[]
+  paymentIntents    PaymentIntent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -189,8 +196,10 @@ enum CampaignStatus {
 
 enum CampaignPaymentStatus {
   UNPAID // created but the brand has not paid yet
-  PROOF_SUBMITTED // the brand submitted a payment proof, awaiting admin verification
-  PAID // admin verified the proof / confirmed funds received (manual payment)
+  AWAITING_PAYMENT // a Snippe payment intent is live and the brand has been asked to authorize it
+  PROOF_SUBMITTED // LEGACY manual flow: the brand submitted a payment proof, awaiting admin verification
+  PAYMENT_FAILED // the latest Snippe attempt failed/expired; the brand may retry
+  PAID // funds confirmed — set ONLY by a verified Snippe webhook (or legacy admin proof verification)
 }
 
 enum BadgeType {
@@ -495,7 +504,9 @@ model PlatformRevenue {
 enum PayoutStatus {
   PENDING
   APPROVED
+  PROCESSING // handed to Snippe, awaiting the payout.completed / payout.failed webhook
   PAID
+  FAILED // Snippe reported payout.failed; funds returned to the Snippe balance
   REJECTED
 }
 
@@ -515,8 +526,22 @@ model Payout {
   paymentMethod String?
   paymentPhone  String?
 
+  // --- Snippe disbursement ---
+  // `amount` above is what the CREATOR receives (the sum of the frozen
+  // earnings' creatorAmount). `feeAmount` is the Snippe payout fee and
+  // `totalAmount` is what actually leaves the platform balance. The platform
+  // absorbs the fee for now — it is NEVER deducted from `amount`.
+provider               String? // "snippe"
+  providerReference      String? @unique // Snippe payout `reference` (webhook lookup)
+  providerExternalRef    String? // upstream processor reference
+  feeAmount           Int     @default(0)
+  totalAmount         Int?
+  narration           String?
+  failureReason       String?
+
   requestedAt DateTime  @default(now())
   approvedAt  DateTime?
+  sentAt      DateTime? // handed to Snippe
   paidAt      DateTime?
   rejectedAt  DateTime?
 
@@ -590,6 +615,11 @@ model PaymentProof {
   campaignId String?
   campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
+  // Set when this proof was produced by a verified Snippe webhook, so an
+  // automated proof can always be traced back to the attempt that caused it.
+  paymentIntentId String?
+  paymentIntent   PaymentIntent? @relation(fields: [paymentIntentId], references: [id], onDelete: SetNull)
+
   payoutId String?
   payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
 
@@ -604,6 +634,12 @@ model PaymentProof {
   note                 String?
   status               PaymentProofStatus @default(PROOF_SUBMITTED)
 
+  // Provider plumbing. Snippe-populated proofs are created by the verified
+  // webhook (not typed by a human), which is why the proof is kept as a pure
+  // audit record: `providerReference` is the Snippe payment/payout reference.
+  provider          String?
+  providerReference String?
+
   // admin review fields
   reviewedById    String?
   reviewedBy      User?     @relation("PaymentProofReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
@@ -616,6 +652,95 @@ model PaymentProof {
   @@index([campaignId])
   @@index([payoutId])
   @@index([status])
+}
+
+// ============================================================
+// SNIPPE PAYMENT COLLECTION (brand -> Konnectika)
+// ============================================================
+//
+// A PaymentIntent is ONE attempt by a brand to pay for a campaign through
+// Snippe. A campaign accumulates many intents across retries (a failed or
+// expired attempt is superseded by a new one); only the campaign's
+// `paymentStatus` reflects the current state.
+//
+// Amounts are a SNAPSHOT taken at intent-creation time:
+//   totalCharge = budgetTotal + platformFee + estimatedProviderFee
+// The estimate is what the brand was shown and charged. The REAL Snippe fee
+// arrives in the `payment.completed` webhook (`data.settlement.fees`) and is
+// written back to `actualProviderFee` / `actualNetAmount`, so the estimate can
+// be reconciled against reality without ever rewriting what was charged.
+
+enum PaymentIntentStatus {
+  AWAITING_PAYMENT // intent created with Snippe; USSD push sent to the brand
+  PROCESSING // Snippe confirmed the intent is in flight
+  PAID // payment.completed webhook verified and applied
+  FAILED // payment.failed / expired / voided
+}
+
+model PaymentIntent {
+  id String @id @default(cuid())
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  // Sequential attempt number per campaign (1, 2, 3 …) so retries are ordered.
+  attempt Int @default(1)
+
+  // <= 30 chars, enforced in lib/snippe.ts. @unique makes a duplicate
+  // submission with the same key a no-op instead of a double charge.
+  idempotencyKey String @unique
+
+  // ---- amount snapshot (integer TZS, never floats) ----
+  budgetTotal     Int
+  platformFeeRate Int
+  platformFee     Int
+  providerFeeRate Int // estimated Snippe collection rate, percent (bps-style int)
+  providerFee     Int // ESTIMATED Snippe collection fee shown to the brand
+  totalCharge     Int // budgetTotal + platformFee + providerFee
+
+  // ---- real figures, written only from a verified webhook ----
+  actualProviderFee Int?
+  actualNetAmount   Int? // gross - real Snippe fee, credited to the balance
+
+  // ---- provider plumbing ----
+  provider            String  @default("snippe")
+  providerReference   String? @unique // Snippe `reference` from POST /v1/payments
+  providerExternalRef String? // upstream processor reference
+  channel             String? // "mpesa" | "airtel" | "mixx" | "halotel"
+  customerPhone       String?
+  customerName        String?
+  customerEmail       String?
+
+  status        PaymentIntentStatus @default(AWAITING_PAYMENT)
+  failureReason String?
+  expiresAt     DateTime?
+  paidAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paymentProofs PaymentProof[]
+
+  // Attempt numbers are allocated per campaign, so this composite unique key is
+  // what stops two concurrent "pay" requests claiming the same attempt (and
+  // therefore the same Snippe idempotency key) at once.
+  @@unique([campaignId, attempt])
+  @@index([status])
+}
+
+// Idempotency ledger for inbound provider webhooks. `id` is the provider's
+// event id, which is the dedupe key — a repeated delivery collides on the
+// primary key and is skipped, making webhook handling harmless to retry.
+model WebhookEvent {
+  id          String    @id // provider event id (dedupe key)
+  provider    String    @default("snippe")
+  type        String // "payment.completed", "payout.failed", …
+  payload     Json
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([type])
+  @@index([receivedAt])
 }
 
 // Konnectika's admin-configured receiving accounts. Brands never type these

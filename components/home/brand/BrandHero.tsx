@@ -124,7 +124,7 @@ export function BrandHero() {
                 minutes, and measure real impact — all from one dashboard.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link href="/signup">
+                <Link href="/signup?role=BRAND">
                   <Button
                     size="lg"
                     className="h-12 w-full rounded-full bg-foreground px-7 text-base font-semibold text-background hover:bg-zinc-300 sm:w-auto"

@@ -50,7 +50,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
   if (!current) return null;
 
   return (
-    <div className="relative w-full min-h-[420px]  overflow-hidden ">
+    <div className="relative min-h-[400px] w-full overflow-hidden sm:min-h-[420px]">
       
       {/* BACKGROUND */}
       <div
@@ -73,7 +73,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
       
 
       {/* CONTENT */}
-      <div className="relative z-10 flex flex-col justify-between h-full px-8 py-10 min-h-[420px]">
+      <div className="relative z-10 flex min-h-[400px] h-full flex-col justify-between px-4 py-6 sm:min-h-[420px] sm:px-8 sm:py-10">
                     <div className="flex items-center justify-baseline  py-1">
   <Image
     src={Logo}
@@ -81,7 +81,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
     width={180}
     height={34}
     priority
-    className="h-auto w-full max-w-[190px]"
+    className="h-auto w-full max-w-[150px] sm:max-w-[190px]"
   />
 </div>
         <div
@@ -91,7 +91,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
         >
           
           {/* BRAND */}
-          <div className="flex items-center gap-3 mb-4 mt-10">
+          <div className="mb-4 mt-8 flex items-center gap-3 sm:mt-10">
             <div
               className="rounded-full flex items-center justify-center text-white text-xs font-bold"
               style={{
@@ -161,12 +161,12 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
           </div>
 
           {/* TITLE */}
-          <h1 className="text-white text-3xl font-bold leading-tight mb-3 max-w-lg">
+          <h1 className="mb-3 max-w-lg text-2xl font-bold leading-tight text-white sm:text-3xl">
             {current.name}
           </h1>
 
           {/* META */}
-          <div className="flex items-center gap-3 mb-5 flex-wrap">
+          <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
             <span className="text-zinc-400 text-sm">{current.category}</span>
             <span className="text-zinc-600">|</span>
 
@@ -183,7 +183,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
           </div>
 
           {/* ACTIONS */}
-          <div className="flex items-center gap-4 flex-wrap mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-3 sm:gap-4">
             
             <button
               onClick={() => onJoin(current)}
@@ -195,7 +195,7 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
             <PlatformIcons platforms={current.platforms} size="md" />
 
             {/* DOTS */}
-            <div className="flex items-center gap-1.5 ml-2">
+            <div className="ml-1 flex items-center gap-1.5 sm:ml-2">
               {featuredCampaigns.map((_, i) => (
                 <button
                   key={i}

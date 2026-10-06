@@ -42,7 +42,7 @@ type ApiCampaign = {
   duration: string | null;
   isOpenToAll: boolean | null;
   isFeatured: boolean | null;
-  businessProfile: { companyName: string | null } | null;
+  businessProfile: { companyName: string | null; logo: string | null } | null;
   _count?: { applications: number };
 };
 
@@ -51,6 +51,7 @@ function toCampaign(c: ApiCampaign): Campaign {
     id: c.id,
     name: c.name,
     brand: c.businessProfile?.companyName ?? "Unknown",
+    brandLogo: c.businessProfile?.logo ?? null,
     category: c.category ?? "",
     campaignType: c.campaignType as Campaign["campaignType"],
     description: c.description ?? "",
@@ -192,7 +193,7 @@ export default function DiscoverClient() {
         onJoin={setSelectedCampaign}
       />
 
-      <div className="w-full px-6 py-8">
+      <div className="w-full px-4 py-6 sm:px-6 sm:py-8">
         <FilterToolbar
           filters={filters}
           onChange={handleFilterChange}
@@ -200,7 +201,7 @@ export default function DiscoverClient() {
           activeFilterCount={activeFilterCount}
         />
 
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-foreground font-semibold text-lg">
             {filtered.length === allCampaigns.length
               ? "All Campaigns"

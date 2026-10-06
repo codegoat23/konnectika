@@ -96,8 +96,6 @@ export default function BrandCampaignView({
       <BrandPaymentSection
         campaignId={campaign.id}
         campaignName={campaign.name}
-        totalCharge={campaign.totalCharge}
-        paymentMethod={campaign.paymentMethod}
         initialStatus={campaign.paymentStatus}
       />
     </div>

@@ -224,7 +224,7 @@ export function CreatorHero() {
                     <ArrowRight data-icon="inline-end" />
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/signup?role=CREATOR">
                   <Button
                     size="lg"
                     variant="outline"

@@ -53,11 +53,11 @@ export default function CreatorHeroV2() {
 
       {/* Hero Heading */}
       <div>
-        <h1 className="text-7xl font-bold text-center text-black">
+        <h1 className="text-4xl font-bold text-center text-black tracking-tight sm:text-6xl lg:text-7xl">
           Earn from
         </h1>
 
-        <h1 className="text-7xl font-bold text-center text-black flex flex-row gap-6 justify-center items-center">
+        <h1 className="text-3xl font-bold text-center text-black flex flex-row gap-2 justify-center items-center tracking-tight sm:text-5xl sm:gap-4 lg:text-7xl lg:gap-6">
 
           <span>
             Creating
@@ -65,7 +65,7 @@ export default function CreatorHeroV2() {
 
           {/* Animated pill */}
           <span
-            className="bg-orange-500 text-white p-6 rounded-full inline-flex justify-center overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            className="bg-orange-500 text-white px-6 py-3 sm:py-5 lg:p-6 rounded-full inline-flex justify-center overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{
               width: `${width}px`,
             }}
@@ -87,9 +87,9 @@ export default function CreatorHeroV2() {
 
       {/* Description */}
       <div>
-        <p className="text-zinc-600 text-xs text-center">
+        <p className="max-w-[min(100vw-2rem,36rem)] text-zinc-600 text-xs text-center leading-relaxed">
           Turn Your Creativity into real opportunities. Discover campaigns
-          <br />
+          <br className="hidden sm:block" />{" "}
           from brands, create authentic content, and get rewarded for your influence.
         </p>
       </div>

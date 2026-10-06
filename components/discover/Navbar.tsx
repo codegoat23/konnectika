@@ -23,7 +23,7 @@ export default function Navbar() {
         <Link href="/" className={`text-foreground flex items-center gap-2 self-center font-bold text-[36px] ${sora.className}`}>
          
          
-          Konnectika
+          
         </Link>
 
         <div className="flex items-center gap-1 flex-1">

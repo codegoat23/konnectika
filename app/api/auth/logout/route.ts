@@ -1,17 +1,25 @@
+// app/api/auth/logout/route.ts
+//
+// Ends the active Clerk session. Locally signing out succeeds even if the
+// Clerk API call fails; Clerk's client component also clears its local state.
+
 import { NextResponse } from "next/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export async function POST() {
-  const response = NextResponse.json({
-    success: true,
-  });
+  try {
+    const { sessionId } = await auth();
 
-  response.cookies.set("token", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
+    if (sessionId) {
+      // Backend API v7 renamed this to revokeSession (there is no
+      // sessions.signOut). Revoking the session is what invalidates the
+      // cookie the browser is holding.
+      const clerk = await clerkClient();
+      await clerk.sessions.revokeSession(sessionId);
+    }
+  } catch (err) {
+    console.error("LOGOUT ERROR:", err);
+  }
 
-  return response;
+  return NextResponse.json({ success: true });
 }

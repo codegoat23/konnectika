@@ -50,13 +50,7 @@ const data = {
         />
       ),
     },
-    {
-      title: "Analytics",
-      url: "/dashboard/analytics",
-      icon: (
-       <TbBrandGoogleAnalytics />
-      ),
-    },
+   
     {
       title: "Submissions",
       url: "/dashboard/submission",

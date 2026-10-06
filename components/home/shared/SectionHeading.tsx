@@ -7,6 +7,7 @@ interface SectionHeadingProps {
   subtitle?: string;
   align?: "center" | "left";
   className?: string;
+  labelClassName?: string;
 }
 
 export function SectionHeading({
@@ -15,10 +16,11 @@ export function SectionHeading({
   subtitle,
   align = "center",
   className,
+  labelClassName,
 }: SectionHeadingProps) {
   return (
     <Reveal className={cn(align === "center" ? "text-center" : "", className)}>
-       <span className="rounded-full border border-zinc-200/50 bg-zinc-100/30 px-4 py-2 text-sm font-semibold text-black">
+       <span className={cn("rounded-full border border-zinc-200/50 bg-zinc-100/30 px-4 py-2 text-sm font-semibold text-black", labelClassName)}>
          {label}
       </span>
      

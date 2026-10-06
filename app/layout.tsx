@@ -3,6 +3,7 @@ import { Sora } from "next/font/google";
 import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -39,7 +40,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <ClerkProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+            </ClerkProvider>
           </QueryProvider>
           <Toaster richColors position="top-right" />
         </ThemeProvider>

@@ -2,6 +2,8 @@
 
 import { OverviewHeader } from "./Overviewheader";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatTZS } from "@/lib/utils";
 import type { CreatorWallet as CreatorWalletData } from "@/lib/wallet";
 import {
@@ -9,25 +11,29 @@ import {
   EARNING_STATUS_DOT,
 } from "@/lib/status-styles";
 import { WalletIcon, LucideHourglass, LockKeyholeIcon } from "lucide-react";
+import { useState, type ReactNode } from "react";
 import {
   LuBadgeDollarSign,
   LuInfinity,
   LuLandmark,
 } from "react-icons/lu";
+import { IoIosMegaphone } from "react-icons/io";
 
 type WalletEarning = CreatorWalletData["earnings"][number];
 
-function formatDate(date: Date | null | undefined): string {
+function formatMobileDate(date: Date | null | undefined): string {
   if (!date) return "—";
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
     year: "numeric",
-    month: "short",
-    day: "numeric",
   });
 }
 
 function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
   return (
+    <>
+    <div className="hidden md:block">
     <div className="border border-border bg-card overflow-hidden" style={{ borderRadius: 24 }}>
       <table className="w-full text-sm">
         <thead className="bg-muted text-muted-foreground text-xs tracking-wider">
@@ -89,6 +95,33 @@ function EarningsTable({ earnings }: { earnings: WalletEarning[] }) {
         </tbody>
       </table>
     </div>
+    </div>
+    <div className="space-y-2 md:hidden">
+      {earnings.map((earning) => (
+        <article key={earning.id} className="flex items-center gap-3 rounded-2xl  bg-card p-3.5">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-orange-600">
+            <IoIosMegaphone className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-foreground">{earning.campaign?.name || "Unknown campaign"}</p>
+            <div className="mt-1 flex min-w-0 items-center gap-2">
+              <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full  px-2 py-0.5 text-[10px] font-medium ${EARNING_STATUS_STYLES[earning.status] ?? ""}`}>
+                
+                {earning.status}
+              </span>
+              <span className="truncate text-xs text-muted-foreground">
+                {earning.payout?.paymentReference || (earning.payout ? "Pending review" : "—")}
+              </span>
+            </div>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-sm font-semibold tabular-nums text-foreground">TZS {formatTZS(earning.creatorAmount)}</p>
+            <p className="mt-1 text-xs tabular-nums text-muted-foreground">{formatMobileDate(earning.createdAt)}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+    </>
   );
 }
 
@@ -97,12 +130,26 @@ interface CreatorWalletProps {
 }
 
 export default function CreatorWallet({ wallet }: CreatorWalletProps) {
+  const [selectedMetric, setSelectedMetric] = useState<{
+    title: string;
+    amount: string;
+    description: string;
+    icon: ReactNode;
+  } | null>(null);
+
+  const mobileMetrics = [
+    { title: "Pending", amount: `TZS ${formatTZS(wallet.pending + wallet.approved)}`, description: "Earnings awaiting approval and settlement.", icon: <LucideHourglass className="size-5" /> },
+    { title: "In Review", amount: `TZS ${formatTZS(wallet.processing)}`, description: "Funds in a payout under admin review.", icon: <LockKeyholeIcon className="size-5" /> },
+    { title: "Lifetime", amount: `TZS ${formatTZS(wallet.lifetime)}`, description: "Total earnings across all campaigns.", icon: <LuInfinity className="size-5" /> },
+    { title: "Total Paid", amount: `TZS ${formatTZS(wallet.paid)}`, description: "Successfully paid out via schedule.", icon: <LuLandmark className="size-5" /> },
+  ];
+
   return (
     <div className="space-y-6">
       <OverviewHeader title="Creator Wallet" />
 
-      <div className="px-4 lg:px-6">
-        <Card className="relative overflow-hidden rounded-2xl border-0 bg-orange-500 p-5 text-white shadow-xs gap-3">
+      <div className="hidden px-4 lg:px-6 md:block">
+        <Card className="relative overflow-hidden rounded-2xl border-0 bg-orange-500 p-4 text-white shadow-xs gap-3 sm:p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -111,7 +158,7 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
                 </div>
                 <span className="text-xs font-medium">Available Balance</span>
               </div>
-              <div className="mt-3 text-3xl font-semibold tabular-nums">
+              <div className="mt-3 break-words text-2xl font-semibold tabular-nums sm:text-3xl">
                 TZS {formatTZS(wallet.available)}
               </div>
               <div className="mt-1 text-[11px] text-white/70">
@@ -122,7 +169,35 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="px-4 md:hidden">
+        <Card className="relative overflow-hidden rounded-3xl border-0 bg-zinc-900 p-5 text-white shadow-lg gap-4">
+          <div className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full border border-white/5" />
+          <div className="relative">
+            <p className="text-xs font-medium text-white/65">Available Balance</p>
+            <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">TZS {formatTZS(wallet.available)}</p>
+            <p className="mt-2 text-xs text-white/65">Ready for a scheduled payout</p>
+          </div>
+          <div className="relative grid grid-cols-4 gap-2 border-t border-white/10 pt-4">
+            {mobileMetrics.map((metric) => (
+              <Button key={metric.title} variant="ghost" className="flex h-auto flex-col gap-2 bg-transparent px-0 py-0 text-white shadow-none hover:bg-transparent hover:text-white" onClick={() => setSelectedMetric(metric)}>
+                <span className="flex size-11 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm">{metric.icon}</span>
+                <span className="text-center text-[10px] font-medium leading-tight">{metric.title}</span>
+              </Button>
+            ))}
+          </div>
+        </Card>
+        <Dialog open={selectedMetric !== null} onOpenChange={(open) => !open && setSelectedMetric(null)}>
+          <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl">
+            <DialogHeader>
+              <DialogTitle>{selectedMetric?.title}</DialogTitle>
+              <DialogDescription>{selectedMetric?.description}</DialogDescription>
+            </DialogHeader>
+            <p className="text-2xl font-semibold tabular-nums">{selectedMetric?.amount}</p>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="hidden grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-2 xl:grid-cols-4 md:grid">
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-warning/15">
@@ -175,9 +250,7 @@ export default function CreatorWallet({ wallet }: CreatorWalletProps) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(wallet.lifetime)}
           </div>
-          <div className="text-[11px] text-muted-foreground">
-            Across all campaigns
-          </div>
+          
         </Card>
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">

@@ -6,10 +6,10 @@ import MarqueeText from "./marquee";
 
 export default function HeroCards() {
   return (
-    <div className="mt-8 flex items-center justify-center gap-4">
+    <div className="mt-8 grid w-full max-w-5xl grid-cols-2 items-center justify-items-center gap-3 px-4 sm:flex sm:flex-wrap sm:gap-4 sm:px-6 xl:flex-nowrap">
 
       {/* Card 1 */}
-      <div className="relative h-85 w-65 -rotate-6 overflow-hidden rounded-[24px]">
+      <div className="relative aspect-[0.76] w-full max-w-[260px] -rotate-3 overflow-hidden rounded-[24px] sm:h-85 sm:w-65 sm:rotate-[-6deg]">
         <video
           autoPlay
           muted
@@ -29,7 +29,7 @@ export default function HeroCards() {
 
 
       {/* Card 2 */}
-      <div className="relative h-85 w-65 rotate-6 overflow-hidden rounded-[24px]">
+      <div className="relative aspect-[0.76] w-full max-w-[260px] rotate-3 overflow-hidden rounded-[24px] sm:h-85 sm:w-65 sm:rotate-6">
         <video
           autoPlay
           muted
@@ -47,11 +47,11 @@ export default function HeroCards() {
 
 
       {/* Card 3 */}
-      <div className="-rotate-9 h-85 w-65 overflow-hidden rounded-[24px] bg-orange-500">
+      <div className="aspect-[0.76] w-full max-w-[260px] -rotate-3 overflow-hidden rounded-[24px] bg-orange-500 sm:h-85 sm:w-65 sm:rotate-[-9deg]">
         <div className="flex h-full flex-col items-center p-6 text-white">
             <AvatarList />
             <h3 className="mt-4 text-lg font-bold text-black">creator we work with</h3>
-            <h1 className="mt-2 text-7xl font-bold text-white">100+</h1>
+            <h1 className="mt-2 text-5xl font-bold text-white sm:text-7xl">100+</h1>
             <div className="mt-4 text-center text-sm bg-zinc-200 text-black border-none rotate-5">
                  <MarqueeText/>
             </div>
@@ -64,7 +64,7 @@ export default function HeroCards() {
 
 
       {/* Card 4 */}
-      <div className="relative h-85 w-65 rotate-5 overflow-hidden rounded-[24px]">
+      <div className="relative aspect-[0.76] w-full max-w-[260px] rotate-3 overflow-hidden rounded-[24px] sm:h-85 sm:w-65 sm:rotate-5">
         <video
           autoPlay
           muted

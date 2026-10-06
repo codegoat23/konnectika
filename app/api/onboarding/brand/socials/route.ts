@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { SocialPlatform } from "@prisma/client";
 
 interface SocialInput {
@@ -60,27 +60,9 @@ export async function POST(req: NextRequest) {
       data: { onboardingStep: 3 },
     });
 
-    // ✅ Re-issue JWT with updated onboardingStep
-    const newToken = await signToken({
-      userId: authUser.userId,
-      role: authUser.role,
-      onboardingDone: false,
-      onboardingStep: 3,
-      type: "access",
-    });
-
     const res = NextResponse.json({
       success: true,
       nextStep: "/onboarding/brand-details",
-    });
-
-    // ✅ Overwrite the stale cookie
-    res.cookies.set("token", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
     });
 
     return res;

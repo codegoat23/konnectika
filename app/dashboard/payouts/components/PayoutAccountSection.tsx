@@ -325,10 +325,14 @@ export default function PayoutAccountSection({
             trigger={
               <Button
                 variant="outline"
-                size="sm"
-                className="h-9 shrink-0 rounded-xl border-border px-3 text-xs font-medium"
+                size={account ? "sm" : "icon"}
+                aria-label={account ? "Edit payout account" : "Add payout account"}
+                title={account ? "Edit payout account" : "Add payout account"}
+                className={account
+                  ? "h-9 shrink-0 rounded-xl border-border px-3 text-xs font-medium"
+                  : "size-9 shrink-0 rounded-full border-border"}
               >
-                {account ? "Edit" : "Add"} Account
+                {account ? "Edit" : <PlusIcon className="size-4" />}
               </Button>
             }
           />

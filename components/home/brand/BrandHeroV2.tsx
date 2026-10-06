@@ -42,8 +42,8 @@ export default function BrandHeroV2() {
     <div className="mt-10 flex flex-col items-center justify-center gap-4">
 
       {/* Categories */}
-      <div className="border border-zinc-200/50 bg-zinc-100/30 px-4 py-2 rounded-full flex flex-row items-center justify-center gap-2">
-        <span className="text-xs text-white flex flex-row items-center font-regular">
+      <div className="flex flex-row items-center justify-center gap-2 rounded-full border border-white/10 bg-card px-4 py-2">
+        <span className="text-xs text-zinc-300 flex flex-row items-center font-regular">
           <span>UGC</span>
           <Dot />
           <span>Sponsored</span>
@@ -54,11 +54,11 @@ export default function BrandHeroV2() {
 
       {/* Hero Heading */}
       <div>
-        <h1 className="text-7xl font-bold text-center text-white">
+        <h1 className="text-4xl font-bold text-center text-white tracking-tight sm:text-6xl lg:text-7xl">
           Grow your Brand
         </h1>
 
-        <h1 className="text-7xl font-bold text-center text-white flex flex-row gap-6 justify-center items-center">
+        <h1 className="text-3xl font-bold text-center text-white flex flex-row gap-2 justify-center items-center tracking-tight sm:text-5xl sm:gap-4 lg:text-7xl lg:gap-6">
 
           <span className="">
             with
@@ -66,7 +66,7 @@ export default function BrandHeroV2() {
 
           {/* Dynamic animated pill */}
           <span
-            className="bg-orange-500 text-black p-6 rounded-full inline-flex justify-center overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            className="bg-orange-500 text-black px-6 py-3 sm:py-5 lg:p-6 rounded-full inline-flex justify-center overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{
               width: `${width}px`,
             }}
@@ -88,10 +88,10 @@ export default function BrandHeroV2() {
 
       {/* Description */}
       <div>
-        <p className="text-white/70 text-xs text-center">
+        <p className="max-w-[min(100vw-2rem,36rem)] text-white/70 text-xs text-center leading-relaxed">
           Find The Creators Your audience trusts. Discover vetted creators across Africa,
-          <br />
-          launch campaigns in minutes, and measure real impact — all from one dashboard.
+          <br className="hidden sm:block" />{" "}
+          launch campaigns in minutes, and measure real impact
         </p>
       </div>
 

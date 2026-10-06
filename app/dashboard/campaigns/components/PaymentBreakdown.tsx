@@ -6,7 +6,13 @@ export type PaymentBreakdownProps = {
   feeRate: number;
   fee: number;
   total: number;
-  paymentStatus?: "UNPAID" | "PROOF_SUBMITTED" | "PAID" | null;
+  paymentStatus?:
+    | "UNPAID"
+    | "AWAITING_PAYMENT"
+    | "PROOF_SUBMITTED"
+    | "PAYMENT_FAILED"
+    | "PAID"
+    | null;
   title?: string;
   showStatus?: boolean;
   showNote?: boolean;
@@ -15,8 +21,18 @@ export type PaymentBreakdownProps = {
 
 const PAYMENT_STATUS_STYLES: Record<string, string> = {
   UNPAID: "bg-warning/15 text-warning border-warning/25",
+  AWAITING_PAYMENT: "bg-info/15 text-info border-info/25",
   PROOF_SUBMITTED: "bg-info/15 text-info border-info/25",
+  PAYMENT_FAILED: "bg-destructive/15 text-destructive border-destructive/25",
   PAID: "bg-success/15 text-success border-success/25",
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  UNPAID: "Unpaid",
+  AWAITING_PAYMENT: "Awaiting Authorization",
+  PROOF_SUBMITTED: "Proof Submitted",
+  PAYMENT_FAILED: "Payment Failed",
+  PAID: "Paid",
 };
 
 // Shared payment ticket. Rendered with live values in the creation form and
@@ -47,7 +63,7 @@ export default function PaymentBreakdown({
               PAYMENT_STATUS_STYLES[paymentStatus]
             }`}
           >
-            {paymentStatus === "PAID" ? "Paid" : paymentStatus === "PROOF_SUBMITTED" ? "Proof Submitted" : "Unpaid"}
+            {PAYMENT_STATUS_LABELS[paymentStatus] ?? paymentStatus}
           </span>
         )}
       </div>
@@ -83,9 +99,8 @@ export default function PaymentBreakdown({
 
       {showNote && (
         <p className="mt-4 text-xs text-muted-foreground">
-          Payments are handled manually. Your campaign will be created as{" "}
-          <span className="font-medium text-warning">Unpaid</span> and becomes active
-          once an admin confirms payment.
+          Payments are processed by mobile money through Snippe and confirmed
+          automatically. No admin confirmation is needed.
         </p>
       )}
     </div>

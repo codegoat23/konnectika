@@ -29,6 +29,16 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma, Payout } from "@prisma/client";
 import { NotifyAdmin } from "@/lib/notification";
+import {
+  buildIdempotencyKey,
+  getBalance,
+  getPayoutFee,
+  sendPayout as snippeSendPayout,
+  SNIPPE_MIN_PAYOUT,
+  toSnippePhone,
+  type SnippePayoutFee,
+} from "@/lib/snippe";
+import { isMobileMoneyMethod } from "@/lib/payment";
 
 // ---------------------------------------------------------------------------
 // Platform settings (minimum threshold + payout day)
@@ -679,14 +689,16 @@ export type PayoutRecord = Prisma.PayoutGetPayload<{
   include: typeof payoutListInclude;
 }>;
 
-/** Admin ledger: run the schedule (materialize the month's batches on the
- *  payout day) then list every payout with the creator's current available
- *  balance (i.e. what has NOT been frozen into this payout — what rolls over). */
+/** Admin ledger: list every payout with the creator's current available
+ *  balance (i.e. what has NOT been frozen into this payout — what rolls over).
+ *
+ *  This is a pure read. Scheduled payout generation deliberately does NOT run
+ *  here: opening a page must never create money-moving rows. The schedule is
+ *  driven by POST /api/payouts/generate (cron), and creators can also request
+ *  a payout themselves once eligible. */
 export async function getAdminPayouts(): Promise<
   Array<PayoutRecord & { currentBalance: number }>
 > {
-  await runScheduledPayouts();
-
   const payouts = await prisma.payout.findMany({
     include: payoutListInclude,
     orderBy: { requestedAt: "desc" },
@@ -728,4 +740,429 @@ export async function getCreatorPayoutSummary(creatorId: string) {
   ]);
 
   return { settings, eligibility, payouts };
+}
+
+// ===========================================================================
+// SNIPPE DISBURSEMENT
+// ===========================================================================
+//
+// Money leaves Konnectika through Snippe instead of a human opening a mobile
+// money app:
+//
+//   AVAILABLE earnings -> Payout PENDING -> admin APPROVED
+//     -> sendPayoutToSnippe()  -> PROCESSING
+//     -> payout.completed webhook -> PAID   (earnings PAID, CREATOR_FEE PAID)
+//     -> payout.failed webhook    -> FAILED  (earnings unfrozen, rolled over)
+//
+// Fee model: `amount` is what the creator receives. `feeAmount` is the REAL
+// Snippe payout fee, quoted from GET /v1/payouts/fee and stored. Konnectika
+// absorbs that fee — it is never subtracted from `amount`, so the creator's
+// earning is unaffected by provider pricing.
+//
+// The admin approval still happens (it is the fraud/compliance gate); only the
+// act of transferring money and recording the reference is automated.
+
+export type SendPayoutResult =
+  | { ok: true; payout: Payout; fee: SnippePayoutFee }
+  | { ok: false; error: string; code: SendPayoutErrorCode };
+
+export type SendPayoutErrorCode =
+  | "NOT_FOUND"
+  | "INVALID_STATE"
+  | "NO_DESTINATION"
+  | "UNSUPPORTED_METHOD"
+  | "BELOW_MINIMUM"
+  | "INSUFFICIENT_BALANCE"
+  | "PROVIDER_ERROR";
+
+/**
+ * Hand an APPROVED payout to Snippe.
+ *
+ * Preflights before committing (the documented pattern):
+ *   1. GET /v1/payouts/fee?amount=N -> the real fee + total that will be debited
+ *   2. GET /v1/payments/balance     -> confirm `available` covers the total
+ *   3. POST /v1/payouts/send        -> reserve the funds
+ *
+ * The response is always `pending`, so the payout moves to PROCESSING here and
+ * only becomes PAID from the verified `payout.completed` webhook.
+ */
+export async function sendPayoutToSnippe(
+  payoutId: string,
+  webhookUrl: string
+): Promise<SendPayoutResult> {
+  const payout = await prisma.payout.findUnique({
+    where: { id: payoutId },
+    include: {
+      creator: {
+        select: {
+          displayName: true,
+          username: true,
+          userId: true,
+          payoutAccount: {
+            select: { method: true, phone: true, accountName: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!payout) {
+    return { ok: false, error: "Payout not found.", code: "NOT_FOUND" };
+  }
+  if (payout.status !== "APPROVED") {
+    return {
+      ok: false,
+      error: `Only an approved payout can be sent (current status: ${payout.status}).`,
+      code: "INVALID_STATE",
+    };
+  }
+  if (payout.providerReference) {
+    return {
+      ok: false,
+      error: "This payout has already been sent to Snippe.",
+      code: "INVALID_STATE",
+    };
+  }
+
+  // Destination: the phone captured when the creator requested the payout,
+  // falling back to their saved payout account.
+  const method = payout.paymentMethod ?? payout.creator.payoutAccount?.method ?? null;
+  const rawPhone = payout.paymentPhone ?? payout.creator.payoutAccount?.phone ?? null;
+  const recipientPhone = toSnippePhone(rawPhone);
+
+  if (!isMobileMoneyMethod(method)) {
+    return {
+      ok: false,
+      error: method
+        ? `Automated payouts currently support mobile money only. "${method}" must use manual settlement.`
+        : "This creator has no mobile money payout method on file.",
+      code: method ? "UNSUPPORTED_METHOD" : "NO_DESTINATION",
+    };
+  }
+  if (!recipientPhone) {
+    return {
+      ok: false,
+      error:
+        "This creator has no valid mobile money number on file. Update their payout account first.",
+      code: "NO_DESTINATION",
+    };
+  }
+  if (payout.amount < SNIPPE_MIN_PAYOUT) {
+    return {
+      ok: false,
+      error: `The payout amount is below Snippe's minimum of ${SNIPPE_MIN_PAYOUT} TZS.`,
+      code: "BELOW_MINIMUM",
+    };
+  }
+
+  const recipientName =
+    payout.creator.payoutAccount?.accountName ||
+    payout.creator.displayName ||
+    payout.creator.username ||
+    "Konnectika Creator";
+
+  // 1. Real fee quote from Snippe (never hardcoded).
+  let fee: SnippePayoutFee;
+  try {
+    fee = await getPayoutFee(payout.amount);
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? `Could not get the payout fee from Snippe: ${error.message}`
+          : "Could not get the payout fee from Snippe.",
+      code: "PROVIDER_ERROR",
+    };
+  }
+
+  // 2. Preflight the balance so we fail before funds are reserved.
+  try {
+    const balance = await getBalance();
+    if (balance.available.value < fee.total_amount) {
+      return {
+        ok: false,
+        error: `Insufficient Snippe balance: ${balance.available.value.toLocaleString()} TZS available, ${fee.total_amount.toLocaleString()} TZS required (payout plus fees).`,
+        code: "INSUFFICIENT_BALANCE",
+      };
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? `Could not check the Snippe balance: ${error.message}`
+          : "Could not check the Snippe balance.",
+      code: "PROVIDER_ERROR",
+    };
+  }
+
+// 3. Claim the payout locally BEFORE calling Snippe.
+  //
+  // Doing this first closes a real double-payment window: if we called Snippe
+  // and only then flipped APPROVED -> PROCESSING, two concurrent "send" clicks
+  // would both pass the status check and both transfer the money. Snippe's
+  // idempotency key would collapse them into one provider-side payout, but the
+  // loser of our claim then has to be told to go look at the winner's payout —
+  // which is exactly what the return below does.
+  const narration = `Konnectika payout for ${payout.creator.username ?? payout.creator.displayName ?? "creator"}`;
+  const idempotencyKey = buildIdempotencyKey("po", payout.id);
+
+  const claimed = await prisma.payout.updateMany({
+    where: { id: payout.id, status: "APPROVED", providerReference: null },
+    data: { status: "PROCESSING", provider: "snippe", narration, sentAt: new Date(), failureReason: null },
+  });
+
+  if (claimed.count === 0) {
+    return {
+      ok: false,
+      error: "This payout was already sent to Snippe.",
+      code: "INVALID_STATE",
+    };
+  }
+
+  // 4. Send. The idempotency key is derived from the payout id, so a retried
+  //    "send" returns Snippe's cached response instead of paying twice.
+  let sent;
+  try {
+    sent = await snippeSendPayout({
+      amount: payout.amount,
+      recipientPhone,
+      recipientName,
+      narration,
+      webhookUrl,
+      metadata: { payoutId: payout.id, creatorId: payout.creatorId },
+      idempotencyKey,
+    });
+  } catch (error) {
+    // Snippe refused the transfer outright, so no money is in flight: release
+    // the claim and put the payout back to APPROVED so an admin can retry once
+    // the cause is fixed. Reverting to FAILED would need an admin to re-approve
+    // a payout that never actually left.
+    const reason =
+      error instanceof Error ? error.message : "Could not send payout to Snippe.";
+    await prisma.payout.updateMany({
+      where: { id: payout.id, status: "PROCESSING", providerReference: null },
+      data: { status: "APPROVED", failureReason: reason },
+    });
+    return { ok: false, error: reason, code: "PROVIDER_ERROR" };
+  }
+
+  // Attach the provider reference now that we have it. A webhook can arrive
+  // before this write lands, so this must tolerate the row already being PAID.
+  await prisma.payout
+    .update({
+      where: { id: payout.id },
+      data: {
+        providerReference: sent.reference,
+        providerExternalRef: sent.external_reference ?? null,
+        feeAmount: sent.fees?.value ?? fee.fee_amount,
+        totalAmount: sent.total?.value ?? fee.total_amount,
+      },
+    })
+    .catch(async (error: unknown) => {
+      const current = await prisma.payout.findUnique({
+        where: { id: payout.id },
+        select: { status: true, providerReference: true },
+      });
+      if (current?.providerReference === sent.reference) return;
+      console.error(
+        `[snippe] could not attach reference ${sent.reference} to payout ${payout.id}`,
+        error
+      );
+    });
+
+  const updated = await prisma.payout.findUniqueOrThrow({ where: { id: payout.id } });
+
+  await prisma.notification.create({
+    data: {
+      userId: payout.creator.userId,
+      title: "Payout Sent",
+      message: `Your payout of TZS ${payout.amount.toLocaleString()} has been sent and is on its way.`,
+      type: "INFO",
+    },
+  });
+
+  return { ok: true, payout: updated, fee };
+}
+
+/**
+ * `payout.completed` — settle the payout. This mirrors markPayoutPaid's money
+ * effects exactly, but is driven by the provider instead of an admin typing a
+ * reference.
+ *
+ * The conditional `WHERE status = PROCESSING` claim is the double-payment
+ * guard: Snippe retries webhooks up to 5 times over 24h, and every repeat
+ * becomes a no-op.
+ */
+export async function settleCompletedPayout(
+  providerReference: string,
+  meta: { paymentReference?: string | null; payoutId?: string | null } = {}
+): Promise<
+  | { ok: true; applied: boolean; payout?: Payout }
+  | { ok: false; error: string; code: "NOT_FOUND" }
+> {
+  const select = { creator: { select: { userId: true } } } as const;
+
+  // Snippe can deliver `payout.completed` before our reference write-back
+  // lands, so fall back to the payout id we put in metadata. Without this that
+  // race would lose a delivered payout and leave the creator unpaid.
+  const payout =
+    (await prisma.payout.findUnique({
+      where: { providerReference },
+      include: select,
+    })) ??
+    (meta.payoutId
+      ? await prisma.payout.findUnique({ where: { id: meta.payoutId }, include: select })
+      : null);
+
+  if (!payout) {
+    return { ok: false, error: `No payout matches ${providerReference}.`, code: "NOT_FOUND" };
+  }
+
+  // Backfill the reference so later lookups (and payouts/reversals) resolve.
+  if (payout.providerReference !== providerReference) {
+    await prisma.payout
+      .update({
+        where: { id: payout.id },
+        data: { providerReference, provider: "snippe" },
+      })
+      .catch(() => undefined);
+  }
+
+  const now = new Date();
+
+  const applied = await prisma.$transaction(async (tx) => {
+    const claimed = await tx.payout.updateMany({
+      where: { id: payout.id, status: "PROCESSING" },
+      data: {
+        status: "PAID",
+        paidAt: now,
+        paymentReference: meta.paymentReference?.trim() || payout.paymentReference,
+      },
+    });
+    if (claimed.count === 0) return false;
+
+    await tx.earning.updateMany({
+      where: { payoutId: payout.id, status: "AVAILABLE" },
+      data: { status: "PAID", paidAt: now },
+    });
+
+    const paidEarningIds = await tx.earning.findMany({
+      where: { payoutId: payout.id },
+      select: { id: true },
+    });
+    const ids = paidEarningIds.map((e) => e.id);
+
+    // The platform's creator fees settle with the payout they were deducted from.
+    await tx.platformRevenue.updateMany({
+      where: { earningId: { in: ids }, type: "CREATOR_FEE", status: "ACCRUED" },
+      data: {
+        status: "PAID",
+        paymentReference: meta.paymentReference?.trim() || payout.providerReference,
+      },
+    });
+
+    // Audit record for an automated settlement.
+    await tx.paymentProof.create({
+      data: {
+        payoutId: payout.id,
+        submittedById: null,
+        amount: payout.amount,
+        paymentMethod: payout.paymentMethod ?? "Mobile Money",
+        transactionReference: payout.providerExternalRef ?? providerReference,
+        note: `Automated Snippe payout (fee ${payout.feeAmount.toLocaleString()} TZS absorbed by the platform).`,
+        status: "VERIFIED",
+        provider: "snippe",
+        providerReference,
+      },
+    });
+
+    return true;
+  });
+
+  if (!applied) {
+    return { ok: true, applied: false, payout };
+  }
+
+  await prisma.notification.create({
+    data: {
+      userId: payout.creator.userId,
+      title: "Payout Paid",
+      message: `Your payout of TZS ${payout.amount.toLocaleString()} has been delivered.`,
+      type: "SUCCESS",
+    },
+  });
+
+  const updated = await prisma.payout.findUnique({ where: { id: payout.id } });
+  return { ok: true, applied: true, payout: updated ?? payout };
+}
+
+/**
+ * `payout.failed` / `payout.reversed` — the delivery failed, so Snippe has
+ * returned the funds to the platform balance. The frozen earnings are
+ * unfrozen and roll into the next payout cycle, exactly as a rejection does.
+ * The FAILED payout row remains as the audit trail.
+ */
+export async function failPayout(
+  providerReference: string,
+  reason: string | null,
+  meta: { payoutId?: string | null } = {}
+): Promise<{ ok: true; applied: boolean } | { ok: false; error: string; code: "NOT_FOUND" }> {
+  const select = { creator: { select: { userId: true } } } as const;
+
+  // Same metadata fallback as the completion path: a failure can land before
+  // the reference write-back.
+  const payout =
+    (await prisma.payout.findUnique({
+      where: { providerReference },
+      include: select,
+    })) ??
+    (meta.payoutId
+      ? await prisma.payout.findUnique({ where: { id: meta.payoutId }, include: select })
+      : null);
+
+  if (!payout) {
+    return { ok: false, error: `No payout matches ${providerReference}.`, code: "NOT_FOUND" };
+  }
+
+  if (payout.providerReference !== providerReference) {
+    await prisma.payout
+      .update({
+        where: { id: payout.id },
+        data: { providerReference, provider: "snippe" },
+      })
+      .catch(() => undefined);
+  }
+
+  const applied = await prisma.$transaction(async (tx) => {
+    const claimed = await tx.payout.updateMany({
+      where: { id: payout.id, status: "PROCESSING" },
+      data: {
+        status: "FAILED",
+        failureReason: reason ?? "Snippe reported the payout as failed.",
+      },
+    });
+    if (claimed.count === 0) return false;
+
+    await tx.earning.updateMany({
+      where: { payoutId: payout.id },
+      data: { payoutId: null },
+    });
+
+    return true;
+  });
+
+  if (!applied) return { ok: true, applied: false };
+
+  await prisma.notification.create({
+    data: {
+      userId: payout.creator.userId,
+      title: "Payout Failed",
+      message: `Your payout of TZS ${payout.amount.toLocaleString()} could not be delivered and has been returned to your available balance. ${reason ?? ""}`.trim(),
+      type: "ERROR",
+    },
+  });
+
+  return { ok: true, applied: true };
 }

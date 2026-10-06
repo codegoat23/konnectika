@@ -5,8 +5,6 @@ const ONBOARDING_STEPS: Record<string, Record<number, string>> = {
   CREATOR: {
     1: "/onboarding/username",
     2: "/onboarding/socials",
-    3: "/onboarding/phone",
-    4: "/onboarding/otp",
   },
   BRAND: {
     1: "/onboarding/companyname",
@@ -25,6 +23,10 @@ export default async function OnboardingIndexPage() {
 
   if (user.onboardingDone) {
     redirect("/dashboard");
+  }
+
+  if (user.onboardingStep === 0) {
+    redirect("/onboarding/role");
   }
 
   const steps = ONBOARDING_STEPS[user.role];

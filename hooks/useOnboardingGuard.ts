@@ -22,19 +22,20 @@ export function useOnboardingGuard() {
       const step = data.user.onboardingStep;
       const role = data.user.role;
 
-      const map: Record<number, string> = role === "CREATOR" ? {
-        1: "/onboarding/username",
-        2: "/onboarding/socials",
-        3: "/onboarding/phone",
-        4: "/onboarding/otp"
-      } 
-      : {
+      const map: Record<number, string> =
+        role === "CREATOR"
+          ? {
+              0: "/onboarding/role",
+              1: "/onboarding/username",
+              2: "/onboarding/socials",
+            }
+          : {
+        0: "/onboarding/role",
         1: "/onboarding/companyname",
         2: "/onboarding/brand-socials",
         3: "/onboarding/brand-details",
         4: "/onboarding/welcome"
-      }
-      ;
+            };
 
       const expected = map[step];
 
@@ -48,5 +49,5 @@ export function useOnboardingGuard() {
     }
 
     check();
-  }, []);
-} 
+  }, [router]);
+}

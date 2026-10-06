@@ -44,7 +44,9 @@ import {
   InfoIcon,
   CheckIcon,
   PlusIcon,
+  Megaphone,
 } from "lucide-react";
+import { FaReceipt } from "react-icons/fa6";
 
 function formatDate(date: Date | null | undefined): string {
   if (!date) return "—";
@@ -52,6 +54,15 @@ function formatDate(date: Date | null | undefined): string {
     year: "numeric",
     month: "short",
     day: "numeric",
+  });
+}
+
+function formatMobileDate(date: Date | null | undefined): string {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
 }
 
@@ -65,10 +76,14 @@ function RequestPayoutDialog({
   eligibility,
   account,
   onDone,
+  triggerClassName,
+  roundAction = false,
 }: {
   eligibility: PayoutEligibility;
   account: PayoutAccount | null;
   onDone: () => void;
+  triggerClassName?: string;
+  roundAction?: boolean;
 }) {
   const [paymentMethod, setPaymentMethod] = useState<string | undefined>(
     account?.method ?? undefined
@@ -124,11 +139,21 @@ function RequestPayoutDialog({
             eligibility.hasActivePayout ||
             eligibility.availableBalance <= 0
           }
-          className="bg-primary text-primary-foreground font-medium hover:bg-[#EA580C] cursor-pointer"
-          style={{ borderRadius: 14 }}
+          className={roundAction
+            ? `flex h-auto flex-col gap-2 bg-transparent px-1 py-0 text-white shadow-none hover:bg-transparent ${triggerClassName ?? ""}`
+            : `bg-primary text-primary-foreground font-medium hover:bg-[#EA580C] cursor-pointer ${triggerClassName ?? ""}`}
+          style={roundAction ? undefined : { borderRadius: 14 }}
         >
-          <ArrowUpRightIcon />
-          Request Payout
+          {roundAction ? (
+            <>
+              <span className="flex size-12 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm">
+                <ArrowUpRightIcon className="size-5" />
+              </span>
+              <span className="text-[11px] font-medium">Request</span>
+            </>
+          ) : (
+            <><ArrowUpRightIcon />Request Payout</>
+          )}
         </Button>
       </DialogTrigger>
      <DialogContent className="w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl p-2">
@@ -271,10 +296,11 @@ export default function CreatorPayouts({
   payouts,
 }: CreatorPayoutsProps) {
   const [account, setAccount] = useState<PayoutAccount | null>(null);
+  const [showMobileAccount, setShowMobileAccount] = useState(false);
 
   return (
     <div className="space-y-6">
-      <div className="px-4 lg:px-6">
+      <div className="hidden px-4 lg:px-6 md:block">
         <Card className="relative overflow-hidden rounded-2xl border-0 bg-zinc-900 p-5 text-white shadow-xs gap-3">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -310,11 +336,74 @@ export default function CreatorPayouts({
         </Card>
       </div>
 
-      <div className="px-4 lg:px-6">
+      <div className="px-4 md:hidden">
+        <Card className="relative overflow-hidden rounded-3xl border-0 bg-zinc-900 p-5 text-white shadow-lg gap-4">
+          <div className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full border border-white/5" />
+          <div className="relative">
+            <p className="text-xs font-medium text-white/65">Available Balance</p>
+            <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">
+              TZS {formatTZS(eligibility.availableBalance)}
+            </p>
+            <p className="mt-2 text-xs text-white/65">
+              Next payout {formatDate(eligibility.nextPayoutDate)}
+            </p>
+          </div>
+          <div className="relative flex items-start justify-center gap-7 border-t border-white/10 pt-4">
+            <RequestPayoutDialog
+              eligibility={eligibility}
+              account={account}
+              onDone={() => {}}
+              roundAction
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex h-auto flex-col gap-2 bg-transparent px-1 py-0 text-white shadow-none hover:bg-transparent hover:text-white"
+              onClick={() => setShowMobileAccount((visible) => !visible)}
+              aria-expanded={showMobileAccount}
+            >
+              <span className="flex size-12 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm">
+                <WalletIcon className="size-5" />
+              </span>
+              <span className="text-[11px] font-medium">Account</span>
+            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button type="button" variant="ghost" className="flex h-auto flex-col gap-2 bg-transparent px-1 py-0 text-white shadow-none hover:bg-transparent hover:text-white" aria-label="Payout information">
+                  <span className="flex size-12 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm">
+                    <InfoIcon className="size-5" />
+                  </span>
+                  <span className="text-[11px] font-medium">Details</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>Payout details</DialogTitle>
+                  <DialogDescription>
+                    Your balance is paid on day {settings.payoutDay} of each month when it meets the minimum payout amount.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 rounded-xl bg-muted/40 p-4 text-sm">
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Minimum payout</span><span className="font-medium">TZS {formatTZS(settings.minimumPayoutAmount)}</span></div>
+                  <div className="flex justify-between gap-3"><span className="text-muted-foreground">Eligibility</span><span className="text-right font-medium">{eligibility.eligible ? "Ready to request" : `TZS ${formatTZS(eligibility.remainingToEligible)} to go`}</span></div>
+                  {eligibility.hasActivePayout && <p className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyholeIcon className="size-3.5" /> A payout is already under review.</p>}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </Card>
+        {showMobileAccount && (
+          <div className="mt-3">
+            <PayoutAccountSection setAccount={setAccount} />
+          </div>
+        )}
+      </div>
+
+      <div className="hidden px-4 lg:px-6 md:block">
         <PayoutAccountSection setAccount={setAccount} />
       </div>
 
-      <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3">
+      <div className="hidden grid-cols-1 gap-3 px-4 lg:px-6 sm:grid-cols-3 md:grid">
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
           <div className="flex items-center gap-2">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/15">
@@ -381,10 +470,7 @@ export default function CreatorPayouts({
         <div className="rounded-2xl">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Payout History</h2>
-            <p className="text-xs text-muted-foreground">
-              Amounts below the minimum threshold roll over to the next payout
-              period.
-            </p>
+           
           </div>
 
           {payouts.length === 0 ? (
@@ -403,7 +489,8 @@ export default function CreatorPayouts({
               </p>
             </div>
           ) : (
-         <div className="mt-5 overflow-hidden rounded-2xl border border-border bg-card">
+         <>
+         <div className="mt-5 hidden overflow-hidden rounded-2xl border border-border bg-card md:block">
   <div className="overflow-x-auto">
     <table className="w-full min-w-[650px] text-sm">
         <thead className="bg-muted">
@@ -467,9 +554,7 @@ export default function CreatorPayouts({
           <tr>
             <td colSpan={4}>
               <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-                <div className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted/50 text-xl">
-                  💸
-                </div>
+                
 
                 <p className="text-sm font-medium text-foreground">
                   No payouts yet
@@ -486,6 +571,29 @@ export default function CreatorPayouts({
     </table>
   </div>
 </div>
+         <div className="mt-5 space-y-2 md:hidden">
+           {payouts.map((payout) => (
+             <article key={payout.id} className="flex items-center gap-3 rounded-2xl  bg-card p-3.5">
+               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-orange-500">
+                 <FaReceipt className="size-4" />
+               </div>
+               <div className="min-w-0 flex-1">
+                 <p className="truncate text-sm font-medium text-foreground">Payout request</p>
+                 <div className="mt-1 flex min-w-0 items-center gap-2">
+                   <span className={`inline-flex shrink-0 items-center rounded-full  px-2 py-0.5 text-[10px] font-medium ${PAYOUT_STATUS_STYLES[payout.status] ?? "border-border bg-muted/50 text-muted-foreground"}`}>
+                     {payout.status}
+                   </span>
+                   {payout.paymentReference && <span className="truncate text-xs text-muted-foreground">{payout.paymentReference}</span>}
+                 </div>
+               </div>
+               <div className="shrink-0 text-right">
+                 <p className="text-sm font-semibold tabular-nums text-foreground">TZS {formatTZS(payout.amount)}</p>
+                 <p className="mt-1 text-xs tabular-nums text-muted-foreground">{formatMobileDate(payout.requestedAt)}</p>
+               </div>
+             </article>
+           ))}
+         </div>
+         </>
           )}
         </div>
       </div>

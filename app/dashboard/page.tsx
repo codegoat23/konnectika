@@ -29,13 +29,16 @@ if (!creator) {
   throw new Error("Creator profile not found");
 }
 
-const earnings = await getCreatorEarnings(creator.id);
-  console.log(earnings)
+const [earnings, submissionCount] = await Promise.all([
+  getCreatorEarnings(creator.id),
+  prisma.submission.count({ where: { creatorId: creator.id } }),
+]);
 
   return (
     <CreatorDashboard
       campaigns={activeCampaigns}
       earnings={earnings}
+      submissionCount={submissionCount}
     />
   );
 }

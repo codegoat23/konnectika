@@ -66,16 +66,16 @@ export default function Testimony() {
   const testimony = testimonies[current]
 
   return (
-    <div className="flex flex-col items-center mb-30 mt-5">
+    <div className="mb-20 mt-5 flex flex-col items-center px-4 sm:mb-30">
 
       {/* Label */}
-      <span className="rounded-full border border-zinc-200/20 bg-zinc-100/20 text-white px-4 py-2 text-sm font-semibold ">
+      <span className="rounded-full border border-white/10 bg-card px-4 py-2 text-xs font-normal text-zinc-300">
         Success Stories
       </span>
 
       {/* Heading */}
       <div className="mt-6 text-center">
-        <span className="text-6xl font-bold text-white">
+        <span className="text-3xl font-bold text-white sm:text-5xl lg:text-6xl">
          Teams that scaled with <br/> Konnectika
         </span>
       </div>
@@ -83,11 +83,11 @@ export default function Testimony() {
       {/* Testimony */}
       <div className="mt-14 flex flex-col items-center">
 
-        <div className="flex flex-row justify-center items-center">
+        <div className="flex w-full flex-col items-center justify-center sm:flex-row">
 
           {/* Image Card */}
           <div
-            className="w-90 h-100 rounded-[24px] -rotate-6 translate-x-10 bg-cover bg-center flex flex-col justify-end items-start text-white shadow-lg font-bold text-7xl overflow-hidden transition-all duration-700"
+            className="h-[22rem] w-[min(84vw,22.5rem)] rounded-[24px] -rotate-3 bg-cover bg-center flex flex-col justify-end items-start text-white shadow-lg font-bold text-6xl overflow-hidden transition-all duration-700 sm:h-100 sm:w-90 sm:-rotate-6 sm:translate-x-10 sm:text-7xl"
             style={{
               backgroundImage: `url('${testimony.image}')`,
             }}
@@ -98,7 +98,7 @@ export default function Testimony() {
           </div>
 
           {/* Testimony Card */}
-          <div className="w-80 h-100 border border-white/10 bg-card rounded-[24px] rotate-4 -translate-x-10 p-6 transition-all duration-700">
+          <div className="h-[22rem] w-[min(84vw,22.5rem)] border border-white/10 bg-card rounded-[24px] p-5 transition-all duration-700 sm:h-100 sm:w-80 sm:rotate-4 sm:-translate-x-10 sm:p-6">
 
             <span className="text-zinc-500 text-xs flex flex-row items-center">
               {testimony.category}
@@ -110,12 +110,12 @@ export default function Testimony() {
               “{testimony.quote}”
             </p>
 
-            <Separator className="my-4 mt-20" />
+            <Separator className="my-4 mt-8 sm:mt-20" />
 
-            <div className="flex flex-row gap-10 items-center p-2">
+            <div className="flex flex-row gap-6 items-center p-2 sm:gap-10">
 
               <div className="flex flex-col items-center justify-center">
-                <span className="text-5xl text-white">
+                <span className="text-4xl text-white sm:text-5xl">
                   {testimony.brands}
                 </span>
 
@@ -125,7 +125,7 @@ export default function Testimony() {
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-5xl text-white">
+                <span className="text-4xl text-white sm:text-5xl">
                   {testimony.earned}
                 </span>
 

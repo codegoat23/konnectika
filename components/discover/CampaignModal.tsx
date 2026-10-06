@@ -38,7 +38,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
       >
 
       <div
-  className="h-52 flex items-center justify-center relative rounded-t-2xl overflow-hidden bg-cover bg-center"
+  className="relative flex h-40 items-center justify-center overflow-hidden rounded-t-2xl bg-cover bg-center sm:h-52"
   style={{
     backgroundImage: `url(${campaign.thumbnailPic})`,
     backgroundSize: "fit",
@@ -65,7 +65,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <h2 className="text-foreground text-xl font-bold leading-tight">{campaign.name}</h2>
@@ -87,9 +87,9 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-muted/40 px-4 py-3">
+          <div className="mt-4 flex flex-col items-start justify-between gap-1 rounded-xl border border-border bg-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
             <span className="text-sm text-muted-foreground">Payment Rate</span>
-            <span className="text-lg font-semibold text-foreground">
+            <span className="text-base font-semibold text-foreground sm:text-lg">
               TZS {formatTZS(campaign.paymentRate)} <span className="text-xs font-normal text-muted-foreground">per approved post</span>
             </span>
           </div>

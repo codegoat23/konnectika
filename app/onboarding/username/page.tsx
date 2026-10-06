@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AtSign, ArrowRight, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { LogoutButton } from "@/components/logoutButton";
+import Logo from "@/public/assets/logo-plain.svg";
 
 type ValidationState = "idle" | "checking" | "available" | "taken";
 
@@ -96,12 +98,10 @@ export default function UsernamePage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-<LogoutButton/>
+        <LogoutButton/>
         {/* Icon */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center">
-            <AtSign size={28} className="text-orange-500" />
-          </div>
+          <Image src={Logo} alt="Konnectika" priority className="size-16" />
         </div>
 
         {/* Heading */}

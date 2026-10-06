@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { NotifyAdmin, Notifycreators } from "@/lib/notification";
-import { computeBrandFee } from "@/lib/pricing";
+import { computeBrandFee, getPlatformPricing } from "@/lib/pricing";
 import { recordBrandFee } from "@/lib/platform-revenue";
 import { getCampaignsPaidBudget } from "@/lib/campaign-budget";
 import {
@@ -41,7 +41,7 @@ export async function GET() {
       isOpenToAll: true,
       isFeatured: true,
       businessProfile: {
-        select: { companyName: true },
+        select: { companyName: true, logo: true },
       },
       _count: { select: { applications: true } },
     },
@@ -151,7 +151,10 @@ export async function POST(req: Request) {
     // (campaignId, BRAND_FEE) so a retried request cannot duplicate it.
     // Computed ONCE here and reused for both the campaign snapshot and the
     // revenue row so frontend preview and stored amounts always agree.
-    const brandFee = computeBrandFee(budgetTotal);
+    // Honour the admin-configured rate (PlatformSetting first, then env), not
+    // just the env default, so a changed fee applies to newly created campaigns.
+    const pricing = await getPlatformPricing();
+    const brandFee = computeBrandFee(budgetTotal, pricing.brandFeePercent);
 
     const campaign = await prisma.$transaction(async (tx) => {
       const created = await tx.campaign.create({

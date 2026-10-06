@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
-import { computeBrandFee } from "@/lib/pricing";
+import { computeBrandFee, getPlatformPricing } from "@/lib/pricing";
 import { getCampaignPaidBudget } from "@/lib/campaign-budget";
 import type { Prisma } from "@prisma/client";
 import {
@@ -184,7 +184,10 @@ export async function PATCH(
     // The historical BRAND_FEE PlatformRevenue row is intentionally left
     // untouched — it is an immutable audit record of what was charged at
     // creation time.
-    const brandFee = computeBrandFee(budgetTotal);
+    // Honour the admin-configured rate (PlatformSetting first, then env), not
+    // just the env default, so a changed fee applies to newly created campaigns.
+    const pricing = await getPlatformPricing();
+    const brandFee = computeBrandFee(budgetTotal, pricing.brandFeePercent);
 
     const updated = await prisma.campaign.update({
       where: { id },

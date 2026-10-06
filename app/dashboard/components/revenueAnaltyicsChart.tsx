@@ -145,7 +145,10 @@ export function RevenueAnalyticsChart(){
       );
 
 
-      const data = await response.json();
+      if (!response.ok) return;
+
+      const data: RevenuePoint[] = await response.json();
+      if (!Array.isArray(data)) return;
 
       setChartData(data);
 
@@ -371,7 +374,7 @@ content={
 className="bg-popover rounded-[10] border-border"
 formatter={(value)=>
 [
-`$${Number(value).toLocaleString()}`,
+`TZS ${Number(value).toLocaleString()}`,
 "Paid earnings"
 ]
 }

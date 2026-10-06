@@ -60,14 +60,14 @@ const trustItems = [
 
 export default function CreatorSteps() {
   return (
-    <section className="relative overflow-hidden bg-white py-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-24 text-center">
+    <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-14 text-center sm:mb-24">
           <span className="rounded-full border border-zinc-200/50 bg-zinc-100/30 px-4 py-2 text-sm font-semibold text-black">
             How it works
           </span>
 
-          <h2 className="mt-6 text-5xl font-black tracking-tight text-black sm:text-6xl">
+          <h2 className="mt-6 text-3xl font-black tracking-tight text-black sm:text-5xl lg:text-6xl">
             Four
 steps
 from
@@ -82,19 +82,19 @@ that &nbsp;
           </h2>
         </div>
 
-        <div className="relative  p-10">
+        <div className="relative p-2 sm:p-6 lg:p-10">
 
 <Reveal> {trustItems.map((item) => (
             <div
               key={item.number}
               className={`flex ${
                 item.side === "left"
-                  ? "justify-start"
-                  : "justify-end"
+                  ? "justify-start sm:pl-0"
+                  : "justify-start sm:justify-end sm:pr-0"
               }`}
             >
               <div
-                className={`relative w-[340px] rounded-[36px] bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] ${item.rotate}`}
+                className={`relative w-full max-w-[340px] rounded-[36px] bg-white p-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:p-5 ${item.rotate}`}
               >
                 {/* Pin */}
                 <div
@@ -102,7 +102,7 @@ that &nbsp;
                 />
 
                 {/* Card */}
-                <div className={`rounded-3xl p-6 ${item.color}`}>
+                <div className={`rounded-3xl p-4 sm:p-6 ${item.color}`}>
                   <p className="text-3xl font-light text-zinc-500">
                     {item.number}
                   </p>

@@ -88,14 +88,14 @@ describe("marketplace lifecycle", () => {
     campaignId = createdBody.id;
     expect(createdBody.status).toBe("PENDING_REVIEW");
     expect(createdBody.paymentStatus).toBe("UNPAID");
-    expect(createdBody.platformFee).toBe(125000); // 5% of 2,500,000
-    expect(createdBody.totalCharge).toBe(2625000);
+    expect(createdBody.platformFee).toBe(250000); // 10% of 2,500,000
+    expect(createdBody.totalCharge).toBe(2750000);
 
     const brandFeeRow = await prisma.platformRevenue.findFirst({
       where: { campaignId, type: "BRAND_FEE" },
     });
     expect(brandFeeRow?.status).toBe("ACCRUED");
-    expect(brandFeeRow?.feeAmount).toBe(125000);
+    expect(brandFeeRow?.feeAmount).toBe(250000);
 
     // 2. Admin approves the campaign (confirms funds received + funds budget).
     await signInAs(fx.admin.id, "ADMIN");

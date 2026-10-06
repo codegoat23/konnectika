@@ -1,8 +1,10 @@
 // tests/helpers.ts
 //
 // Shared utilities for the Konnectika marketplace test environment:
-//   - auth: mint real JWTs and drop them into the mocked next/headers cookie
-//     jar (signInAs / signOut)
+//   - auth: sign the Clerk test session in/out as a given user (signInAs /
+//     signOut). Under Clerk, identity is a Clerk user id and role still comes
+//     from Prisma — so these helpers attach a deterministic clerkUserId to the
+//     fixture user and point the session mock at it.
 //   - routing: invoke Next.js route handlers directly without a server
 //     (callRoute)
 //   - data: deterministic fixtures (@test.konnectika.local domain), resetDb()
@@ -10,8 +12,8 @@
 //     builders.
 
 import { prisma } from "@/lib/prisma";
-import { signToken } from "@/lib/auth";
-import { setAuthToken, clearAuthToken } from "./cookie-jar";
+import { setClerkSession, clearClerkSession } from "./clerk-jar";
+import { clearCookies } from "./cookie-jar";
 import type { Role } from "@prisma/client";
 import type { MarkPayoutPaidResult } from "@/lib/payout";
 import { expect } from "vitest";
@@ -43,19 +45,39 @@ export function addDays(date: Date, days: number): Date {
 // Auth
 // ---------------------------------------------------------------------------
 
+/**
+ * Signs the Clerk test session in as `userId`.
+ *
+ * Attaches a deterministic clerkUserId to the row if it doesn't have one yet,
+ * so the lookup path in lib/auth.ts (find user by clerkUserId) runs exactly as
+ * it does in production. `role` is intentionally ignored for authorization —
+ * Prisma already holds the truth — but kept in the signature so existing call
+ * sites read the same.
+ */
 export async function signInAs(userId: string, role: Role): Promise<void> {
-  const token = await signToken({
-    userId,
-    role,
-    onboardingDone: true,
-    onboardingStep: 0,
-    type: "email",
+  void role;
+
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { clerkUserId: true, email: true },
   });
-  setAuthToken(token);
+
+  const clerkUserId =
+    existing?.clerkUserId ?? `user_test_${userId.replace(/[^a-zA-Z0-9]/g, "")}`;
+
+  if (existing && !existing.clerkUserId) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { clerkUserId },
+    });
+  }
+
+  setClerkSession(clerkUserId, { email: existing?.email ?? null });
 }
 
 export function signOut(): void {
-  clearAuthToken();
+  clearClerkSession();
+  clearCookies();
 }
 
 // ---------------------------------------------------------------------------
@@ -210,7 +232,7 @@ export interface CampaignOverrides {
   budgetTotal?: number;
   applicationsClose?: Date;
   status?: "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED";
-  paymentStatus?: "UNPAID" | "PAID";
+  paymentStatus?: "UNPAID" | "AWAITING_PAYMENT" | "PROOF_SUBMITTED" | "PAYMENT_FAILED" | "PAID";
   paymentMethod?: string | null;
   paymentPhone?: string | null;
 }
@@ -315,6 +337,24 @@ export async function resetDb(): Promise<void> {
   });
   const campaignIds = campaigns.map((c) => c.id);
 
+  // Snippe webhook events are global (not scoped to a user), so drop them by
+  // the references we may have minted during a test.
+  await prisma.webhookEvent.deleteMany({ where: { provider: "snippe" } });
+
+  // Fee settings are global too. A test that changes a percentage would
+  // otherwise leak that rate into every later test's fee assertions.
+  await prisma.platformSetting.deleteMany({
+    where: {
+      key: {
+        in: [
+          "pricing.brandFeePercent",
+          "pricing.creatorFeePercent",
+          "pricing.snippeCollectionFeePercent",
+        ],
+      },
+    },
+  });
+
   const applications = await prisma.campaignApplication.findMany({
     where: {
       OR: [
@@ -350,7 +390,17 @@ export async function resetDb(): Promise<void> {
     }),
     // Payouts are the single settlement channel; WITHDRAWN/Payment rows no
     // longer exist.
+    // Proofs reference payouts/intents with Restrict, so drop them first.
+    prisma.paymentProof.deleteMany({
+      where: {
+        OR: [
+          { campaignId: { in: campaignIds } },
+          { payout: { creatorId: { in: creatorIds } } },
+        ],
+      },
+    }),
     prisma.payout.deleteMany({ where: { creatorId: { in: creatorIds } } }),
+    prisma.paymentIntent.deleteMany({ where: { campaignId: { in: campaignIds } } }),
     prisma.earning.deleteMany({ where: { id: { in: earningIds } } }),
     prisma.submission.deleteMany({
       where: {

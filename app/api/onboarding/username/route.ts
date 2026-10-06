@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,43 +11,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { username } = await req.json();
+    if (authUser.role !== "CREATOR") {
+      return NextResponse.json({ error: "This step is only for creator accounts." }, { status: 403 });
+    }
 
-    if (!username || username.trim().length < 3) {
+    const body = await req.json().catch(() => null);
+    const username = typeof body?.username === "string"
+      ? body.username.trim().toLowerCase()
+      : "";
+
+    if (!/^[a-z0-9_]{3,30}$/.test(username)) {
       return NextResponse.json(
-        { error: "Username must be at least 3 characters" },
+        { error: "Username must be 3–30 characters using lowercase letters, numbers, or underscores." },
         { status: 400 }
       );
     }
 
     const existing = await prisma.creatorProfile.findUnique({
       where: { username },
+      select: { userId: true },
     });
 
-    if (existing) {
+    if (existing && existing.userId !== authUser.userId) {
       return NextResponse.json(
         { error: "Username already taken" },
         { status: 409 }
       );
     }
 
-    await prisma.creatorProfile.update({
-      where: { userId: authUser.userId },
-      data: { username },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.creatorProfile.upsert({
+        where: { userId: authUser.userId },
+        update: { username },
+        create: { userId: authUser.userId, username },
+      });
 
-    await prisma.user.update({
-      where: { id: authUser.userId },
-      data: { onboardingStep: 2 },
-    });
-
-    // ✅ Re-issue JWT with updated onboardingStep
-    const newToken = await signToken({
-      userId: authUser.userId,
-      role: authUser.role,
-      onboardingDone: false,
-      onboardingStep: 2,
-      type: "access",
+      await tx.user.update({
+        where: { id: authUser.userId },
+        data: { onboardingStep: 2 },
+      });
     });
 
     const res = NextResponse.json({
@@ -55,17 +57,11 @@ export async function POST(req: NextRequest) {
       nextStep: "/onboarding/socials",
     });
 
-    // ✅ Overwrite the stale cookie
-    res.cookies.set("token", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
     return res;
   } catch (err) {
+    if (typeof err === "object" && err !== null && "code" in err && err.code === "P2002") {
+      return NextResponse.json({ error: "Username already taken" }, { status: 409 });
+    }
     console.error("USERNAME ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

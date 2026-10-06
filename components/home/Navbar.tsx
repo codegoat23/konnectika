@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import LogoMark from "@/public/assets/logo-plain.svg";
 import {
   AudienceToggle,
   type Audience,
@@ -49,21 +48,14 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
             aria-label="Konnectika home"
           >
             <Image
-              src={LogoMark}
+              src="/assets/logo-plain.svg"
               alt=""
               width={34}
               height={34}
               priority
               className="h-8 w-8"
             />
-            <span
-              className={cn(
-                "text-lg font-extrabold tracking-tight",
-                brand ? "text-white" : "text-foreground"
-              )}
-            >
-              Konnectika
-            </span>
+         
           </Link>
 
           <div className="hidden md:block">
@@ -84,7 +76,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
                 Login
               </Button>
             </Link>
-            <Link href="/signup">
+            <Link href={brand ? "/signup?role=BRAND" : "/signup?role=CREATOR"}>
               <Button
                 className={cn(
                   "rounded-full px-5 py-5.5",

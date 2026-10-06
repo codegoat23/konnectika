@@ -90,6 +90,22 @@ export const ourFileRouter = {
 
   }),
 
+  brandLogo: f({
+    image: { maxFileSize: "2MB", maxFileCount: 1 },
+  })
+    .middleware(async () => {
+      const user = await getSessionUser();
+      if (!user) throw new Error("Unauthorized");
+      if (user.role !== "BRAND" || !user.businessProfileId) {
+        throw new Error("Only brands can upload a logo");
+      }
+      return { brandId: user.businessProfileId };
+    })
+    .onUploadComplete(async ({ metadata, file }) => ({
+      uploadedBy: metadata.brandId,
+      url: file.ufsUrl ?? file.url,
+    })),
+
   paymentProof: f({
     image: {
       maxFileSize: "4MB",

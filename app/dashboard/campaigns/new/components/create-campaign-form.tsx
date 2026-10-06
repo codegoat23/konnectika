@@ -13,13 +13,8 @@ import type { Prisma, CampaignTypeEnum } from "@prisma/client";
 import type { IconType } from "react-icons";
 import CoverImageUploader from "@/components/CoverImageUploader";
 import PaymentBreakdown from "../../components/PaymentBreakdown";
-import {
-  getPaymentMethodMeta,
-  PaymentMethodDisplay,
-} from "@/components/payment-method-display";
-import { isMobileMoneyMethod, normalizePhoneNumber } from "@/lib/payment";
 import { format, parseISO, startOfDay } from "date-fns";
-import { CalendarIcon, Check, Landmark, Loader2Icon, Smartphone } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -41,32 +36,6 @@ type CampaignFormProps = {
     include: { businessProfile: { select: { userId: true } } };
   }>;
 };
-
-// The admin-configured destination the brand pays into, as returned by
-// GET /api/payment-receiving-accounts?method=...
-type ReceivingAccountPayload = {
-  id: string;
-  type: "MOBILE_MONEY" | "BANK";
-  provider: string;
-  accountName: string;
-  phone: string | null;
-  accountNumber: string | null;
-  branchDetail: string | null;
-  extraDetails: string | null;
-};
-
-// Visual payment-method cards. `value` is the exact string stored in
-// form.paymentMethod (and validated by the backend); the logo and label come
-// from the shared payment-method mapping so the whole app stays consistent.
-const PAYMENT_OPTIONS = [
-  "M-PESA",
-  "Airtel Money",
-  "Tigo Pesa",
-  "HaloPesa",
-  "Bank Transfer",
-].map((value) => ({ value, meta: getPaymentMethodMeta(value)! }));
-
-
 
  const Input = ({ id, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
@@ -125,14 +94,6 @@ export default function CampaignForm({
   // summary always matches the authoritative rate (lib/pricing.ts).
   const [brandFeePercent, setBrandFeePercent] = useState<number | null>(null);
 
-  // Konnectika receiving accounts for the selected payment method — fetched
-  // from the API so the brand immediately sees the admin-configured account
-  // number it should pay into.
-  const [receivingAccounts, setReceivingAccounts] = useState<
-    ReceivingAccountPayload[]
-  >([]);
-  const [receivingLoading, setReceivingLoading] = useState(false);
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -159,8 +120,6 @@ export default function CampaignForm({
     badge: initialData?.badge ?? "new",
     paymentRate: initialData?.paymentRate?.toString() ?? "",
     budgetTotal: initialData?.budgetTotal?.toString() ?? "",
-    paymentMethod: initialData?.paymentMethod ?? "",
-    paymentPhone: initialData?.paymentPhone ?? "",
     contentFormat: initialData?.contentFormat ?? "",
     duration: initialData?.duration ?? "",
     applicationsClose: initialData?.applicationsClose
@@ -172,34 +131,6 @@ export default function CampaignForm({
     requirements: initialData?.requirements?.join("\n") ?? "",
     platforms: (initialData?.platforms ?? []) as string[],
   });
-
-  // Fetch the admin-configured Konnectika receiving account whenever the
-  // selected payment method changes so the brand sees where to send the money.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const method = form.paymentMethod;
-      if (!method) {
-        if (!cancelled) setReceivingAccounts([]);
-        return;
-      }
-      setReceivingLoading(true);
-      try {
-        const res = await fetch(
-          `/api/payment-receiving-accounts?method=${encodeURIComponent(method)}`
-        );
-        const data = await res.json();
-        if (!cancelled) setReceivingAccounts(data?.accounts ?? []);
-      } catch {
-        if (!cancelled) setReceivingAccounts([]);
-      } finally {
-        if (!cancelled) setReceivingLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [form.paymentMethod]);
 
   // Live payment preview (display only — final amounts are computed and
   // stored by the backend on submit).
@@ -237,15 +168,6 @@ export default function CampaignForm({
     const closeDate = new Date(form.applicationsClose);
     if (!form.applicationsClose || isNaN(closeDate.getTime())) {
       alert("Choose a valid applications close date");
-      setLoading(false);
-      return;
-    }
-
-    if (
-      isMobileMoneyMethod(form.paymentMethod) &&
-      !normalizePhoneNumber(form.paymentPhone)
-    ) {
-      alert("Enter a valid contact number for this campaign.");
       setLoading(false);
       return;
     }
@@ -424,144 +346,6 @@ export default function CampaignForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2 space-y-2 flex flex-col gap-0.5">
-            <label id="payment-method-label" className="text-sm font-medium text-muted-foreground">
-              Payment Method
-            </label>
-            <div
-              role="radiogroup"
-              aria-labelledby="payment-method-label"
-              className="grid grid-cols-2 gap-3 sm:grid-cols-4"
-            >
-              {PAYMENT_OPTIONS.map((option) => {
-                const active = form.paymentMethod === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() =>
-                      setForm({ ...form, paymentMethod: option.value })
-                    }
-                    className={`
-                      relative flex flex-col items-center justify-center gap-2
-                      rounded-2xl border bg-background px-2 py-4 min-h-[88px]
-                      transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
-                      ${active
-                        ? "border-orange-500 bg-orange-500/5"
-                        : "border-border hover:border-orange-500/40"}
-                    `}
-                    style={{ borderRadius: 14 }}
-                  >
-                    <PaymentMethodDisplay
-                      method={option.value}
-                      size="lg"
-                      showLabel={false}
-                    />
-                    <span
-                      className={`text-sm font-medium ${
-                        active ? "text-orange-600 dark:text-orange-400" : "text-foreground"
-                      }`}
-                    >
-                      {option.meta.label}
-                    </span>
-                    {active && (
-                      <span className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-orange-500 text-white">
-                        <Check className="size-3" />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Admin-configured Konnectika receiving account for the chosen method */}
-          {(form.paymentMethod || receivingLoading) && (
-            <div className="sm:col-span-2 flex flex-col gap-3 rounded-2xl border border-border bg-muted/30 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Send Your Payment To (Konnectika)
-                </p>
-                {receivingLoading && (
-                  <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                )}
-              </div>
-              {!receivingLoading && receivingAccounts.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No receiving account has been configured for{" "}
-                  <PaymentMethodDisplay method={form.paymentMethod} size="sm" />{" "}
-                  yet. Please contact the admin before completing your payment.
-                </p>
-              )}
-              {receivingAccounts.map((account) => (
-                <div key={account.id} className="flex items-start gap-2.5">
-                  {account.type === "BANK" ? (
-                    <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                  ) : (
-                    <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                  )}
-                  <div className="min-w-0 space-y-0.5 text-sm">
-                    <div className="flex flex-wrap items-center gap-x-2">
-                      <span className="font-medium text-foreground">
-                        {account.accountName}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {account.provider}
-                      </span>
-                    </div>
-                    {account.phone && (
-                      <p className="font-mono font-medium text-foreground">
-                        {account.phone}
-                      </p>
-                    )}
-                    {account.accountNumber && (
-                      <p className="font-mono font-medium text-foreground">
-                        Acc: {account.accountNumber}
-                      </p>
-                    )}
-                    {(account.branchDetail || account.extraDetails) && (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {[account.branchDetail, account.extraDetails]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {isMobileMoneyMethod(form.paymentMethod) && (
-            <div className="sm:col-span-2 space-y-2 flex flex-col gap-0.5">
-              <label htmlFor="payment-phone" className="text-sm font-medium text-muted-foreground">
-                Contact Number <span className="text-destructive">*</span>
-              </label>
-              <Input
-                id="payment-phone"
-                type="tel"
-                inputMode="tel"
-                placeholder="e.g. 0712 345 678 or +255 712 345 678"
-                value={form.paymentPhone}
-                onChange={(e) =>
-                  setForm({ ...form, paymentPhone: e.target.value })
-                }
-              />
-            </div>
-          )}
-        </div>
-
-        {isMobileMoneyMethod(form.paymentMethod) && (
-          <p className="text-xs text-muted-foreground">
-            This is the number Konnectika uses to reach you about your campaign
-            payment. Send the money to the{" "}
-            <PaymentMethodDisplay method={form.paymentMethod} size="sm" />{" "}
-            account above, then submit your proof once the campaign is created.
-          </p>
-        )}
       </Section>
 
       {/* Content */}

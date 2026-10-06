@@ -78,7 +78,7 @@ export default function ActiveCampaigns({active_campaigns}:ActiveCampaignsProps)
         </div>
       </section>
 
-      <section className="w-full lg:w-auto shrink-0 flex justify-center lg:justify-start">
+      <section className="hidden w-full shrink-0 justify-center md:flex md:w-auto md:justify-start">
         <SocialFolderGrid />
       </section>
     </div>

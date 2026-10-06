@@ -73,7 +73,11 @@ function CornerDot({ className }: { className?: string }) {
   );
 }
 
-export default function SocialFolderGrid() {
+export default function SocialFolderGrid({
+  mobileFavoritesOnly = false,
+}: {
+  mobileFavoritesOnly?: boolean;
+}) {
   const [socials, setSocials] = useState<SocialAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -205,6 +209,44 @@ export default function SocialFolderGrid() {
 
   return (
     <div className="flex flex-col gap-5">
+      {mobileFavoritesOnly && (
+        <section className="mx-4 rounded-3xl border border-white/5 bg-zinc-900 px-4 py-4 text-white shadow-lg md:hidden" aria-label="Favorite social platforms">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Social Platforms</h2>
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="text-xs text-white/60 transition hover:text-white"
+            >
+              View all
+            </button>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {PLATFORMS.map((platform) => {
+              const Icon = platform.icon;
+              const connected = isConnected(platform.id);
+              return (
+                <button
+                  key={platform.id}
+                  type="button"
+                  onClick={() => setSelectedPlatform(platform)}
+                  aria-label={`${platform.name}: ${connected ? "connected" : "not connected"}`}
+                  className="flex w-14 shrink-0 flex-col items-center gap-1.5 rounded-xl py-1 text-[10px] text-white/65 transition hover:bg-white/5 hover:text-white"
+                >
+                  <span className="flex size-10 items-center justify-center rounded-full bg-white/10">
+                    <Icon className={`size-4 ${connected ? (platform.id === "TIKTOK" ? "text-white" : platform.color) : "text-zinc-500"}`} />
+                  </span>
+                  <span className="max-w-full truncate">{platform.name.split(" /")[0]}</span>
+                </button>
+              );
+            })}
+          </div>
+          {loading && <p className="mt-2 text-[10px] text-white/45">Loading connected platforms…</p>}
+          {error && <p className="mt-2 text-[10px] text-red-300">{error}</p>}
+        </section>
+      )}
+
+      <div className={mobileFavoritesOnly ? "hidden md:flex md:flex-col md:gap-5" : "flex flex-col gap-5"}>
       <h2 className="text-lg font-semibold text-foreground">Social platforms</h2>
 
       {error && (
@@ -283,6 +325,7 @@ export default function SocialFolderGrid() {
             Add
           </button>
         </div>
+      </div>
       </div>
 
       {/* ALL PLATFORMS MODAL */}

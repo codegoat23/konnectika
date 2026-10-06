@@ -43,17 +43,27 @@ export default function CampaignCard({ campaign, onClick }: CampaignCardProps) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div>
-            <div className="flex flex-row justify-between items-center w-[260px] ">
-                 <h3 className="text-foreground text-sm font-medium leading-tight line-clamp-1">
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
+                 <h3 className="min-w-0 flex-1 text-foreground text-sm font-medium leading-tight line-clamp-1">
               {campaign.name}
             </h3>
-             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-xs font-semibold text-foreground ">
+             <div className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card/80 px-2.5 py-1.5 text-xs font-semibold text-foreground sm:px-3 ">
   <Users size={12} />
   <span>{campaign._count.applications}</span>
 </div>
             </div>
            
-            <p className="text-muted-foreground text-xs mt-0.5 flex items-center gap-1">
+            <p className="text-muted-foreground text-xs mt-0.5 flex items-center gap-1.5">
+              {campaign.brandLogo ? (
+                <span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={campaign.brandLogo} alt={`${campaign.brand} logo`} className="h-full w-full object-contain p-0.5" />
+                </span>
+              ) : (
+                <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-semibold text-foreground">
+                  {campaign.brand.slice(0, 1).toUpperCase()}
+                </span>
+              )}
               {campaign.brand}
               {campaign.isFeatured && (
                 <span className="w-3 h-3 rounded-full bg-orange-500 inline-block" />

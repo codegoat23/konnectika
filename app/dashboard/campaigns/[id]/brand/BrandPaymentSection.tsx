@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,277 +9,312 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import PaymentProofUploader from "@/components/PaymentProofUploader";
-import { PaymentMethodDisplay } from "@/components/payment-method-display";
 import { formatTZS } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
-  Landmark,
   Loader2Icon,
-  Smartphone,
+  RefreshCw,
+  ShieldCheck,
   XCircle,
 } from "lucide-react";
 
+/**
+ * Brand campaign payment through Snippe.
+ *
+ * The brand starts a payment, Snippe pushes a USSD authorization to their
+ * phone, and the campaign is marked PAID by the verified webhook — never by
+ * this component. The status shown here is refreshed by polling purely so the
+ * UI settles on the truth; `POST /api/campaigns/[id]/pay` returning 202 does
+ * NOT mean paid, and this component never claims it is.
+ */
+
 export type CampaignPaymentStatus =
   | "UNPAID"
+  | "AWAITING_PAYMENT"
   | "PROOF_SUBMITTED"
+  | "PAYMENT_FAILED"
   | "PAID";
 
-type ReceivingAccount = {
-  id: string;
-  type: "MOBILE_MONEY" | "BANK";
-  provider: string;
-  accountName: string;
-  phone: string | null;
-  accountNumber: string | null;
-  branchDetail: string | null;
-  extraDetails: string | null;
-  isActive: boolean;
+type Breakdown = {
+  budget: number;
+  platformFeeRate: number;
+  platformFee: number;
+  providerFeeRate: number;
+  providerFee: number;
+  totalCharge: number;
 };
 
-type SimpleProof = {
+type Intent = {
   id: string;
-  amount: number;
-  paymentMethod: string;
-  transactionReference: string;
-  proofUrl: string | null;
-  note: string | null;
-  status: "PROOF_SUBMITTED" | "VERIFIED" | "REJECTED";
-  rejectionReason: string | null;
+  attempt: number;
+  status: "AWAITING_PAYMENT" | "PROCESSING" | "PAID" | "FAILED";
+  totalCharge: number;
+  platformFee: number;
+  providerFee: number;
+  providerFeeRate: number;
+  actualProviderFee: number | null;
+  channel: string | null;
+  customerPhone: string | null;
+  failureReason: string | null;
   createdAt: string;
 };
 
-function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("en-US", {
+type Instructions = {
+  reference: string;
+  amount: number;
+  phone: string;
+  channel: string;
+  message: string;
+  expiresAt: string | null;
+};
+
+type PayResponse = {
+  campaign: { id: string; name: string; paymentStatus: CampaignPaymentStatus };
+  breakdown: Breakdown | null;
+  intent: Intent | null;
+};
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
 }
 
+const STATUS_LABEL: Record<CampaignPaymentStatus, string> = {
+  UNPAID: "Unpaid",
+  AWAITING_PAYMENT: "Awaiting authorization",
+  PROOF_SUBMITTED: "Verifying",
+  PAYMENT_FAILED: "Payment failed",
+  PAID: "Paid",
+};
+
 export default function BrandPaymentSection({
   campaignId,
   campaignName,
-  totalCharge,
-  paymentMethod,
   initialStatus,
 }: {
   campaignId: string;
   campaignName: string;
-  totalCharge: number;
-  paymentMethod: string | null;
   initialStatus: CampaignPaymentStatus;
 }) {
-  const [status, setStatus] = useState<CampaignPaymentStatus>(initialStatus);
-  const [accounts, setAccounts] = useState<ReceivingAccount[]>([]);
-  const [proofs, setProofs] = useState<SimpleProof[]>([]);
-  const [accountsLoading, setAccountsLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] =
+    useState<CampaignPaymentStatus>(initialStatus);
+  const [breakdown, setBreakdown] = useState<Breakdown | null>(null);
+  const [intent, setIntent] = useState<Intent | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [transactionReference, setTransactionReference] = useState("");
-  const [note, setNote] = useState("");
-  const [proofUrl, setProofUrl] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const [instructions, setInstructions] = useState<Instructions | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}/pay`);
+      if (!res.ok) return null;
+      const data: PayResponse = await res.json();
+      setBreakdown(data.breakdown);
+      setIntent(data.intent);
+      setStatus(data.campaign.paymentStatus);
+      return data;
+    } catch {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [campaignId]);
+
+  // Load once on mount. The route is a read; any later refresh is user- or
+  // timer-driven, so this must not be an effect that setStates synchronously.
   useEffect(() => {
+    const controller = new AbortController();
     let cancelled = false;
-    const methodParam = paymentMethod
-      ? `?method=${encodeURIComponent(paymentMethod)}`
-      : "";
+
     (async () => {
       try {
-        const [accountsRes, proofsRes] = await Promise.all([
-          fetch(`/api/payment-receiving-accounts${methodParam}`),
-          fetch(`/api/brand-payments?campaignId=${campaignId}`),
-        ]);
-        const accountsData = await accountsRes
-          .json()
-          .catch(() => ({ accounts: [] }));
-        const proofsData = await proofsRes
-          .json()
-          .catch(() => ({ proofs: [] }));
-        if (!cancelled) {
-          setAccounts(accountsData.accounts ?? []);
-          setProofs(proofsData.proofs ?? []);
-        }
+        const res = await fetch(`/api/campaigns/${campaignId}/pay`, {
+          signal: controller.signal,
+        });
+        if (!res.ok || cancelled) return;
+        const data: PayResponse = await res.json();
+        if (cancelled) return;
+        setBreakdown(data.breakdown);
+        setIntent(data.intent);
+        setStatus(data.campaign.paymentStatus);
       } catch {
-        if (!cancelled) {
-          setAccounts([]);
-          setProofs([]);
-        }
+        if (!cancelled) setBreakdown(null);
       } finally {
-        if (!cancelled) setAccountsLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, [campaignId, paymentMethod]);
+  }, [campaignId]);
 
-  const latestProof = proofs[0] ?? null;
-  const awaiting = status === "PROOF_SUBMITTED";
-  const canSubmit = status === "UNPAID";
-  const paid = status === "PAID";
+  /**
+   * While a payment is in flight, poll for the webhook's effect so the UI
+   * updates without a manual reload. This is UX only — the webhook is what
+   * actually settles the campaign.
+   */
+  useEffect(() => {
+    if (status !== "AWAITING_PAYMENT") {
+      if (pollRef.current) clearTimeout(pollRef.current);
+      return;
+    }
+    pollRef.current = setTimeout(async () => {
+      const data = await refresh();
+      if (data?.campaign.paymentStatus === "AWAITING_PAYMENT") {
+        // still pending — schedule the next check
+        void refresh();
+      }
+    }, 4000);
+    return () => {
+      if (pollRef.current) clearTimeout(pollRef.current);
+    };
+  }, [status, refresh]);
 
-  const submit = async () => {
-    setSubmitting(true);
+  const startPayment = async () => {
+    setStarting(true);
     setError(null);
     try {
-      const res = await fetch("/api/brand-payments", {
+      const res = await fetch(`/api/campaigns/${campaignId}/pay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          campaignId,
-          amount: totalCharge,
-          paymentMethod,
-          transactionReference,
-          proofUrl,
-          note,
-        }),
+        body: JSON.stringify({ phoneNumber, firstName, lastName, email }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error ?? "Failed to submit proof. Please try again.");
-        setSubmitting(false);
+        setError(data?.error ?? "Could not start the payment. Please try again.");
+        setStarting(false);
         return;
       }
-      setStatus("PROOF_SUBMITTED");
-      setSubmitted(true);
+
+      if (data?.breakdown) setBreakdown(data.breakdown);
+      setInstructions(data?.instructions ?? null);
+      setStatus("AWAITING_PAYMENT");
       setOpen(false);
-      setSubmitting(false);
-      window.location.reload();
+      setStarting(false);
+      void refresh();
     } catch {
       setError("Something went wrong. Please try again.");
-      setSubmitting(false);
+      setStarting(false);
     }
   };
 
+  const paid = status === "PAID";
+  const awaiting = status === "AWAITING_PAYMENT";
+  const failed = status === "PAYMENT_FAILED";
+  const canPay = !paid && !awaiting;
+
+  const display = breakdown;
+
   return (
-    <div className="bg-muted/50 border border-border rounded-[24px] p-5" style={{ borderRadius: 24 }}>
+    <div
+      className="bg-muted/50 border border-border p-5"
+      style={{ borderRadius: 24 }}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            Pay the Platform Fee
+            Pay for this campaign
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            {paymentMethod ? (
-              <>
-                Send{" "}
-                <span className="font-medium text-foreground">
-                  TZS {formatTZS(totalCharge)}
-                </span>{" "}
-                to Konnectika&apos;s{" "}
-                <PaymentMethodDisplay method={paymentMethod} size="sm" showLabel />{" "}
-                account shown below, then submit your proof for admin verification.
-              </>
-            ) : (
-              "No payment method was selected for this campaign."
-            )}
+            Pay securely by mobile money. You&apos;ll get a USSD prompt to
+            authorize the payment — no transfers, no receipts to upload.
           </p>
         </div>
 
-        {paymentMethod && (
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium",
-              paid
-                ? "bg-success/15 text-success border-success/25"
-                : awaiting
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium",
+            paid
+              ? "bg-success/15 text-success border-success/25"
+              : awaiting
                 ? "bg-info/15 text-info border-info/25"
-                : "bg-warning/15 text-warning border-warning/25"
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-current" />
-            {paid ? "Paid" : awaiting ? "Proof Submitted" : "Unpaid"}
-          </span>
+                : failed
+                  ? "bg-destructive/15 text-destructive border-destructive/25"
+                  : "bg-warning/15 text-warning border-warning/25"
+          )}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+          {STATUS_LABEL[status]}
+        </span>
+      </div>
+
+      {/* Charge breakdown: budget + platform fee + payment fee = total */}
+      <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+        {loading && !display ? (
+          <div className="flex items-center justify-center py-4 text-xs text-muted-foreground">
+            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            Loading payment details...
+          </div>
+        ) : display ? (
+          <>
+            <dl className="space-y-2.5 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Campaign budget</dt>
+                <dd className="font-medium text-foreground">
+                  TZS {formatTZS(display.budget)}
+                </dd>
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">
+                  Platform fee ({display.platformFeeRate}%)
+                </dt>
+                <dd className="font-medium text-foreground">
+                  TZS {formatTZS(display.platformFee)}
+                </dd>
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">
+                  Payment processing fee ({display.providerFeeRate}%)
+                </dt>
+                <dd className="font-medium text-foreground">
+                  TZS {formatTZS(display.providerFee)}
+                </dd>
+              </div>
+
+              <div className="flex items-center justify-between gap-4 border-t border-border pt-2.5">
+                <dt className="font-medium text-foreground">Total</dt>
+                <dd className="text-base font-semibold text-foreground">
+                  TZS {formatTZS(display.totalCharge)}
+                </dd>
+              </div>
+            </dl>
+
+            {intent?.actualProviderFee != null &&
+              intent.actualProviderFee !== display.providerFee && (
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  Actual processing fee charged: TZS{" "}
+                  {formatTZS(intent.actualProviderFee)}
+                </p>
+              )}
+          </>
+        ) : (
+          <p className="py-2 text-xs text-muted-foreground">
+            Payment details unavailable.
+          </p>
         )}
       </div>
 
-      {/* Konnectika receiving account(s) */}
-      {paymentMethod && (
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {accountsLoading ? (
-            <div className="flex h-24 items-center justify-center text-xs text-muted-foreground">
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              Loading receiving account...
-            </div>
-          ) : accounts.length === 0 ? (
-            <div className="md:col-span-2 flex items-start gap-2 rounded-2xl border border-warning/25 bg-warning/10 px-4 py-3 text-xs text-warning">
-              <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>
-                Konnectika has not configured a receiving account for this
-                payment method yet. Please contact support before making a
-                payment.
-              </span>
-            </div>
-          ) : (
-            accounts.map((account) => (
-              <div
-                key={account.id}
-                className="rounded-2xl border border-border bg-card p-4"
-              >
-                <div className="flex items-center gap-2">
-                  {account.type === "BANK" ? (
-                    <Landmark className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Smartphone className="h-4 w-4 text-muted-foreground" />
-                  )}
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {account.provider} Account
-                  </span>
-                </div>
-
-                <dl className="mt-3 space-y-2 text-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <dt className="text-muted-foreground">Account name</dt>
-                    <dd className="font-medium text-foreground">
-                      {account.accountName}
-                    </dd>
-                  </div>
-
-                  {account.phone && (
-                    <div className="flex items-center justify-between gap-2">
-                      <dt className="text-muted-foreground">Phone</dt>
-                      <dd className="font-mono font-medium text-foreground">
-                        {account.phone}
-                      </dd>
-                    </div>
-                  )}
-
-                  {account.accountNumber && (
-                    <div className="flex items-center justify-between gap-2">
-                      <dt className="text-muted-foreground">Account number</dt>
-                      <dd className="font-mono font-medium text-foreground">
-                        {account.accountNumber}
-                      </dd>
-                    </div>
-                  )}
-
-                  {(account.branchDetail || account.extraDetails) && (
-                    <div className="flex items-center justify-between gap-2">
-                      <dt className="text-muted-foreground">Reference</dt>
-                      <dd className="text-right text-xs text-muted-foreground">
-                        {[account.branchDetail, account.extraDetails]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Latest proof / actions */}
+      {/* Action / status */}
       <div className="mt-4 border-t border-border pt-4">
         {paid ? (
           <div className="flex items-start gap-2 rounded-2xl border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
@@ -287,198 +322,146 @@ export default function BrandPaymentSection({
             <div>
               <p className="font-medium">Payment confirmed</p>
               <p className="text-xs text-success/80">
-                {latestProof
-                  ? `Verified on ${formatDate(latestProof.createdAt)}.`
-                  : "Your payment for this campaign has been confirmed."}
+                {intent?.createdAt
+                  ? `Received on ${formatDate(intent.createdAt)}.`
+                  : "Your payment for this campaign has been received."}
               </p>
             </div>
           </div>
         ) : awaiting ? (
-          <div className="flex items-start gap-2 rounded-2xl border border-info/25 bg-info/10 px-4 py-3 text-sm text-info">
-            <Loader2Icon className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
-              <p className="font-medium">Payment proof submitted</p>
-              <p className="text-xs text-info/80">
-                {latestProof
-                  ? `TZS ${formatTZS(latestProof.amount)} · Ref ${latestProof.transactionReference} — submitted on ${formatDate(latestProof.createdAt)}. Awaiting admin verification.`
-                  : "Awaiting admin verification."}
-              </p>
-            </div>
-          </div>
-        ) : latestProof?.status === "REJECTED" ? (
           <div className="space-y-3">
-            <div className="flex items-start gap-2 rounded-2xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div className="flex items-start gap-2 rounded-2xl border border-info/25 bg-info/10 px-4 py-3 text-sm text-info">
+              <Loader2Icon className="mt-0.5 h-4 w-4 shrink-0 animate-spin" />
               <div>
-                <p className="font-medium">Payment proof rejected</p>
-                <p className="text-xs text-destructive/80">
-                  {latestProof.rejectionReason || "Rejection reason not provided."}
+                <p className="font-medium">Waiting for your authorization</p>
+                <p className="text-xs text-info/80">
+                  {instructions?.message ??
+                    "Approve the USSD prompt on your phone to complete the payment."}
                 </p>
-              </div>
-            </div>
-            <Button
-              onClick={() => {
-                setError(null);
-                setSubmitted(false);
-                setOpen(true);
-              }}
-              disabled={!paymentMethod || accounts.length === 0}
-              className="bg-primary text-primary-foreground font-medium hover:bg-primary/90"
-              style={{ borderRadius: 14 }}
-            >
-              Resubmit Payment Proof
-            </Button>
-          </div>
-        ) : canSubmit ? (
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">
-              After sending the money, submit a screenshot / receipt with the
-              transaction reference so an admin can verify it.
-            </p>
-            <Button
-              onClick={() => {
-                setError(null);
-                setSubmitted(false);
-                setOpen(true);
-              }}
-              disabled={!paymentMethod || accounts.length === 0}
-              className="shrink-0 bg-primary text-primary-foreground font-medium hover:bg-primary/90"
-              style={{ borderRadius: 14 }}
-            >
-              I&apos;ve Made the Payment
-            </Button>
-          </div>
-        ) : null}
-
-        {accounts.length === 0 && !accountsLoading && !paymentMethod && (
-          <p className="text-xs text-muted-foreground">
-            No payment method selected.
-          </p>
-        )}
-      </div>
-
-      {/* Submit proof dialog */}
-      <Dialog
-        open={open}
-        onOpenChange={(o) => {
-          if (!o) setOpen(false);
-        }}
-      >
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-2xl p-2">
-          <DialogHeader className="border-b border-border px-6 py-5">
-            <DialogTitle className="text-lg font-semibold tracking-tight">
-              Submit Payment Proof
-            </DialogTitle>
-            <DialogDescription>
-              Confirm you sent{" "}
-              <span className="font-semibold text-foreground">
-                TZS {formatTZS(totalCharge)} via{" "}
-                <PaymentMethodDisplay method={paymentMethod} size="sm" showLabel />
-              </span>. Provide the transaction reference so admin can verify it.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 px-6 py-5">
-            {/* Konnectika receiving account — shown inside the dialog so the brand
-                knows exactly where to send the money while filling out the form */}
-            {accounts.length > 0 && (
-              <div className="rounded-2xl border border-border bg-muted/30 p-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                  Send Payment To (Konnectika)
-                </p>
-                {accounts.map((account) => (
-                  <div key={account.id} className="flex items-start gap-2">
-                    {account.type === "BANK" ? (
-                      <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                    ) : (
-                      <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                    )}
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-foreground">
-                          {account.accountName}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {account.provider}
-                        </span>
-                      </div>
-                      {account.phone && (
-                        <p className="font-mono font-medium text-foreground">
-                          {account.phone}
-                        </p>
-                      )}
-                      {account.accountNumber && (
-                        <p className="font-mono font-medium text-foreground">
-                          Acc: {account.accountNumber}
-                        </p>
-                      )}
-                      {(account.branchDetail || account.extraDetails) && (
-                        <p className="text-xs text-muted-foreground">
-                          {[account.branchDetail, account.extraDetails]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Amount (read-only confirmation) */}
-            <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/30 px-4 py-3">
-              <span className="text-xs text-muted-foreground">You paid</span>
-              <span className="font-semibold text-foreground">
-                TZS {formatTZS(totalCharge)}
-              </span>
-            </div>
-
-            {/* Transaction reference */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Transaction / Reference number{" "}
-                <span className="text-destructive">*</span>
-              </label>
-              <Input
-                value={transactionReference}
-                onChange={(e) => setTransactionReference(e.target.value)}
-                placeholder="e.g. Airtel Money transaction ID"
-                className="h-12 rounded-xl"
-              />
-            </div>
-
-            {/* Receipt upload */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Receipt / screenshot
-              </label>
-              <div className="rounded-xl border border-dashed border-border bg-muted/30 p-3">
-                <PaymentProofUploader
-                  onUploadComplete={(urls) => setProofUrl(urls[0] ?? null)}
-                  label={
-                    proofUrl ? "Upload another receipt" : "Upload receipt / screenshot"
-                  }
-                />
-                {proofUrl && (
-                  <p className="mt-2 flex items-center gap-1 text-xs text-success">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Receipt uploaded
+                {intent?.customerPhone && (
+                  <p className="mt-1 font-mono text-xs text-info/80">
+                    {intent.customerPhone}
+                  </p>
+                )}
+                {instructions?.reference && (
+                  <p className="mt-1 font-mono text-[11px] text-info/60">
+                    Ref {instructions.reference}
                   </p>
                 )}
               </div>
             </div>
+            <Button
+              onClick={() => void refresh()}
+              variant="ghost"
+              className="cursor-pointer rounded-xl text-xs"
+            >
+              <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+              Check status
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {failed && (
+              <div className="flex items-start gap-2 rounded-2xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  <p className="font-medium">Payment not completed</p>
+                  <p className="text-xs text-destructive/80">
+                    {intent?.failureReason ||
+                      "The authorization was not completed in time. You can try again."}
+                  </p>
+                </div>
+              </div>
+            )}
 
-            {/* Note */}
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-xs text-muted-foreground">
+                {failed
+                  ? "Start a new payment attempt."
+                  : "Pay the total above by mobile money."}
+              </p>
+              <Button
+                onClick={() => {
+                  setError(null);
+                  setOpen(true);
+                }}
+                disabled={!canPay || !display}
+                className="shrink-0 cursor-pointer bg-primary font-medium text-primary-foreground hover:bg-primary/90 p-2"
+                style={{ borderRadius: 14 }}
+              >
+                {failed ? "Try Again" : "Pay Now"}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <p className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Payments are processed by Snippe and confirmed automatically — no admin
+          approval needed.
+        </p>
+      </div>
+
+      {/* Start payment dialog */}
+      <Dialog open={open} onOpenChange={(o) => !o && setOpen(false)}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-2xl p-2">
+          <DialogHeader className="border-b border-border px-6 py-5">
+            <DialogTitle className="text-lg font-semibold tracking-tight">
+              Pay TZS {display ? formatTZS(display.totalCharge) : "—"}
+            </DialogTitle>
+            <DialogDescription>
+              Confirm the mobile money number to charge for &quot;{campaignName}&quot;.
+              We&apos;ll send a USSD prompt — approve it with your PIN.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 px-6 py-5">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Note <span className="text-muted-foreground">(optional)</span>
+                Mobile money number <span className="text-destructive">*</span>
               </label>
-              <Textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Anything the admin should know"
-                rows={3}
-                className="rounded-xl"
+              <Input
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="0712 345 678"
+                inputMode="tel"
+                className="h-12 rounded-xl"
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  First name <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Last name <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="h-12 rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Email <span className="text-destructive">*</span>
+              </label>
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="you@company.co.tz"
+                className="h-12 rounded-xl"
               />
             </div>
 
@@ -490,46 +473,33 @@ export default function BrandPaymentSection({
           </div>
 
           <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:justify-between">
-            <DialogClose asChild>
-              <Button variant="ghost" className="cursor-pointer rounded-xl" disabled={submitting}>
-                Cancel
-              </Button>
-            </DialogClose>
-
             <Button
-              onClick={submit}
-              disabled={submitting || !transactionReference.trim()}
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              disabled={starting}
+              className="cursor-pointer rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={startPayment}
+              disabled={
+                starting ||
+                !phoneNumber.trim() ||
+                !firstName.trim() ||
+                !lastName.trim() ||
+                !email.trim()
+              }
               className="w-full cursor-pointer rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto"
             >
-              {submitting ? (
+              {starting ? (
                 <>
                   <Loader2Icon className="h-4 w-4 animate-spin" />
-                  Submitting...
+                  Starting...
                 </>
               ) : (
-                "Submit Proof"
+                "Send USSD prompt"
               )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Success dialog */}
-      <Dialog open={submitted} onOpenChange={(o) => !o && setSubmitted(false)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <CheckCircle2 className="h-10 w-10 text-success" />
-            <DialogTitle className="text-lg font-semibold">
-              Proof Submitted
-            </DialogTitle>
-            <DialogDescription>
-              Thank you! Your payment proof for &quot;{campaignName}&quot; has
-              been submitted and will be verified by an admin shortly.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setSubmitted(false)} className="rounded-xl">
-              Done
             </Button>
           </DialogFooter>
         </DialogContent>

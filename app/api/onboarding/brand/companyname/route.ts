@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, signToken } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,46 +51,20 @@ export async function POST(req: NextRequest) {
 
 
     // Update onboarding progress
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: authUser.userId,
       },
       data: {
         onboardingStep: 2,
       },
-      select: {
-        role: true,
-        onboardingStep: true,
-        onboardingDone: true,
-      },
     });
-
-
-    // Create fresh JWT
-    const newToken = await signToken({
-      userId: authUser.userId,
-      role: updatedUser.role,
-      onboardingStep: updatedUser.onboardingStep,
-      onboardingDone: updatedUser.onboardingDone,
-      type: "access",
-    });
-
 
 
     const response = NextResponse.json({
       success: true,
       nextStep: "/onboarding/companydetails",
     });
-
-
-    response.cookies.set("token", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
 
     return response;
 

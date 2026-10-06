@@ -12,8 +12,9 @@ import { useRouter } from "next/navigation";
 
 
 export default function BrandOnboardingPage() {
-const router = useRouter();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [logo, setLogo] = useState("");
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
@@ -29,6 +30,7 @@ const router = useRouter();
         website: formData.get("website"),
         industry: formData.get("industry"),
         description: formData.get("description"),
+        logo,
       };
 
       const res = await fetch(
@@ -88,7 +90,7 @@ const router = useRouter();
 
 
         <div className="space-y-2 flex ">
-            <LogoUpload/>
+            <LogoUpload value={logo} onChange={setLogo} />
          
         </div>
 
