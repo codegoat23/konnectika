@@ -18,6 +18,7 @@
 // matters because every foreign key in the schema points at User.id.
 //
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { unstable_rethrow } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ensurePrismaUserForClerkUser } from "@/lib/clerk-sync";
 
@@ -98,8 +99,15 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       type: "access",
     };
   } catch (error) {
-    // A misconfigured Clerk instance must degrade to "signed out" rather than
-    // taking down every authenticated route with a 500.
+    // Next.js signals control flow by throwing (DynamicServerError when a
+    // segment is forced static, redirect/notFound, PPR postponement). Those
+    // errors are not failures and MUST propagate, or the framework can no
+    // longer classify and serve the route — catching them silently turns a
+    // framework signal into a bogus "signed out" (null) result.
+    unstable_rethrow(error);
+
+    // A genuine auth/DB failure degrades to "signed out" rather than taking
+    // down every authenticated route with a 500.
     console.error("getAuthUser failed:", error);
     return null;
   }

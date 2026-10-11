@@ -88,14 +88,27 @@ export default clerkMiddleware(async (auth, request) => {
 
   // Role + onboarding state are Konnectika's, not Clerk's, so read them from
   // Prisma. Scoped to the two columns needed.
-  const user = await prisma.user.findUnique({
-    where: { clerkUserId },
-    select: {
-      role: true,
-      onboardingDone: true,
-      onboardingStep: true,
-    },
-  });
+  //
+  // A transient database/Neon failure must not turn every protected route into
+  // a 500. Authentication already succeeded above (Clerk), and each page and
+  // route handler re-enforces authorization, so on a lookup failure we fall
+  // through the "no row yet" path (skip the redirect UX) instead of crashing.
+  const user = await prisma.user
+    .findUnique({
+      where: { clerkUserId },
+      select: {
+        role: true,
+        onboardingDone: true,
+        onboardingStep: true,
+      },
+    })
+    .catch((error) => {
+      console.error(
+        "[proxy] user lookup failed; skipping onboarding gates:",
+        error
+      );
+      return null;
+    });
 
   // Signed in with Clerk but no Konnectika row. Don't bounce them to sign-in
   // (they ARE signed in) and don't hard-fail; send them to onboarding so the
@@ -127,10 +140,15 @@ export default clerkMiddleware(async (auth, request) => {
     !user.onboardingDone &&
     user.onboardingStep >= 3
   ) {
-    await prisma.user.update({
-      where: { clerkUserId },
-      data: { onboardingDone: true, onboardingStep: 3 },
-    });
+    try {
+      await prisma.user.update({
+        where: { clerkUserId },
+        data: { onboardingDone: true, onboardingStep: 3 },
+      });
+    } catch (error) {
+      console.error("[proxy] creator onboarding backfill failed:", error);
+      return NextResponse.next();
+    }
 
     if (isOnboarding) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
