@@ -39,7 +39,7 @@ export function SignUpForm({
       {...props}
     >
       <p className="w-full max-w-md text-center text-sm text-muted-foreground">
-        {role === "CREATOR" ? "Creator account selected" : role === "BRAND" ? "Brand account selected" : "After email verification, choose whether you’re joining as a creator or a brand."}
+        {role === "CREATOR" ? "Creator account selected" : role === "BRAND" }
       </p>
 
       <SignUp
