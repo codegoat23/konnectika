@@ -35,45 +35,11 @@ function CampaignCard({ campaign }: { campaign: HomeCampaign }) {
       {/* Bottom gradient scrim so overlaid text stays legible */}
       <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
 
-      {/* Badge, top-left */}
-      <span className="absolute left-4 top-4 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-        {campaign.badge}
-      </span>
-
-      {/* Brand chip, top-right */}
-      <span
-        className="absolute right-4 top-4 z-10 flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-extrabold text-white shadow-md"
-        style={{ backgroundColor: campaign.color }}
-        aria-hidden
-      >
-        {campaign.brand.charAt(0)}
-      </span>
-
-      {/* Content, pinned to bottom over the scrim */}
-      <div className="relative z-10 mt-auto flex flex-col gap-3 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-bold leading-tight text-white">
-            {campaign.title}
-          </h3>
-         
-        </div>
-
-        <p className="text-sm text-white/80">{campaign.brand}</p>
-
-        <div className="flex flex-wrap gap-2">
-          <span className="flex items-center gap-1 rounded-full  px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
-            <PlatformIcon platform={campaign.platform} />
-          </span>
-          <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
-            {campaign.category}
-          </span>
-          <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
-            {campaign.applicants} <User size={14}/>
-          </span>
-        </div>
 
       
-      </div>
+
+      
+      
     </article>
   );
 }

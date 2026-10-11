@@ -13,10 +13,10 @@ interface CampaignOverviewData {
 export default function CampaignOverview({ campaign }: { campaign: CampaignOverviewData }) {
   return (
     <div
-      className="bg-card border border-border p-5 text-sm text-muted-foreground space-y-4"
+      className="space-y-4 bg-card border border-border p-4 text-sm text-muted-foreground sm:p-5"
       style={{ borderRadius: 24 }}
     >
-      <p className="text-xs">{campaign?.description}</p>
+      <p className="break-words text-xs leading-relaxed sm:text-sm">{campaign?.description}</p>
 
       <PlatformIcons platforms={campaign?.platforms} />
 
@@ -31,7 +31,7 @@ export default function CampaignOverview({ campaign }: { campaign: CampaignOverv
                 className="flex items-start gap-3 text-sm text-muted-foreground"
               >
                 <RiVerifiedBadgeLine className="mt-0.5 size-4 shrink-0 text-green-500" aria-hidden="true" />
-                <span>{req}</span>
+                <span className="min-w-0 break-words">{req}</span>
               </div>
             ))}
           </div>

@@ -89,7 +89,7 @@ export default function AdminApplications({
   return (
     <>
       <div className="rounded-3xl border border-border bg-card overflow-hidden">
-        <div className="flex items-center justify-between p-6 pb-4">
+        <div className="flex items-center justify-between p-4 pb-3 sm:p-6 sm:pb-4">
           <h2 className="text-foreground font-semibold flex items-center gap-2">
             <Users size={16} />
             Applications
@@ -114,8 +114,8 @@ export default function AdminApplications({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto overscroll-x-contain">
+            <table className="w-full min-w-[700px] text-sm">
               <thead className="bg-[#FAFAF9] text-muted-foreground text-xs">
                 <tr>
                   <th className="p-3 text-left w-[28%]">Creator</th>
@@ -218,7 +218,7 @@ export default function AdminApplications({
       {selected && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div
-            className="w-full max-w-2xl bg-popover border border-border p-6 space-y-5 max-h-[90vh] overflow-y-auto"
+            className="w-[calc(100%-1.5rem)] max-w-2xl bg-popover border border-border p-4 space-y-5 max-h-[90vh] overflow-y-auto sm:w-full sm:p-6"
             style={{ borderRadius: 24 }}
           >
             <div className="flex justify-between items-start">

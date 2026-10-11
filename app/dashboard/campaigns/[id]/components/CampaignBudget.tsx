@@ -12,38 +12,38 @@ export default function CampaignBudget({ campaign }: { campaign: CampaignBudgetD
 
   return (
     <div
-      className="bg-card border border-border p-5"
+      className="bg-card border border-border p-4 sm:p-5"
       style={{ borderRadius: 24 }}
     >
       <h3 className="text-foreground font-semibold mb-4">Budget</h3>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
         <div
-          className="bg-muted/50 border border-border p-3 rounded-xl"
+          className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Total Budget</p>
-          <p className="text-foreground font-semibold">
+          <p className="break-words text-sm font-semibold text-foreground sm:text-base">
             TZS {total.toLocaleString()}
           </p>
         </div>
 
         <div
-          className="bg-muted/50 border border-border p-3 rounded-xl"
+          className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Funded</p>
-          <p className="text-foreground font-semibold">
+          <p className="break-words text-sm font-semibold text-foreground sm:text-base">
             TZS {funded.toLocaleString()}
           </p>
         </div>
 
         <div
-          className="bg-muted/50 border border-border p-3 rounded-xl"
+          className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
           style={{ borderRadius: 16 }}
         >
           <p className="text-xs text-muted-foreground">Remaining</p>
-          <p className="text-foreground font-semibold">
+          <p className="break-words text-sm font-semibold text-foreground sm:text-base">
             TZS {(total - funded).toLocaleString()}
           </p>
         </div>

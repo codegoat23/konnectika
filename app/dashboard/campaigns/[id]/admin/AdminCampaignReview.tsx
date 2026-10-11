@@ -166,7 +166,7 @@ export default function AdminCampaignReview({
         style={{ borderRadius: 24 }}
       >
         <div
-          className="h-52 xl:h-64 2xl:h-72 bg-cover bg-center relative"
+          className="relative h-44 bg-cover bg-center sm:h-52 xl:h-64 2xl:h-72"
           style={{
             backgroundImage: `url(${campaign.thumbnailPic})`,
           }}
@@ -178,8 +178,8 @@ export default function AdminCampaignReview({
             </div>
           )}
 
-          <div className="absolute bottom-5 left-5">
-            <h1 className="text-5xl font-bold text-white">{campaign.name}</h1>
+          <div className="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-5">
+            <h1 className="break-words text-2xl font-bold leading-tight text-white sm:text-4xl">{campaign.name}</h1>
 
             <p className="text-zinc-300 text-sm">
               {campaign.businessProfile?.companyName}
@@ -187,39 +187,39 @@ export default function AdminCampaignReview({
           </div>
         </div>
 
-        <div className="p-5 text-sm text-muted-foreground space-y-4">
-          <p>{campaign.description}</p>
+        <div className="space-y-4 p-4 text-sm text-muted-foreground sm:p-5">
+          <p className="break-words">{campaign.description}</p>
 
           <PlatformIcons platforms={campaign.platforms} />
 
           {/* Budget Stats */}
-          <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
             <div
-              className="bg-muted/50 border border-border p-3 rounded-xl"
+              className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Total Budget</p>
-              <p className="text-foreground font-semibold">
+              <p className="break-words text-sm font-semibold text-foreground sm:text-base">
                 TZS {campaign.budgetTotal.toLocaleString()}
               </p>
             </div>
 
             <div
-              className="bg-muted/50 border border-border p-3 rounded-xl"
+              className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Funded</p>
-              <p className="text-success font-semibold">
+              <p className="break-words text-sm font-semibold text-success sm:text-base">
                 TZS {campaign.budgetFunded.toLocaleString()}
               </p>
             </div>
 
             <div
-              className="bg-muted/50 border border-border p-3 rounded-xl"
+              className="min-w-0 bg-muted/50 border border-border p-3 rounded-xl"
               style={{ borderRadius: 16 }}
             >
               <p className="text-xs text-muted-foreground">Remaining</p>
-              <p className="text-warning font-semibold">
+              <p className="break-words text-sm font-semibold text-warning sm:text-base">
                 TZS {(
                   campaign.budgetTotal - campaign.budgetFunded
                 ).toLocaleString()}
@@ -280,7 +280,7 @@ export default function AdminCampaignReview({
       />
 
       {/* ACTIONS */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           onClick={toggleFeatured}
           disabled={savingFeatured}
@@ -324,7 +324,7 @@ export default function AdminCampaignReview({
         )}
 
         <div
-          className={`ml-auto px-4 py-2 rounded-full flex justify-center items-center  text-xs font-light ${STATUS_STYLES[status]}`}
+          className={`ml-0 px-3 py-2 rounded-full flex justify-center items-center text-xs font-light sm:ml-auto sm:px-4 ${STATUS_STYLES[status]}`}
         >
           {status === "APPROVED" && (
             <span className="inline-block mr-1">

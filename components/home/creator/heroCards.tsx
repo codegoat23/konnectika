@@ -17,7 +17,7 @@ export default function HeroCards() {
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/background/video1.mp4" type="video/mp4" />
+          <source src="/background/video5.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 bg-black/30" />
@@ -72,7 +72,7 @@ export default function HeroCards() {
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/background/video3.mp4" type="video/mp4" />
+          <source src="/background/video6.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 bg-black/30" />

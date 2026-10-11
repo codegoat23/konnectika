@@ -154,17 +154,24 @@ function StatsSkeleton() {
     <>
       {/* Mobile placeholder: match the single-card overview layout. */}
       <div className="px-4 lg:hidden">
-        <Card className="overflow-hidden rounded-3xl bg-card p-5 shadow-xs gap-4">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-8 w-1/2" />
-            <Skeleton className="h-4 w-36" />
+        <Card className="relative overflow-hidden rounded-3xl border-0 bg-zinc-900 p-5 text-white shadow-lg gap-4">
+          <div className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full border border-white/5" />
+          <div className="relative space-y-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="size-3.5 rounded-full bg-white/15" />
+              <Skeleton className="h-3 w-28 bg-white/15" />
+            </div>
+            <Skeleton className="h-9 w-2/3 bg-white/15" />
+            <Skeleton className="h-3 w-36 bg-white/10" />
           </div>
-          <div className="space-y-3 border-t border-border pt-4">
+          <div className="relative space-y-1 divide-y divide-white/10 border-t border-white/10 pt-1">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center justify-between gap-4">
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-5 w-20" />
+                <div className="flex min-w-0 items-center gap-2 py-3">
+                  <Skeleton className="size-3.5 shrink-0 rounded-full bg-white/10" />
+                  <Skeleton className="h-3 w-28 bg-white/10" />
+                </div>
+                <Skeleton className="h-4 w-20 shrink-0 bg-white/15" />
               </div>
             ))}
           </div>
