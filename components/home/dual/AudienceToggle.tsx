@@ -67,7 +67,7 @@ export function AudienceToggle({ mode, onChange }: AudienceToggleProps) {
             aria-pressed={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative z-10 flex h-9 items-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors duration-300 sm:px-6",
+              "relative z-10 flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-colors duration-300 sm:h-9 sm:gap-2 sm:px-5 sm:text-sm md:px-6",
               active ? "text-white" : "text-muted-foreground hover:text-foreground"
             )}
           >

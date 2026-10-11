@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
 
 import {
   AudienceToggle,
@@ -16,8 +17,14 @@ interface NavbarProps {
   onModeChange: (mode: Audience) => void;
 }
 
+const MOBILE_NAV_LINKS = [
+  { label: "Discover", href: "/discover" },
+  { label: "Login", href: "/login" },
+];
+
 export function Navbar({ mode, onModeChange }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const brand = mode === "brand";
 
   useEffect(() => {
@@ -26,6 +33,18 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+  const ctaHref = brand ? "/signup?role=BRAND" : "/signup?role=CREATOR";
 
   return (
     <header
@@ -39,9 +58,9 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
     >
       <nav
         aria-label="Primary"
-        className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8"
+        className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8"
       >
-        <div className="flex h-16 items-center justify-between gap-4">
+        <div className="flex h-16 items-center justify-between gap-2 sm:gap-4">
           <Link
             href="/"
             className="flex shrink-0 items-center gap-2.5"
@@ -55,55 +74,132 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
               priority
               className="h-8 w-8"
             />
-         
           </Link>
 
-          <div className="hidden md:block">
-            <AudienceToggle mode={mode} onChange={onModeChange} />
-          </div>
+          <AudienceToggle mode={mode} onChange={onModeChange} />
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/discover"
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                brand
-                  ? "text-zinc-300 hover:bg-white/10 hover:text-white"
-                  : "text-black hover:bg-black/10 hover:text-black"
-              )}
-            >
-              Discover
-            </Link>
-            <Link href="/login" className="hidden sm:block">
-              <Button
-                variant="ghost"
-               className={cn(
-  "rounded-full px-4",
-  brand
-    ? "text-zinc-300 hover:bg-white/10 hover:text-white"
-    : "text-black hover:bg-black/10 hover:text-black"
-)}
-              >
-                Login
-              </Button>
-            </Link>
-            <Link href={brand ? "/signup?role=BRAND" : "/signup?role=CREATOR"}>
-              <Button
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="hidden items-center gap-2 md:flex">
+              <Link
+                href="/discover"
                 className={cn(
-                  "rounded-full px-5 py-5.5",
+                  "rounded-full px-4 py-2 text-sm font-medium transition-colors",
                   brand
-                    ? "bg-foreground text-background hover:bg-zinc-300"
-                    : "bg-primary text-primary-foreground hover:bg-orange-400"
+                    ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+                    : "text-black hover:bg-black/10 hover:text-black"
                 )}
               >
-                {brand ? "Launch a Campaign" : "Start earning"}
-              </Button>
-            </Link>
+                Discover
+              </Link>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "rounded-full px-4",
+                    brand
+                      ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+                      : "text-black hover:bg-black/10 hover:text-black"
+                  )}
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link href={ctaHref}>
+                <Button
+                  className={cn(
+                    "rounded-full px-5 py-5.5",
+                    brand
+                      ? "bg-foreground text-background hover:bg-zinc-300"
+                      : "bg-primary text-primary-foreground hover:bg-orange-400"
+                  )}
+                >
+                  {brand ? "Launch a Campaign" : "Start earning"}
+                </Button>
+              </Link>
+            </div>
+
+            <button
+              type="button"
+              className={cn(
+                "flex size-10 shrink-0 items-center justify-center rounded-full transition-colors md:hidden",
+                brand
+                  ? "text-white hover:bg-white/10"
+                  : "text-foreground hover:bg-black/10"
+              )}
+              aria-label={
+                menuOpen ? "Close navigation menu" : "Open navigation menu"
+              }
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span className="relative size-5" aria-hidden="true">
+                <Menu
+                  className={cn(
+                    "absolute inset-0 size-5 transition-all duration-300",
+                    menuOpen
+                      ? "rotate-90 scale-50 opacity-0"
+                      : "rotate-0 scale-100 opacity-100"
+                  )}
+                />
+                <X
+                  className={cn(
+                    "absolute inset-0 size-5 transition-all duration-300",
+                    menuOpen
+                      ? "rotate-0 scale-100 opacity-100"
+                      : "-rotate-90 scale-50 opacity-0"
+                  )}
+                />
+              </span>
+            </button>
           </div>
         </div>
 
-        <div className="flex justify-center pb-3 md:hidden">
-          <AudienceToggle mode={mode} onChange={onModeChange} />
+        <div
+          id="mobile-nav-menu"
+          aria-hidden={!menuOpen}
+          className={cn(
+            "absolute inset-x-0 top-full border-b transition-all duration-300 md:hidden",
+            brand
+              ? "border-white/10 bg-[#0a0a0a]/95"
+              : "border-border bg-background/95 backdrop-blur-xl",
+            menuOpen
+              ? "translate-y-0 opacity-100"
+              : "invisible -translate-y-2 opacity-0"
+          )}
+        >
+          <ul className="flex flex-col gap-1 px-4 py-4 sm:px-6">
+            {MOBILE_NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={closeMenu}
+                  className={cn(
+                    "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    brand
+                      ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+                      : "text-black hover:bg-black/10 hover:text-black"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link href={ctaHref} onClick={closeMenu} className="mt-1 block">
+                <Button
+                  className={cn(
+                    "w-full rounded-full px-5",
+                    brand
+                      ? "bg-foreground text-background hover:bg-zinc-300"
+                      : "bg-primary text-primary-foreground hover:bg-orange-400"
+                  )}
+                >
+                  {brand ? "Launch a Campaign" : "Start earning"}
+                </Button>
+              </Link>
+            </li>
+          </ul>
         </div>
       </nav>
     </header>

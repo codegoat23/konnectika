@@ -109,7 +109,7 @@ export default function BrandSolution() {
               </div>
               <div className="px-2 pb-2 pt-6 text-center sm:px-4 sm:pt-7">
                 <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">We handle everything else</h3>
-                <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-zinc-400 sm:text-base">Content Rewards tracks the views, calculates rewards, and pays creators automatically.</p>
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-zinc-400 sm:text-base">Konnectika tracks the views, calculates rewards, and pays creators automatically.</p>
               </div>
             </article>
           </Reveal>
