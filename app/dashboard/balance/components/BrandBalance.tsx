@@ -17,6 +17,7 @@ import {
 
 
 import { EARNING_STATUS_STYLES, EARNING_STATUS_ICONS } from "@/lib/status-styles";
+import { FaReceipt } from "react-icons/fa6";
 
 type BrandPayment = Prisma.EarningGetPayload<{
   include: {
@@ -137,10 +138,7 @@ export default function BrandBalance({ payments }: Props) {
         <div className="rounded-2xl ">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Creator Payments</h2>
-            <p className="text-xs text-muted-foreground">
-              Creator earnings are settled by the platform through scheduled
-              payouts. Approved content accrues here until then.
-            </p>
+            
           </div>
 
           {payments.length === 0 ? (
@@ -148,7 +146,7 @@ export default function BrandBalance({ payments }: Props) {
               className="mt-5 flex flex-col items-center justify-center border border-border bg-card py-20"
               style={{ borderRadius: 24 }}
             >
-              <div className="text-5xl mb-4">💸</div>
+              <div className="text-5xl mb-4"><FaReceipt size={26}/></div>
               <h3 className="text-lg font-semibold text-foreground">
                 No creator payments
               </h3>

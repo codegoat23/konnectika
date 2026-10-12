@@ -229,9 +229,7 @@ export default function CampaignForm({
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
           {mode === "edit" ? "Edit Campaign" : "Create Campaign"}
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Publish a campaign and start receiving creator applications.
-        </p>
+       
       </div>
 
       {/* Campaign Details */}
