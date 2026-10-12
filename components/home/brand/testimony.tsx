@@ -10,7 +10,7 @@ const testimonies = [
     name: "AMARA",
     surname: "OKAFOR",
     image: "/thumbnails/kukupoa.png",
-    category: "Food brand · Marketing team",
+    category: "Food brand",
     platform: "Instagram Reels",
     quote:
       'Launching campaigns used to take weeks of coordination. Now we brief, approve, and publish from a single dashboard',
@@ -32,7 +32,7 @@ const testimonies = [
     name: "ZURI",
     surname: "KATO",
     image: "/thumbnails/crdb.jpg",
-    category: "Fintech · Campaign lead",
+    category: "Fintech",
     platform: "Instagram",
     quote:
      'The creators we found became brand advocates. Their content reaches communities we could never reach ourselves.',
@@ -112,24 +112,24 @@ export default function Testimony() {
 
             <Separator className="my-4 mt-8 sm:mt-20" />
 
-            <div className="flex flex-row gap-6 items-center p-2 sm:gap-10">
+            <div className="flex flex-row justify-between items-center p-2 sm:gap-10">
 
               <div className="flex flex-col items-center justify-center">
-                <span className="text-4xl text-white sm:text-5xl">
+                <span className="text-5xl text-white sm:text-5xl">
                   {testimony.brands}
                 </span>
 
-                <span className="text-zinc-700 text-xs font-medium">
+                <span className="text-zinc-500 text-xs font-medium">
                   Brands
                 </span>
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-4xl text-white sm:text-5xl">
+                <span className="text-5xl text-white sm:text-5xl">
                   {testimony.earned}
                 </span>
 
-                <span className="text-zinc-700 text-xs font-medium">
+                <span className="text-zinc-500 text-xs font-medium">
                   Earned
                 </span>
               </div>

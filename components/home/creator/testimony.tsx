@@ -114,10 +114,10 @@ export default function Testimony() {
 
             <Separator className="my-4 mt-8 sm:mt-20" />
 
-            <div className="flex flex-row gap-6 items-center p-2 sm:gap-10">
+            <div className="flex flex-row justify-between items-center p-2 sm:gap-10">
 
               <div className="flex flex-col items-center justify-center">
-                <span className="text-4xl text-black sm:text-5xl">
+                <span className="text-5xl text-black sm:text-5xl">
                   {testimony.brands}
                 </span>
 
@@ -127,7 +127,7 @@ export default function Testimony() {
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-4xl text-black sm:text-5xl">
+                <span className="text-5xl text-black sm:text-5xl">
                   {testimony.earned}
                 </span>
 
