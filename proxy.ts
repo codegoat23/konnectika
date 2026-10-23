@@ -27,6 +27,8 @@ import { FIRST_STEP_BY_ROLE } from "@/lib/auth";
 const isPublicRoute = createRouteMatcher([
   "/",
   "/discover(.*)",
+  "/brand-campaign-inquiry(.*)",
+  "/api/brand-campaign-inquiry",
   "/login(.*)",
   "/signup(.*)",
   // Clerk's own mounted flows (sign-in, sign-up, captcha, OAuth callbacks).

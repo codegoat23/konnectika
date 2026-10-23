@@ -327,6 +327,15 @@ Dark hierarchy:
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+body:has(.inquiry-page) {
+  background: radial-gradient(ellipse at center, #222 0%, #111 58%, #090909 100%);
+}
+
+.inquiry-page {
+  min-height: 100vh;
+  padding: 1px 0;
+}
+
 
 /* ============================================================
    GLOBAL UI POLISH

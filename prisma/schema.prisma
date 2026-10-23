@@ -37,6 +37,29 @@ model User {
   reviewedPaymentProofs  PaymentProof[] @relation("PaymentProofReviewedBy")
 }
 
+model CampaignInquiry {
+  id           String   @id @default(cuid())
+  brandName    String
+  contactName  String
+  email        String
+  whatsapp     String
+  website      String?
+  industry     String
+  campaignTypes String
+  objective    String
+  product      String
+  description  String   @db.Text
+  platforms    String
+  creatorCount String?
+  budget       String
+  startDate    DateTime?
+  additional   String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+}
+
 model CreatorProfile {
   id String @id @default(cuid())
 
