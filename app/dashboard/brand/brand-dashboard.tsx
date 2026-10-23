@@ -35,13 +35,13 @@ function BrandDashboard({ campaigns }: DashboardProps) {
       {
         label: "Budget Funded",
         value: `TZS ${formatTZS(totalFunded)}`,
-        footerSubtitle: `of TZS ${formatTZS(totalBudget)} total budgeted`,
+        footerSubtitle: ``,
         highlight: true,
       },
       {
         label: "Campaigns Created",
         value: inRange.length,
-        footerTitle: "Total campaigns launched",
+        footerTitle: "",
       },
       {
         label: "Active Campaigns",
@@ -51,7 +51,7 @@ function BrandDashboard({ campaigns }: DashboardProps) {
       {
         label: "Total Applications",
         value: totalApplications,
-        footerSubtitle: "Across all campaigns",
+        footerSubtitle: "",
       },
     ];
   }, [campaigns, range]);

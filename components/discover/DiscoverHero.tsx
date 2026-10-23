@@ -5,15 +5,20 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Campaign } from "@/types";
 import { formatTZS } from "@/lib/utils";
 import PlatformIcons from "./PlatformIcons";
-import Logo from "@/public/assets/logo.svg"
+import Logo from "@/public/assets/logo-plain.svg"
 import Image from "next/image";
 
 interface DiscoverHeroProps {
   featuredCampaigns: Campaign[];
   onJoin: (campaign: Campaign) => void;
+  isLoading?: boolean;
 }
 
-export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHeroProps) {
+export default function DiscoverHero({
+  featuredCampaigns,
+  onJoin,
+  isLoading = false,
+}: DiscoverHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -47,7 +52,58 @@ export default function DiscoverHero({ featuredCampaigns, onJoin }: DiscoverHero
     return () => clearInterval(timer);
   }, [activeIndex, total, goTo]);
 
-  if (!current) return null;
+  if (!current) {
+    return (
+      <section
+        aria-label="Discover campaigns"
+        aria-busy={isLoading}
+        className="relative min-h-[360px] w-full overflow-hidden sm:min-h-[460px]"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/background/orange-abstract.webp')" }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/15"
+        />
+        <div className="relative z-10 flex min-h-[360px] flex-col justify-between px-6 py-7 sm:min-h-[460px] sm:px-8 sm:py-9">
+          <div className="flex items-center py-1">
+            <Image
+              src={Logo}
+              alt="Konnectika"
+              width={180}
+              height={34}
+              priority
+              className="h-auto w-full max-w-[150px] sm:max-w-[60px]"
+            />
+          </div>
+
+          {isLoading ? (
+            <div role="status" className="mb-2 max-w-2xl space-y-4">
+              <span className="sr-only">Loading featured campaigns</span>
+              <div className="h-3 w-24 animate-pulse rounded bg-white/30" />
+              <div className="h-10 w-full max-w-xl animate-pulse rounded bg-white/30 sm:h-14" />
+              <div className="h-5 w-72 max-w-full animate-pulse rounded bg-white/25" />
+            </div>
+          ) : (
+            <div className="mb-2 max-w-2xl">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/75 sm:text-sm">
+                Discover
+              </p>
+              <h1 className="max-w-none whitespace-nowrap text-[clamp(1.25rem,4vw,3.25rem)] font-medium leading-[1.08] tracking-tight text-white">
+                Campaigns worth joining
+              </h1>
+              <p className="mt-3 max-w-md text-base leading-relaxed text-white/80 sm:text-lg">
+                Find campaigns that align with  audience, and start collaborating with top brands today.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className="relative min-h-[400px] w-full overflow-hidden sm:min-h-[420px]">

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import { IoFilm } from "react-icons/io5";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
 
 type ReadyToSubmit = {
   id: string;
@@ -67,11 +69,13 @@ export default function CreatorSubmissionView() {
       )}
 
       {/* EMPTY STATE */}
-      {readyToSubmit.length === 0 ? (
-        <div className="text-muted-foreground text-sm">
-          Nothing waiting right now — approved campaigns will appear here.
-        </div>
-      ) : (
+      {!error && readyToSubmit.length === 0 ? (
+        <EmptyDashboardState
+          title="Nothing to submit yet"
+          description="Approved campaign work waiting for proof will appear here."
+          icon={<IoFilm aria-hidden="true" className="size-8" />}
+        />
+      ) : !error ? (
         <div className="space-y-3">
 
           {readyToSubmit.map((item) => (
@@ -132,9 +136,8 @@ export default function CreatorSubmissionView() {
               </div>
             </div>
           ))}
-
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

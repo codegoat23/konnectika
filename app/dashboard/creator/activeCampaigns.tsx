@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ApprovedCampaigns } from "@/lib/campaigns";
 import CampaignCard from "./components/CampaignCard";
 import SocialFolderGrid from "@/components/social/SocialFolder";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
+import { BiSolidMegaphone } from "react-icons/bi";
 
 type ActiveCampaignsProps ={ 
   active_campaigns: ApprovedCampaigns[];
@@ -31,19 +33,13 @@ export default function ActiveCampaigns({active_campaigns}:ActiveCampaignsProps)
 
         <div>
           {active_campaigns.length === 0 ? (
-            <div className="flex flex-col justify-center items-center gap-3 border border-border p-8 sm:p-14 lg:p-18 rounded-3xl bg-card text-center">
-              <span className="text-sm font-normal text-muted-foreground">
-                You haven&apos;t applied to any campaigns yet
-              </span>
-              <a
-                href="/discover"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl text-sm bg-primary text-primary-foreground font-medium hover:bg-orange-600 transition flex items-center gap-2"
-              >
-                Browse campaigns
-              </a>
-            </div>
+            <EmptyDashboardState
+              title="No campaigns joined"
+              description="Campaigns you join will appear here."
+              icon={<BiSolidMegaphone aria-hidden="true" className="size-8" />}
+              actionHref="/discover"
+              actionLabel="Browse campaigns"
+            />
           ) : (
             <>
               {/* Mobile: horizontal swipeable row */}

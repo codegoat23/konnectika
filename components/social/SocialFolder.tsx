@@ -283,19 +283,7 @@ export default function SocialFolderGrid({
               })}
             </div>
 
-            {/* Connected count */}
-            <div className="text-4xl font-extrabold tracking-tight text-white">
-              {loading ? (
-                <span className="inline-block h-9 w-10 animate-pulse rounded bg-white/20 align-middle" />
-              ) : (
-                <>
-                  {socials.length}
-                  <span className="text-2xl text-white/70">
-                    /{PLATFORMS.length}
-                  </span>
-                </>
-              )}
-            </div>
+          
 
             <div className="text-sm font-medium text-white/70">
               Platforms connected

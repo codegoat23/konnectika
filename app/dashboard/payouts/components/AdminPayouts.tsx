@@ -242,10 +242,7 @@ export default function AdminPayouts({
             Payout Settings
           </h2>
 
-          <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">
-            Set the minimum balance required for payout and the monthly payout
-            day. Changes apply to the next payout cycle.
-          </p>
+         
         </div>
       </div>
 
@@ -347,9 +344,7 @@ export default function AdminPayouts({
         <div className="">
           <div className="p-1">
             <h2 className="text-lg font-semibold">Payout Batches</h2>
-            <p className="text-xs text-muted-foreground">
-              Only admins can approve, reject, or mark a payout as paid.
-            </p>
+           
           </div>
 
           {payouts.length === 0 ? (
@@ -361,11 +356,7 @@ export default function AdminPayouts({
               <h3 className="text-lg font-semibold text-foreground">
                 No payouts yet
               </h3>
-              <p className="mt-2 max-w-sm text-center text-sm text-muted-foreground">
-                Payouts are generated on the monthly payout day once a
-                creator&apos;s available balance crosses the minimum threshold.
-                You can also generate them now with the button above.
-              </p>
+             
             </div>
           ) : (
            <div className="mt-5 overflow-hidden rounded-[24px] border border-border bg-card">

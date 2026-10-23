@@ -246,7 +246,7 @@ export async function POST(req: Request) {
     //create notifications for all creators about the new campaign
 
     await Notifycreators({
-      title: "New Campaign Available 🚀",
+      title: "New Campaign Available",
       message: `A new campaign "${campaign.name}" is waiting for applications.`,
       type: "INFO",
 

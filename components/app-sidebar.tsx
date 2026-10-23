@@ -1,16 +1,31 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
+import Link from "next/link"
 import Logo from "@/public/assets/logo-expanded.svg"
-import Image from "next/image";
+import {
+  ChartNoAxesColumn,
+  CircleHelp,
+  Compass,
+  FileText,
+  HandCoins,
+  House,
+  Landmark,
+  Megaphone,
+  Settings,
+  Users,
+} from "lucide-react"
+import { SiDiscord } from "react-icons/si"
+import { IoFilm } from "react-icons/io5";
+import { BiSolidMegaphone } from "react-icons/bi";
 
-
-
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
-import Link from "next/link";
+import { NavMain, type NavSection } from "@/components/nav-main"
+import { useDashboardRole } from "@/components/dashboard-role-provider"
+import type { DashboardRole } from "@/lib/roles"
+import { Skeleton } from "@/components/ui/skeleton"
+import { TbMoneybag } from "react-icons/tb";
+import { SidebarUser } from "./sidebarUser"
 import {
   Sidebar,
   SidebarContent,
@@ -20,244 +35,118 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, Megaphone, Send, WalletIcon, Landmark } from "lucide-react"
-import { TbBrandGoogleAnalytics } from "react-icons/tb";
-import { GoHome } from "react-icons/go";
 
-import { LogoutButton } from "./logoutButton"
-import { SidebarUser } from "./sidebarUser";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: (
-        <GoHome
-        />
-      ),
-    },
-    {
-      title: "Campaigns",
-      url: "/dashboard/campaigns",
-      icon: (
-        <Megaphone
-        />
-      ),
-    },
-   
-    {
-      title: "Submissions",
-      url: "/dashboard/submission",
-      icon: (
-        <Send
-        />
-      ),
-    },
-    {
-      title: "Balance",
-      url: "/dashboard/balance",
-      icon: (
-        <WalletIcon
-        
-        />
-      ),
-    },
+const roleSections: Record<DashboardRole, NavSection[]> = {
+  CREATOR: [
+    { title: "Discover", items: [
+      { title: "Home", url: "/dashboard", icon: <House /> },
+      { title: "Campaigns", url: "/dashboard/campaigns", icon:<BiSolidMegaphone /> },
+      { title: "Discover", url: "/discover", icon: <Compass /> },
+    ] },
+    { title: "My work", items: [
+      { title: "Submissions", url: "/dashboard/submission", icon: <IoFilm /> },
+      { title: "Earnings", url: "/dashboard/balance", icon: <TbMoneybag /> },
+      { title: "Payouts", url: "/dashboard/payouts", icon: <Landmark /> },
+    ] },
+    { title: "Account", items: [
+      { title: "Settings", url: "/settings", icon: <Settings /> },
+      { title: "Help & support", url: "mailto:support@konnectika.com", icon: <CircleHelp /> },
+    ] },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <CameraIcon
-        />
-      ),
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
+  BRAND: [
+    { title: "Discover", items: [
+      { title: "Home", url: "/dashboard", icon: <House /> },
+      { title: "Campaigns", url: "/dashboard/campaigns", icon: <BiSolidMegaphone /> },
+      { title: "Discover", url: "/discover", icon: <Compass /> },
+    ] },
+    { title: "My work", items: [
+      { title: "Submissions", url: "/dashboard/submission", icon: <IoFilm /> },
+      { title: "Earnings", url: "/dashboard/balance", icon: <TbMoneybag /> },
+      { title: "Applicants", url: "/dashboard/applicants", icon: <Users /> },
+    ] },
+    { title: "Account", items: [
+      { title: "Settings", url: "/settings", icon: <Settings /> },
+      { title: "Help & support", url: "mailto:support@konnectika.com", icon: <CircleHelp /> },
+    ] },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: (
-        <Settings2Icon
-        />
-      ),
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: (
-        <CircleHelpIcon
-        />
-      ),
-    },
-  
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: (
-        <FileChartColumnIcon
-        />
-      ),
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
-    },
+  ADMIN: [
+    { title: "Discover", items: [
+      { title: "Home", url: "/dashboard", icon: <House /> },
+      { title: "Campaigns", url: "/dashboard/campaigns", icon: <BiSolidMegaphone /> },
+      { title: "Discover", url: "/discover", icon: <Compass /> },
+    ] },
+    { title: "My work", items: [
+      { title: "Submissions", url: "/dashboard/submission", icon: <IoFilm /> },
+      { title: "Applicants", url: "/dashboard/applicants", icon: <Users /> },
+      { title: "Payouts", url: "/dashboard/payouts", icon: <Landmark /> },
+      { title: "Payments", url: "/dashboard/payments", icon: <HandCoins /> },
+      { title: "Revenue", url: "/dashboard/revenue", icon: <ChartNoAxesColumn /> },
+    ] },
+    { title: "Account", items: [
+      { title: "Settings", url: "/settings", icon: <Settings /> },
+      { title: "Help & support", url: "mailto:support@konnectika.com", icon: <CircleHelp /> },
+    ] },
   ],
 }
-const user = {
-  name:"Eric Shija",
-  email: "codesmrt@gmail.com",
-  avatar: "ES"
+
+function SidebarNavigationSkeleton() {
+  return (
+    <div role="status" aria-label="Loading navigation" className="space-y-5 px-3">
+      <span className="sr-only">Loading navigation</span>
+      {[3, 4, 2].map((itemCount, sectionIndex) => (
+        <div key={sectionIndex} className="space-y-2">
+          <Skeleton aria-hidden="true" className="ml-3 h-3 w-16 bg-sidebar-foreground/10" />
+          <div className="space-y-1">
+            {Array.from({ length: itemCount }, (_, itemIndex) => (
+              <div key={itemIndex} className="flex h-10 items-center gap-3 rounded-[10px] px-3">
+                <Skeleton aria-hidden="true" className="size-[20px] shrink-0 rounded-[5px] bg-sidebar-foreground/10" />
+                <Skeleton
+                  aria-hidden="true"
+                  className={`h-5 bg-sidebar-foreground/10 ${itemIndex % 2 === 0 ? "w-24" : "w-32"}`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [role, setRole] = React.useState<string | null>(null);
+  const role = useDashboardRole()
 
-  React.useEffect(() => {
-    fetch("/api/user")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setRole(data?.User?.role ?? null))
-      .catch(() => {});
-  }, []);
-
-  const navMain = React.useMemo(() => {
-    // Admins have no wallet balance — that page just redirects to the payout
-    // dashboard, so drop it from their nav.
-    const items =
-      role === "ADMIN"
-        ? data.navMain.filter((item) => item.url !== "/dashboard/balance")
-        : [...data.navMain];
-    if (role === "ADMIN" || role === "BRAND") {
-      items.push({
-        title: "Applicants",
-        url: "/dashboard/applicants",
-        icon: <UsersIcon />,
-      });
-    }
-    if (role === "ADMIN" || role === "CREATOR") {
-      items.push({
-        title: "Payouts",
-        url: "/dashboard/payouts",
-        icon: <Landmark />,
-      });
-    }
-    if (role === "ADMIN") {
-      items.push({
-        title: "Payments",
-        url: "/dashboard/payments",
-        icon: <Landmark />,
-      });
-    }
-    if (role === "ADMIN") {
-      items.push({
-        title: "Revenue",
-        url: "/dashboard/revenue",
-        icon: <Landmark />,
-      });
-    }
-    return items;
-  }, [role]);
+  const sections = role ? roleSections[role] : []
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="px-3 pb-3 pt-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
-             <div className="flex items-center justify-baseline  py-1">
-  <Image
-    src={Logo}
-    alt="Konnectika"
-    width={180}
-    height={34}
-    priority
-    className="h-auto w-full max-w-[190px]"
-  />
-</div>
-       
-            </SidebarMenuButton>
+            <div className="flex h-10 items-center justify-between gap-2 px-1">
+              <Link href="/dashboard" aria-label="Konnectika home" className="min-w-0">
+                <Image
+                  src={Logo}
+                  alt="Konnectika"
+                  width={154}
+                  height={34}
+                  priority
+                  className="h-auto w-[154px]"
+                />
+              </Link>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navMain}  />
+
+      <SidebarContent className="gap-0 px-0 pb-3">
+        {role ? <NavMain sections={roleSections[role]} /> : <SidebarNavigationSkeleton />}
         
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-      
-      <SidebarUser/>
-     </SidebarFooter>
+
+      <SidebarFooter className="border-t border-white/[0.06] px-2 py-2">
+        <SidebarUser />
+      </SidebarFooter>
     </Sidebar>
   )
 }

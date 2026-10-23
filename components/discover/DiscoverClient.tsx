@@ -191,6 +191,7 @@ export default function DiscoverClient() {
       <DiscoverHero
         featuredCampaigns={featuredCampaigns}
         onJoin={setSelectedCampaign}
+        isLoading={loading}
       />
 
       <div className="w-full px-4 py-6 sm:px-6 sm:py-8">

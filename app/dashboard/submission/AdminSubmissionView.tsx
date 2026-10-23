@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Eye, ImageIcon, Link2, X } from "lucide-react";
+import { IoFilm } from "react-icons/io5";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
 import {
   Select,
   SelectContent,
@@ -94,6 +96,13 @@ export default function AdminSubmissionView() {
         </div>
       )}
 
+     {!error && submissions.length === 0 ? (
+       <EmptyDashboardState
+         title="No submissions yet"
+         description="New submissions across campaigns will appear here."
+         icon={<IoFilm aria-hidden="true" className="size-8" />}
+       />
+     ) : !error ? (
      <div className="overflow-hidden rounded-[24px] border border-border bg-card">
   <div className="overflow-x-auto">
     <table className="w-full min-w-[900px] text-sm">
@@ -238,6 +247,7 @@ export default function AdminSubmissionView() {
     </table>
   </div>
 </div>
+     ) : null}
 
       {/* SUBMISSION DETAIL MODAL */}
       {selected && (

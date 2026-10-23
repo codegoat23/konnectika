@@ -5,6 +5,8 @@ import { CreatedCampaign } from "@/lib/campaigns";
 import { BadgeCheck, Megaphone, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { TbFileDescription } from "react-icons/tb";
+import { BiSolidMegaphone } from "react-icons/bi";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
 
 const BADGE_STYLES: Record<string, string> = {
   active: "text-success",
@@ -30,20 +32,13 @@ export default function CreatedCampaigns({
         <h2 className="text-lg font-semibold text-foreground mb-4">
           Your Campaigns
         </h2>
-        <div className="flex flex-col items-center justify-center gap-3 border border-border p-8 sm:p-12 rounded-3xl bg-card text-center">
-          <p className="text-sm text-muted-foreground">
-            You haven&apos;t created any campaigns yet.
-          </p>
-          <button
-            onClick={() => router.push("/dashboard/campaigns/new")}
-            className="rounded-xl bg-orange-500 text-white px-5 py-2.5 text-sm font-medium hover:bg-orange-600 transition min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            style={{
-              borderRadius: 14,
-            }}
-          >
-            + Create your First Campaign
-          </button>
-        </div>
+        <EmptyDashboardState
+          title="No campaigns created"
+          description="Campaigns you create will appear here."
+          icon={<BiSolidMegaphone aria-hidden="true" className="size-8" />}
+          actionHref="/dashboard/campaigns/new"
+          actionLabel="Create your first campaign"
+        />
       </section>
     );
   }

@@ -104,9 +104,7 @@ export default function BrandBalance({ payments }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             TZS {formatTZS(totalSpending)}
           </div>
-          <div className="text-[11px] text-white/80">
-            Campaign commitments
-          </div>
+          
         </Card>
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
@@ -116,9 +114,7 @@ export default function BrandBalance({ payments }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             {pendingCount}
           </div>
-          <div className="text-[11px] text-muted-foreground">
-            Approved, awaiting payout
-          </div>
+         
         </Card>
 
         <Card className="rounded-2xl bg-card p-4 shadow-xs gap-2">
@@ -128,9 +124,7 @@ export default function BrandBalance({ payments }: Props) {
           <div className="mt-2 text-xl font-semibold tabular-nums">
             {paidCount}
           </div>
-          <div className="text-[11px] text-muted-foreground">
-            TZS {formatTZS(paidTotal)} settled via payouts
-          </div>
+         
         </Card>
       </div>
 

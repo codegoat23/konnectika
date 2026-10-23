@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
 import { JoinedCampaign } from "@/lib/campaigns";
 import JoinedCampaignCard from "./JoinedCampaignCard";
 import CampaignModal from "@/app/dashboard/creator/components/CampaignModal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BiSolidMegaphone } from "react-icons/bi";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
 
 export default function JoinedCampaigns({
   campaigns,
@@ -23,20 +24,13 @@ export default function JoinedCampaigns({
           Campaigns Joined
         </h2>
 
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="p-4 rounded-full bg-card border border-border mb-4">
-            <RefreshCw size={24} className="text-muted-foreground" />
-          </div>
-          <p className="text-muted-foreground font-medium mb-1">
-            You haven&apos;t applied to any campaigns yet
-          </p>
-          <p className="text-muted-foreground text-sm">
-            <Link href="/discover" className="text-foreground underline hover:text-orange-600">
-              Browse open campaigns
-            </Link>{" "}
-            to get started
-          </p>
-        </div>
+        <EmptyDashboardState
+          title="No campaigns joined"
+          description="Campaigns you join will appear here."
+          icon={<BiSolidMegaphone aria-hidden="true" className="size-8" />}
+          actionHref="/discover"
+          actionLabel="Browse open campaigns"
+        />
       </section>
     );
   }

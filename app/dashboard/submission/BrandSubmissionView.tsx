@@ -10,7 +10,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FiLink2 } from "react-icons/fi";
-import { IoInformationCircleOutline } from "react-icons/io5";
+import { IoFilm, IoInformationCircleOutline } from "react-icons/io5";
+import EmptyDashboardState from "@/app/dashboard/components/EmptyDashboardState";
 import {
   Select,
   SelectContent,
@@ -134,15 +135,21 @@ export default function BrandSubmissionView() {
       </header>
 
       {error && (
-        <div className="rounded-[14] border  border-destructive/25 bg-destructive/15 px-4 py-3 text-sm text-destructive flex flex-row gap-3">
+        <div className="rounded-[14px] border  border-destructive/25 bg-destructive/15 px-4 py-3 text-sm text-destructive flex flex-row gap-3">
           <IoInformationCircleOutline size={20}/>
           {error}
         </div>
       )}
 
-      {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No submissions yet for this view.</p>
-      ) : (
+      {!error && submissions.length === 0 ? (
+        <EmptyDashboardState
+          title="No submissions yet"
+          description="Creator submissions for your campaigns will appear here."
+          icon={<IoFilm aria-hidden="true" className="size-8" />}
+        />
+      ) : !error && filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No submissions match this campaign filter.</p>
+      ) : !error ? (
        <ul className="space-y-4">
   {filtered.map((s) => (
     <li
@@ -339,8 +346,8 @@ export default function BrandSubmissionView() {
     </li>
   ))}
 </ul>
-      )}
-    </div>
+  ) : null}
+ </div>
   );
 }
 
