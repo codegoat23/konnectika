@@ -27,7 +27,7 @@ import { FIRST_STEP_BY_ROLE } from "@/lib/auth";
 const isPublicRoute = createRouteMatcher([
   "/",
   "/discover(.*)",
-  "/brand-campaign-inquiry(.*)",
+  "/launch-campaign(.*)",
   "/api/brand-campaign-inquiry",
   "/login(.*)",
   "/signup(.*)",
