@@ -8,6 +8,7 @@ import {
   BusinessRuleError,
 } from "@/lib/payment-flow";
 import { notify } from "@/lib/notification";
+import { getPlatformPricing } from "@/lib/pricing";
 
 const statusSchema = z.object({
   status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
@@ -62,6 +63,7 @@ export async function PATCH(
           name: true,
           paymentRate: true,
           budgetTotal: true,
+          paymentStatus: true,
           businessProfile: { select: { userId: true } },
         },
       },
@@ -81,6 +83,13 @@ export async function PATCH(
     user.id !== application.campaign.businessProfile.userId
   ) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (parsed.data.status === "APPROVED" && application.campaign.paymentStatus !== "PAID") {
+    return NextResponse.json(
+      { error: "Campaign not funded (payment pending)" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -111,6 +120,7 @@ export async function PATCH(
 
       let earning = null;
       if (parsed.data.status === "APPROVED") {
+        const pricing = await getPlatformPricing();
         earning = await createEarningForApprovedApplication(
           tx,
           {
@@ -118,6 +128,7 @@ export async function PATCH(
             campaignId: application.campaignId,
             creatorId: application.creatorId,
             paymentRate: application.campaign.paymentRate,
+            creatorFeePercent: pricing.creatorFeePercent,
           },
           new Date()
         );

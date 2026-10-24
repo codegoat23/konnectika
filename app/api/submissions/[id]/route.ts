@@ -174,6 +174,28 @@ export async function PATCH(
     );
   }
 
+  if (parsed.data.status === "APPROVED") {
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: submission.campaignId },
+      select: { paymentStatus: true },
+    });
+    if (!campaign || campaign.paymentStatus !== "PAID") {
+      return NextResponse.json(
+        { error: "Campaign not funded (payment pending)" },
+        { status: 400 }
+      );
+    }
+  }
+
+  if (submission.status === "APPROVED" || submission.status === "REJECTED") {
+    if (parsed.data.status !== submission.status) {
+      return NextResponse.json(
+        { error: "Submission already settled" },
+        { status: 400 }
+      );
+    }
+  }
+
   let contentApproved = false;
   const updated = await prisma.$transaction(async (tx) => {
     const updated = await tx.submission.update({
@@ -193,10 +215,6 @@ export async function PATCH(
       },
     });
 
-    // Content approved -> the earning (created at application approval) flips
-    // PENDING -> APPROVED and the platform CREATOR_FEE is recorded. The money
-    // itself is settled later through the scheduled payout flow. Atomic +
-    // idempotent: re-approving already-approved content re-runs cleanly.
     if (parsed.data.status === "APPROVED") {
       const result = await approveContentForEarning(tx, {
         submissionId: updated.id,

@@ -348,7 +348,7 @@ model Earning {
   // came from. Campaign is REQUIRED (backfilled from submission on migrate);
   // application is set when the earning is created at application approval.
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   applicationId String?              @unique
   application   CampaignApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
@@ -356,7 +356,7 @@ model Earning {
   // Linked once content is approved (nullable because an earning is created
   // at APPLICATION approval, before any content exists).
   submissionId String?     @unique
-  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
 
   // --- payment breakdown (gross / fee / net) ---
   amount          Int // gross campaign payment
@@ -449,16 +449,16 @@ model PlatformRevenue {
 
   // links
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   creatorId String? // set for CREATOR_FEE
-  creator   CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  creator   CreatorProfile? @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   businessId String? // set for BRAND_FEE
-  business   BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  business   BusinessProfile? @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   earningId String?  @unique // set for CREATOR_FEE -> the earning the fee was deducted from
-  earning   Earning? @relation(fields: [earningId], references: [id], onDelete: Restrict)
+  earning   Earning? @relation(fields: [earningId], references: [id], onDelete: Cascade)
 
   description String?
 
@@ -553,7 +553,7 @@ provider               String? // "snippe"
 
   earnings Earning[]
 
-  paymentProofs PaymentProof[]
+  paymentProof PaymentProof?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -620,8 +620,8 @@ model PaymentProof {
   paymentIntentId String?
   paymentIntent   PaymentIntent? @relation(fields: [paymentIntentId], references: [id], onDelete: SetNull)
 
-  payoutId String?
-  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  payoutId String? @unique
+  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: Cascade)
 
   // who submitted/recorded the proof
   submittedById String?

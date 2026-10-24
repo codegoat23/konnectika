@@ -191,8 +191,22 @@ export async function POST(req: NextRequest) {
   }
 
   // --- If you removed the @@unique on applicationId to allow
-  // resubmissions after CHANGES_REQUESTED, delete this block. ---
   if (application.submission) {
+    if (application.submission.status === "CHANGES_REQUESTED") {
+      const updated = await prisma.submission.update({
+        where: { id: application.submission.id },
+        data: {
+          screenshots,
+          postLinks,
+          caption,
+          status: "PENDING_REVIEW",
+          reviewNote: null,
+          reviewedAt: null,
+          reviewedBy: null,
+        },
+      });
+      return NextResponse.json({ submission: updated }, { status: 201 });
+    }
     return NextResponse.json(
       { error: "A submission already exists for this application" },
       { status: 409 }

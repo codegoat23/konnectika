@@ -178,8 +178,10 @@ export interface CreatorFeeSplit {
 }
 
 // Gross -> gross | fee | net split for a creator earning.
-export function computeCreatorFeeSplit(gross: number): CreatorFeeSplit {
-  const rate = getCreatorFeePercent();
+export function computeCreatorFeeSplit(
+  gross: number,
+  rate: number = getCreatorFeePercent()
+): CreatorFeeSplit {
   const platformFee = Math.round((gross * rate) / 100);
   return {
     amount: gross,
@@ -198,8 +200,11 @@ export function computeCreatorFeeSplit(gross: number): CreatorFeeSplit {
  * computeCreatorFeeSplit so the flow reads clearly and the same math is
  * reused everywhere.
  */
-export function calculateCreatorEarning(gross: number): CreatorFeeSplit {
-  return computeCreatorFeeSplit(gross);
+export function calculateCreatorEarning(
+  gross: number,
+  creatorFeePercent?: number
+): CreatorFeeSplit {
+  return computeCreatorFeeSplit(gross, creatorFeePercent);
 }
 
 export interface BrandFee {

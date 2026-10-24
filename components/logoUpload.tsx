@@ -42,7 +42,7 @@ export default function LogoUpload({ value, onChange }: LogoUploadProps) {
         onUploadBegin={() => setUploading(true)}
         onClientUploadComplete={(files) => {
           setUploading(false);
-          const url = files[0]?.ufsUrl ?? files[0]?.url;
+          const url = files[0]?.ufsUrl;
           if (url) { setPreview(url); onChange(url); }
         }}
         onUploadError={(error) => { setUploading(false); alert(error.message); }}

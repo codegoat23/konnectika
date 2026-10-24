@@ -12,12 +12,10 @@ import {
 
 
 export async function GET() {
-  // Public discovery list. Explicit `select` whitelist — never expose payment
-  // details (paymentMethod/paymentPhone/paymentStatus/platformFee/totalCharge)
-  // or admin-only fields to unauthenticated visitors.
   const campaigns = await prisma.campaign.findMany({
     where: {
       status: "APPROVED",
+      paymentStatus: "PAID",
     },
     select: {
       id: true,
@@ -50,13 +48,18 @@ export async function GET() {
     },
   });
 
-  // Override the stored budgetFunded column with the real gross paid-out total
-  // so the discover progress bars always reflect gross amount funded for creators.
   const paid = await getCampaignsPaidBudget(campaigns.map((c) => c.id));
-  const campaignsWithRealBudget = campaigns.map((c) => ({
-    ...c,
-    budgetFunded: paid.get(c.id) ?? 0,
-  }));
+  const now = Date.now();
+  const campaignsWithRealBudget = campaigns.map(({ _count, ...c }) => {
+    const appsClose = c.applicationsClose ? new Date(c.applicationsClose).getTime() : null;
+    const derivedDaysLeft = appsClose !== null ? Math.max(0, Math.ceil((appsClose - now) / (1000 * 60 * 60 * 24))) : c.daysLeft;
+    return {
+      ...c,
+      daysLeft: derivedDaysLeft,
+      creatorsJoined: _count.applications,
+      budgetFunded: paid.get(c.id) ?? 0,
+    };
+  });
 
   return Response.json(campaignsWithRealBudget);
 }

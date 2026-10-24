@@ -217,6 +217,12 @@ describe("permissions", () => {
     });
     expect(approve.status).toBe(200);
 
+    // Fund the campaign so application and submission approvals can proceed
+    await prisma.campaign.update({
+      where: { id: campaign.id },
+      data: { paymentStatus: "PAID" },
+    });
+
     // Admin approves an application on brandAlpha's campaign.
     const application = await createApplication(
       fx.creatorAlpha.creatorProfileId,

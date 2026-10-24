@@ -97,7 +97,7 @@ describe("marketplace lifecycle", () => {
     expect(brandFeeRow?.status).toBe("ACCRUED");
     expect(brandFeeRow?.feeAmount).toBe(250000);
 
-    // 2. Admin approves the campaign (confirms funds received + funds budget).
+    // 2. Admin approves the campaign (review decision only, payment stays UNPAID).
     await signInAs(fx.admin.id, "ADMIN");
     const approved = await callRoute({ PATCH: adminCampaignStatusRoute }, {
       method: "PATCH",
@@ -108,14 +108,14 @@ describe("marketplace lifecycle", () => {
     expect(approved.status).toBe(200);
     const approvedBody = await readJson(approved);
     expect(approvedBody.status).toBe("APPROVED");
-    expect(approvedBody.paymentStatus).toBe("PAID");
+    expect(approvedBody.paymentStatus).toBe("UNPAID");
     // Approval funds nothing to creators yet — budgetFunded is the real
     // gross paid-out total, so it stays 0 until a payout is actually paid.
     expect(approvedBody.budgetFunded).toBe(0);
-    const paidBrandFee = await prisma.platformRevenue.findFirst({
+    const accruedBrandFee = await prisma.platformRevenue.findFirst({
       where: { campaignId, type: "BRAND_FEE" },
     });
-    expect(paidBrandFee?.status).toBe("PAID");
+    expect(accruedBrandFee?.status).toBe("ACCRUED");
 
     // 3. Creator applies.
     await signInAs(fx.creatorAlpha.id, "CREATOR");
@@ -145,8 +145,28 @@ describe("marketplace lifecycle", () => {
     expect(dup.status).toBe(400);
     expect((await readJson(dup)).error).toMatch(/already applied/i);
 
-    // 5. Brand approves the application -> Earning created (PENDING).
+    // Brand cannot approve application while campaign is unpaid.
     await signInAs(fx.brandAlpha.id, "BRAND");
+    const blockedApproval = await callRoute({ PATCH: applicationStatusRoute }, {
+      method: "PATCH",
+      url: `${URL}/applications/${applicationId}/status`,
+      params: { id: applicationId },
+      body: { status: "APPROVED" },
+    });
+    expect(blockedApproval.status).toBe(400);
+    expect((await readJson(blockedApproval)).error).toMatch(/payment pending/i);
+
+    // Brand pays for campaign -> paymentStatus flips to PAID.
+    await prisma.campaign.update({
+      where: { id: campaignId },
+      data: { paymentStatus: "PAID" },
+    });
+    await prisma.platformRevenue.updateMany({
+      where: { campaignId, type: "BRAND_FEE" },
+      data: { status: "PAID" },
+    });
+
+    // 5. Brand approves the application -> Earning created (PENDING).
     const appApproved = await callRoute({ PATCH: applicationStatusRoute }, {
       method: "PATCH",
       url: `${URL}/applications/${applicationId}/status`,
@@ -331,6 +351,7 @@ describe("marketplace lifecycle", () => {
     const campaign = await createCampaign(fx.brandAlpha.businessProfileId, {
       paymentRate,
       budgetTotal,
+      paymentStatus: "PAID",
     });
 
     // 10 creators apply and get approved -> campaign is full.

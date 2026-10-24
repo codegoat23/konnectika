@@ -607,6 +607,60 @@ describe("snippe outbound payout flow", () => {
     ).toBeNull();
   });
 
+  it("reverses an already PAID payout and returns earnings to AVAILABLE", async () => {
+    const { payout, earningId } = await approvedPayout();
+    mockSnippeFetch(happyPath("po_ref_rev_paid"));
+    await sendPayoutToSnippe(payout.id, WEBHOOK_URL);
+
+    // First, complete the payout
+    await deliverPayoutWebhook("payout.completed", {
+      reference: "po_ref_rev_paid",
+      status: "completed",
+      amount: { value: 225_000, currency: "TZS" },
+      metadata: { payoutId: payout.id },
+    });
+    expect((await prisma.payout.findUniqueOrThrow({ where: { id: payout.id } })).status).toBe("PAID");
+    expect((await prisma.earning.findUniqueOrThrow({ where: { id: earningId } })).status).toBe("PAID");
+
+    // Later, the provider sends a reversal
+    const { json } = await deliverPayoutWebhook("payout.reversed", {
+      reference: "po_ref_rev_paid",
+      status: "reversed",
+      failure_reason: "Reversed by upstream operator.",
+      metadata: { payoutId: payout.id },
+    });
+    expect(json.applied).toBe(true);
+    expect((await prisma.payout.findUniqueOrThrow({ where: { id: payout.id } })).status).toBe("FAILED");
+    const earning = await prisma.earning.findUniqueOrThrow({ where: { id: earningId } });
+    expect(earning.status).toBe("AVAILABLE");
+    expect(earning.payoutId).toBeNull();
+    expect(earning.paidAt).toBeNull();
+
+    const wallet = await getCreatorWallet(fx.creatorAlpha.creatorProfileId);
+    expect(wallet.available).toBe(225_000);
+    expect(wallet.paid).toBe(0);
+  });
+
+  it("guards against double-pay on timeout by keeping status in PROCESSING", async () => {
+    const { payout } = await approvedPayout();
+    mockSnippeFetch((url) => {
+      if (url.includes("/v1/payouts/send")) {
+        throw new Error("Request timed out connecting to Snippe");
+      }
+      return happyPath()(url);
+    });
+
+    const result = await sendPayoutToSnippe(payout.id, WEBHOOK_URL);
+    expect(result.ok).toBe(false);
+    if (result.ok) return; // narrow type
+    expect(result.code).toBe("PROVIDER_ERROR");
+
+    // Status MUST remain PROCESSING to prevent an admin from double-paying
+    const after = await prisma.payout.findUniqueOrThrow({ where: { id: payout.id } });
+    expect(after.status).toBe("PROCESSING");
+    expect(after.failureReason).toMatch(/timed out/i);
+  });
+
   // -------------------------------------------------------------------------
   // Send route access control
   // -------------------------------------------------------------------------

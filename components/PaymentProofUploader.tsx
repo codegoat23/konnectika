@@ -21,7 +21,7 @@ export default function PaymentProofUploader({
         allowedContent: "Image up to 6MB",
       }}
       onClientUploadComplete={(files) => {
-        const urls = files.map((file) => file.url);
+        const urls = files.map((file) => file.ufsUrl);
         onUploadComplete(urls);
       }}
       onUploadError={(error) => {

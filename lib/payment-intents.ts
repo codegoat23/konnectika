@@ -32,7 +32,7 @@
 // is a no-op, not an error.
 
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   buildIdempotencyKey,
   createPayment as snippeCreatePayment,
@@ -87,6 +87,7 @@ export type StartPaymentErrorCode =
   | "INVALID_PHONE"
   | "AMOUNT_TOO_SMALL"
   | "IN_FLIGHT"
+  | "INVALID_STATE"
   | "PROVIDER_ERROR";
 
 const NOT_FOUND = "NOT_FOUND" as const;
@@ -149,6 +150,7 @@ export async function createPaymentIntent(
       budgetTotal: true,
       paymentStatus: true,
       totalCharge: true,
+      status: true,
       businessProfile: { select: { userId: true, companyName: true } },
     },
   });
@@ -159,6 +161,13 @@ export async function createPaymentIntent(
       ok: false,
       error: "You can only pay for your own campaign.",
       code: FORBIDDEN,
+    };
+  }
+  if (campaign.status !== "APPROVED") {
+    return {
+      ok: false,
+      error: `Campaign cannot be paid in ${campaign.status} status.`,
+      code: "INVALID_STATE",
     };
   }
   if (campaign.paymentStatus === "PAID") {
@@ -211,32 +220,48 @@ export async function createPaymentIntent(
   const attempt = (latest?.attempt ?? 0) + 1;
   const idempotencyKey = buildIdempotencyKey("pay", `${campaign.id}-${attempt}`);
 
-  const intent = await prisma.$transaction(async (tx) => {
-    const created = await tx.paymentIntent.create({
-      data: {
-        campaignId: campaign.id,
-        attempt,
-        idempotencyKey,
-        budgetTotal: breakdown.budget,
-        platformFeeRate: breakdown.platformFeeRate,
-        platformFee: breakdown.platformFee,
-        providerFeeRate: breakdown.providerFeeRate,
-        providerFee: breakdown.providerFee,
-        totalCharge: breakdown.totalCharge,
-        status: "AWAITING_PAYMENT",
-        customerPhone: phone,
-        customerName: `${input.firstName} ${input.lastName}`.trim(),
-        customerEmail: input.email,
-      },
-    });
+  let intent;
+  try {
+    intent = await prisma.$transaction(async (tx) => {
+      const created = await tx.paymentIntent.create({
+        data: {
+          campaignId: campaign.id,
+          attempt,
+          idempotencyKey,
+          budgetTotal: breakdown.budget,
+          platformFeeRate: breakdown.platformFeeRate,
+          platformFee: breakdown.platformFee,
+          providerFeeRate: breakdown.providerFeeRate,
+          providerFee: breakdown.providerFee,
+          totalCharge: breakdown.totalCharge,
+          status: "AWAITING_PAYMENT",
+          customerPhone: phone,
+          customerName: `${input.firstName} ${input.lastName}`.trim(),
+          customerEmail: input.email,
+        },
+      });
 
-    await tx.campaign.update({
-      where: { id: campaign.id },
-      data: { paymentStatus: "AWAITING_PAYMENT" },
-    });
+      await tx.campaign.update({
+        where: { id: campaign.id },
+        data: { paymentStatus: "AWAITING_PAYMENT" },
+      });
 
-    return created;
-  });
+      return created;
+    });
+  } catch (err: unknown) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      return {
+        ok: false,
+        error:
+          "You already have a payment in progress for this campaign. Finish or cancel it before starting another.",
+        code: IN_FLIGHT,
+      };
+    }
+    throw err;
+  }
 
   let payment: SnippePayment;
   try {

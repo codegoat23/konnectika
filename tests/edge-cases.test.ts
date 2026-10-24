@@ -45,7 +45,9 @@ describe("edge cases", () => {
   });
 
   it("re-approving an application is idempotent (one earning only)", async () => {
-    const campaign = await createCampaign(fx.brandAlpha.businessProfileId);
+    const campaign = await createCampaign(fx.brandAlpha.businessProfileId, {
+      paymentStatus: "PAID",
+    });
     const application = await createApplication(
       fx.creatorAlpha.creatorProfileId,
       campaign.id,
@@ -76,6 +78,7 @@ describe("edge cases", () => {
   it("re-approving content is idempotent (one fee row only)", async () => {
     const campaign = await createCampaign(fx.brandAlpha.businessProfileId, {
       paymentRate: 100000,
+      paymentStatus: "PAID",
     });
     const application = await createApplication(
       fx.creatorAlpha.creatorProfileId,
@@ -171,7 +174,7 @@ describe("edge cases", () => {
 
     const result = await createPayout(fx.creatorAlpha.creatorProfileId);
     expect(result.payout).toBeUndefined();
-    expect(getCreatorPayouts(fx.creatorAlpha.creatorProfileId)).resolves.toHaveLength(0);
+    await expect(getCreatorPayouts(fx.creatorAlpha.creatorProfileId)).resolves.toHaveLength(0);
   });
 
   it("AVAILABLE earnings leave the wallet only through a payout (single settlement channel)", async () => {

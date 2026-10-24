@@ -93,6 +93,7 @@ export async function createEarningForApprovedApplication(
     campaignId: string;
     creatorId: string;
     paymentRate: number;
+    creatorFeePercent?: number;
   },
   now = new Date()
 ) {
@@ -101,7 +102,7 @@ export async function createEarningForApprovedApplication(
   });
   if (existing) return existing;
 
-  const split = calculateCreatorEarning(input.paymentRate);
+  const split = calculateCreatorEarning(input.paymentRate, input.creatorFeePercent);
 
   return tx.earning.create({
     data: {
@@ -147,6 +148,7 @@ export async function approveContentForEarning(
     creatorId: string;
     campaignId: string;
     paymentRate: number;
+    creatorFeePercent?: number;
   },
   now = new Date()
 ): Promise<ContentApprovalResult> {
@@ -164,6 +166,7 @@ export async function approveContentForEarning(
         campaignId: input.campaignId,
         creatorId: input.creatorId,
         paymentRate: input.paymentRate,
+        creatorFeePercent: input.creatorFeePercent,
       },
       now
     );

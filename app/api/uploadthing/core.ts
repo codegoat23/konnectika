@@ -40,13 +40,13 @@ export const ourFileRouter = {
 
     console.log({
       creatorId: metadata.creatorId,
-      url: file.url,
+      url: file.ufsUrl,
     });
 
 
     return {
       uploadedBy: metadata.creatorId,
-      url: file.url,
+      url: file.ufsUrl,
     };
 
   }),
@@ -80,12 +80,12 @@ export const ourFileRouter = {
 
     console.log("Cover image uploaded", {
       brandId: metadata.brandId,
-      url: file.url,
+      url: file.ufsUrl,
     });
 
     return {
       uploadedBy: metadata.brandId,
-      url: file.url,
+      url: file.ufsUrl,
     };
 
   }),
@@ -103,7 +103,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => ({
       uploadedBy: metadata.brandId,
-      url: file.ufsUrl ?? file.url,
+      url: file.ufsUrl,
     })),
 
   paymentProof: f({
@@ -139,13 +139,13 @@ export const ourFileRouter = {
 
     console.log("Payment proof uploaded", {
       uploadedBy: metadata.uploadedBy,
-      url: file.url,
+      url: file.ufsUrl,
     });
 
 
     return {
       uploadedBy: metadata.uploadedBy,
-      url: file.url,
+      url: file.ufsUrl,
     };
 
   }),

@@ -4,6 +4,7 @@ export async function getCreatorEarnings(creatorId: string) {
   const items = await prisma.earning.findMany({
     where: {
       creatorId,
+      status: { not: "REJECTED" },
     },
     select: {
       creatorAmount: true,

@@ -935,16 +935,31 @@ export async function sendPayoutToSnippe(
       idempotencyKey,
     });
   } catch (error) {
-    // Snippe refused the transfer outright, so no money is in flight: release
-    // the claim and put the payout back to APPROVED so an admin can retry once
-    // the cause is fixed. Reverting to FAILED would need an admin to re-approve
-    // a payout that never actually left.
     const reason =
       error instanceof Error ? error.message : "Could not send payout to Snippe.";
-    await prisma.payout.updateMany({
-      where: { id: payout.id, status: "PROCESSING", providerReference: null },
-      data: { status: "APPROVED", failureReason: reason },
-    });
+    const isTimeout =
+      reason.toLowerCase().includes("timeout") ||
+      reason.toLowerCase().includes("timed out") ||
+      (error instanceof Error && error.name === "AbortError") ||
+      (error as { code?: string })?.code === "ETIMEDOUT";
+
+    if (!isTimeout) {
+      // Snippe refused the transfer outright (non-timeout error), so no money is in flight: release
+      // the claim and put the payout back to APPROVED so an admin can retry once
+      // the cause is fixed.
+      await prisma.payout.updateMany({
+        where: { id: payout.id, status: "PROCESSING", providerReference: null },
+        data: { status: "APPROVED", failureReason: reason },
+      });
+    } else {
+      // Timeout error: money may be in flight at Snippe. Keep status as PROCESSING
+      // to guard against double-pay (admin cannot manually mark PAID or retry-send concurrently).
+      // The pending webhook or provider reconciliation will settle or fail it.
+      await prisma.payout.updateMany({
+        where: { id: payout.id, status: "PROCESSING", providerReference: null },
+        data: { failureReason: reason },
+      });
+    }
     return { ok: false, error: reason, code: "PROVIDER_ERROR" };
   }
 
@@ -1135,19 +1150,52 @@ export async function failPayout(
       .catch(() => undefined);
   }
 
+  const isReversal = payout.status === "PAID";
+
   const applied = await prisma.$transaction(async (tx) => {
     const claimed = await tx.payout.updateMany({
-      where: { id: payout.id, status: "PROCESSING" },
+      where: { id: payout.id, status: { in: ["PROCESSING", "PAID"] } },
       data: {
         status: "FAILED",
-        failureReason: reason ?? "Snippe reported the payout as failed.",
+        failureReason: reason ?? (isReversal ? "Payout reversed by the provider." : "Snippe reported the payout as failed."),
       },
     });
     if (claimed.count === 0) return false;
 
+    const linkedEarnings = await tx.earning.findMany({
+      where: { payoutId: payout.id },
+      select: { id: true },
+    });
+    const ids = linkedEarnings.map((e) => e.id);
+
+    // Unfreeze the earnings and return them to AVAILABLE balance so they can be paid in the next cycle
     await tx.earning.updateMany({
       where: { payoutId: payout.id },
-      data: { payoutId: null },
+      data: {
+        payoutId: null,
+        status: "AVAILABLE",
+        paidAt: null,
+      },
+    });
+
+    // Revert accrued creator fees if they had settled with the payout
+    if (ids.length > 0) {
+      await tx.platformRevenue.updateMany({
+        where: { earningId: { in: ids }, type: "CREATOR_FEE" },
+        data: {
+          status: "ACCRUED",
+          paymentReference: null,
+        },
+      });
+    }
+
+    // If an audit payment proof was created, mark it rejected
+    await tx.paymentProof.updateMany({
+      where: { payoutId: payout.id },
+      data: {
+        status: "REJECTED",
+        rejectionReason: reason ?? (isReversal ? "Payout reversed by provider." : "Payout failed."),
+      },
     });
 
     return true;
@@ -1158,8 +1206,10 @@ export async function failPayout(
   await prisma.notification.create({
     data: {
       userId: payout.creator.userId,
-      title: "Payout Failed",
-      message: `Your payout of TZS ${payout.amount.toLocaleString()} could not be delivered and has been returned to your available balance. ${reason ?? ""}`.trim(),
+      title: isReversal ? "Payout Reversed" : "Payout Failed",
+      message: isReversal
+        ? `Your payout of TZS ${payout.amount.toLocaleString()} was reversed by the provider and returned to your available balance. ${reason ?? ""}`.trim()
+        : `Your payout of TZS ${payout.amount.toLocaleString()} could not be delivered and has been returned to your available balance. ${reason ?? ""}`.trim(),
       type: "ERROR",
     },
   });

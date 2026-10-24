@@ -9,6 +9,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { setReceivingAccountActive } from "@/lib/payments";
 import { z } from "zod";
 
@@ -78,22 +79,19 @@ export async function PATCH(
     return NextResponse.json({ account: result.account });
   }
 
+  const updateData: Prisma.ReceivingAccountUpdateInput = {};
+  if (parsed.data.type !== undefined) updateData.type = parsed.data.type;
+  if (parsed.data.provider !== undefined) updateData.provider = parsed.data.provider;
+  if (parsed.data.accountName !== undefined) updateData.accountName = parsed.data.accountName;
+  if (parsed.data.phone !== undefined) updateData.phone = parsed.data.phone;
+  if (parsed.data.accountNumber !== undefined) updateData.accountNumber = parsed.data.accountNumber;
+  if (parsed.data.branchDetail !== undefined) updateData.branchDetail = parsed.data.branchDetail;
+  if (parsed.data.extraDetails !== undefined) updateData.extraDetails = parsed.data.extraDetails;
+  if (parsed.data.isActive !== undefined) updateData.isActive = parsed.data.isActive;
+
   const account = await prisma.receivingAccount.update({
     where: { id },
-    data: {
-      type: data.type as never,
-      provider: data.provider as string,
-      accountName: data.accountName as string,
-      phone: typeof data.phone === "string" ? data.phone : null,
-      accountNumber:
-        typeof data.accountNumber === "string" ? data.accountNumber : null,
-      branchDetail:
-        typeof data.branchDetail === "string" ? data.branchDetail : null,
-      extraDetails:
-        typeof data.extraDetails === "string" ? data.extraDetails : null,
-      isActive:
-        typeof data.isActive === "boolean" ? data.isActive : undefined,
-    },
+    data: updateData,
   }).catch(() => null);
 
   if (!account) {

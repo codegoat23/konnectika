@@ -24,7 +24,6 @@ const PUBLIC_CAMPAIGN_FIELDS = {
   budgetTotal: true,
   budgetFunded: true,
   creatorsJoined: true,
-  paymentMethod: true,
   daysLeft: true,
   contentFormat: true,
   duration: true,
@@ -90,13 +89,29 @@ export async function GET(
     });
   }
 
-  const publicCampaign = await prisma.campaign.findUnique({
-    where: { id },
-    select: PUBLIC_CAMPAIGN_FIELDS,
-  });
+  const [publicCampaign, applicationsCount] = await Promise.all([
+    prisma.campaign.findUnique({
+      where: { id },
+      select: PUBLIC_CAMPAIGN_FIELDS,
+    }),
+    prisma.campaignApplication.count({
+      where: { campaignId: id },
+    }),
+  ]);
+
+  const now = Date.now();
+  const appsClose = publicCampaign?.applicationsClose
+    ? new Date(publicCampaign.applicationsClose).getTime()
+    : null;
+  const derivedDaysLeft =
+    appsClose !== null
+      ? Math.max(0, Math.ceil((appsClose - now) / (1000 * 60 * 60 * 24)))
+      : publicCampaign?.daysLeft;
 
   return Response.json({
     ...publicCampaign,
+    daysLeft: derivedDaysLeft,
+    creatorsJoined: applicationsCount,
     budgetFunded: await getCampaignPaidBudget(id),
   });
 }

@@ -27,7 +27,7 @@ endpoint="submissionProof"
 onClientUploadComplete={(files)=>{
 
  const urls = files.map(
-   file=>file.url
+   file=>file.ufsUrl
  );
 
  onUploadComplete(urls);

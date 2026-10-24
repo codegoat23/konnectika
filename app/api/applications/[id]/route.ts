@@ -32,7 +32,7 @@ export async function GET(
           platforms:true,
         },
       },
-      submission: { select: { id: true } },
+      submission: { select: { id: true, status: true, reviewNote: true } },
     },
   });
 
@@ -50,7 +50,10 @@ export async function GET(
     );
   }
 
-  if (application.submission) {
+  if (
+    application.submission &&
+    application.submission.status !== "CHANGES_REQUESTED"
+  ) {
     return NextResponse.json(
       { error: "Proof has already been submitted for this campaign" },
       { status: 409 }

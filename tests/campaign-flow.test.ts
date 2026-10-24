@@ -112,7 +112,7 @@ describe("campaign flow", () => {
     expect(revenue?.status).toBe("ACCRUED");
   });
 
-  it("approves a campaign (admin), which funds the budget and marks payment received", async () => {
+  it("approves a campaign (admin) — status becomes APPROVED, paymentStatus stays UNPAID", async () => {
     const campaign = await createCampaign(fx.brandAlpha.businessProfileId, {
       status: "PENDING_REVIEW",
       budgetTotal: 2000000,
@@ -128,7 +128,8 @@ describe("campaign flow", () => {
 
     const updated = await readJson(res);
     expect(updated.status).toBe("APPROVED");
-    expect(updated.paymentStatus).toBe("PAID");
+    // Admin approval is decoupled from payment — the brand must pay separately.
+    expect(updated.paymentStatus).toBe("UNPAID");
     // budgetFunded is the gross amount funded for creators — approval funds
     // nothing to creators, so it remains 0 here.
     expect(updated.budgetFunded).toBe(0);
@@ -164,6 +165,11 @@ describe("campaign flow", () => {
       status: "REJECTED",
       name: "Hidden Rejected",
     });
+    await createCampaign(fx.brandAlpha.businessProfileId, {
+      status: "APPROVED",
+      name: "Hidden Unpaid",
+      paymentStatus: "UNPAID",
+    });
 
     signOut();
     const res = await callRoute({ GET: campaignsListRoute }, {
@@ -177,6 +183,7 @@ describe("campaign flow", () => {
     expect(names).toContain("Public Approved");
     expect(names).not.toContain("Hidden Pending");
     expect(names).not.toContain("Hidden Rejected");
+    expect(names).not.toContain("Hidden Unpaid");
 
     const found = campaigns.find(
       (c: { id: string }) => c.id === approved.id
@@ -187,6 +194,9 @@ describe("campaign flow", () => {
     expect(found.platformFee).toBeUndefined();
     expect(found.platformFeeRate).toBeUndefined();
     expect(found.totalCharge).toBeUndefined();
+    expect((found as Record<string, unknown>)._count).toBeUndefined();
+    expect(found.creatorsJoined).toBe(0);
+    expect(typeof found.daysLeft).toBe("number");
     expect(found.name).toBe("Public Approved");
   });
 
