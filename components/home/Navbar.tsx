@@ -87,7 +87,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
                 Discover
               </Link>
               {!brand && (
-                <Link href="/login">
+                <Link href="https://krietas.com/login">
                   <Button
                     variant="ghost"
                     className="rounded-full px-4 text-black hover:bg-black/10 hover:text-black"
@@ -178,7 +178,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
             {!brand && (
               <li>
                 <Link
-                  href="/login"
+                  href="https://krietas.com/login"
                   onClick={closeMenu}
                   className="block rounded-lg px-3 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/10 hover:text-black"
                 >
