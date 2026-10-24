@@ -18,7 +18,30 @@ export const metadata: Metadata = {
   title: "Konnectika — Where African creativity meets opportunity",
   description:
     "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://wekonnectika.com"),
+  openGraph: {
+    title: "Konnectika — Where African creativity meets opportunity",
+    description:
+      "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
+    url: "/",
+    siteName: "Konnectika",
+    type: "website",
+    images: [
+      {
+        url: "/assets/link-banner.webp",
+        width: 1080,
+        height: 630,
+        alt: "Konnectika — Where African creativity meets opportunity",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Konnectika — Where African creativity meets opportunity",
+    description:
+      "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
+    images: ["/assets/link-banner.webp"],
+  },
 };
 
 export default function RootLayout({
