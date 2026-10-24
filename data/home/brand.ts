@@ -17,7 +17,7 @@ export interface BrandCreator {
 export const brandWorkflow: Step[] = [
   {
     step: "1",
-    icon: "Rocket",
+    icon: "BiSolidMegaphone",
     title: "Create campaign",
     description: "Define your goals, budget, and creative brief.",
   },
@@ -25,13 +25,13 @@ export const brandWorkflow: Step[] = [
     step: "2",
     icon: "UserCheck",
     title: "Approve creators",
-    description: "Review applications and pick the right voices.",
+    description: "We review applications and pick the right voices.",
   },
   {
     step: "3",
     icon: "ClipboardList",
     title: "Receive content",
-    description: "Collect authentic submissions in one place.",
+    description: "We collect authentic submissions in one place.",
   },
   {
     step: "4",

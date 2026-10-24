@@ -97,7 +97,7 @@ export default function BrandHeroV2() {
 
       {/* CTA */}
       <div>
-        <Link href="/discover">
+        <Link href="/launch-campaign">
           <Button
             size="lg"
             className="h-12 w-full rounded-full bg-white px-7 text-base font-semibold text-black hover:bg-orange-400 sm:w-auto"

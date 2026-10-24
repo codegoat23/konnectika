@@ -17,11 +17,6 @@ interface NavbarProps {
   onModeChange: (mode: Audience) => void;
 }
 
-const MOBILE_NAV_LINKS = [
-  { label: "Discover", href: "/discover" },
-  { label: "Login", href: "/login" },
-];
-
 export function Navbar({ mode, onModeChange }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,7 +39,7 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
-  const ctaHref = brand ? "/signup?role=BRAND" : "/signup?role=CREATOR";
+  const ctaHref = brand ? "/launch-campaign" : "https://krietas.com/signup";
 
   return (
     <header
@@ -91,19 +86,16 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
               >
                 Discover
               </Link>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "rounded-full px-4",
-                    brand
-                      ? "text-zinc-300 hover:bg-white/10 hover:text-white"
-                      : "text-black hover:bg-black/10 hover:text-black"
-                  )}
-                >
-                  Login
-                </Button>
-              </Link>
+              {!brand && (
+                <Link href="/login">
+                  <Button
+                    variant="ghost"
+                    className="rounded-full px-4 text-black hover:bg-black/10 hover:text-black"
+                  >
+                    Login
+                  </Button>
+                </Link>
+              )}
               <Link href={ctaHref}>
                 <Button
                   className={cn(
@@ -169,22 +161,31 @@ export function Navbar({ mode, onModeChange }: NavbarProps) {
           )}
         >
           <ul className="flex flex-col gap-1 px-4 py-4 sm:px-6">
-            {MOBILE_NAV_LINKS.map((link) => (
-              <li key={link.href}>
+            <li>
+              <Link
+                href="/discover"
+                onClick={closeMenu}
+                className={cn(
+                  "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  brand
+                    ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+                    : "text-black hover:bg-black/10 hover:text-black"
+                )}
+              >
+                Discover
+              </Link>
+            </li>
+            {!brand && (
+              <li>
                 <Link
-                  href={link.href}
+                  href="/login"
                   onClick={closeMenu}
-                  className={cn(
-                    "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                    brand
-                      ? "text-zinc-300 hover:bg-white/10 hover:text-white"
-                      : "text-black hover:bg-black/10 hover:text-black"
-                  )}
+                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/10 hover:text-black"
                 >
-                  {link.label}
+                  Login
                 </Link>
               </li>
-            ))}
+            )}
             <li>
               <Link href={ctaHref} onClick={closeMenu} className="mt-1 block">
                 <Button

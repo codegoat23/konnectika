@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ArrowRight, Check, Search } from "lucide-react";
+import type { IconType } from "react-icons";
+import { BiSolidMegaphone } from "react-icons/bi";
+import { FaChartLine, FaClipboardList, FaUserCheck } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/home/Reveal";
-import { HomeIcon } from "@/components/home/icon-map";
-import { SectionHeading } from "@/components/home/shared/SectionHeading";
 import { BenefitsGrid } from "@/components/home/shared/BenefitsGrid";
 import { TestimonialsSection } from "@/components/home/shared/TestimonialsSection";
+import { SectionHeading } from "@/components/home/shared/SectionHeading";
 import { CTABanner } from "@/components/home/shared/CTABanner";
 import {
   brandBenefits,
@@ -33,6 +35,13 @@ const categoryChips = [
   "Fitness & Wellness",
   "Music & Culture",
 ];
+
+const workflowIcons: Record<string, IconType> = {
+  BiSolidMegaphone,
+  UserCheck: FaUserCheck,
+  ClipboardList: FaClipboardList,
+  TrendingUp: FaChartLine,
+};
 
 function CreatorRow({ creator }: { creator: BrandCreator }) {
   return (
@@ -78,38 +87,41 @@ export function BrandSections() {
             label="How it works"
             labelClassName="border-white/10 bg-card text-xs font-normal text-zinc-300"
             title="From brief to results in four steps"
-           
           />
-     <div className="mt-14 grid max-w-4xl mx-auto gap-5 md:grid-cols-2">
-  {brandWorkflow.map((step, i) => (
-    <Reveal key={step.step} delay={i * 90}>
-      <div
-        className={`relative h-full overflow-hidden rounded-3xl border border-white/10 bg-card p-6 ${
-          i % 2 === 1 ? "md:translate-y-10" : ""
-        }`}
-      >
-        <span
-          className="absolute right-4 top-3 text-5xl font-extrabold leading-none text-white/[0.06]"
-          aria-hidden
-        >
-          {step.step}
-        </span>
+          <div className="mx-auto mt-14 grid max-w-4xl gap-5 md:grid-cols-2">
+            {brandWorkflow.map((step, i) => {
+              const Icon = workflowIcons[step.icon];
 
-        <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-          <HomeIcon name={step.icon} className="size-5" />
-        </span>
+              return (
+                <Reveal key={step.step} delay={i * 90}>
+                  <div
+                    className={`relative h-full overflow-hidden rounded-3xl border border-white/10 bg-card p-6 ${
+                      i % 2 === 1 ? "md:translate-y-10" : ""
+                    }`}
+                  >
+                    <span
+                      className="absolute right-4 top-3 text-5xl font-extrabold leading-none text-white/[0.06]"
+                      aria-hidden
+                    >
+                      {step.step}
+                    </span>
 
-        <h3 className="mt-5 text-base font-bold text-white">
-          {step.title}
-        </h3>
+                    <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                      {Icon && <Icon className="size-5" />}
+                    </span>
 
-        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-          {step.description}
-        </p>
-      </div>
-    </Reveal>
-  ))}
-</div>
+                    <h3 className="mt-5 text-base font-bold text-white">
+                      {step.title}
+                    </h3>
+
+                    <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
+                      {step.description}
+                    </p>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -124,7 +136,7 @@ export function BrandSections() {
           </div>
         </Reveal>
       </section>
-      <Testimony />
+      
      
 
       <CTABanner
@@ -133,7 +145,7 @@ export function BrandSections() {
         headline="Launch your first campaign this week"
         subtext="Join the brands discovering Africa's best creators — from brief to published content in days."
         primaryLabel="Start a Campaign"
-        primaryHref="/signup?role=BRAND"
+        primaryHref="/launch-campaign"
         secondaryLabel="Explore the marketplace"
         secondaryHref="#marketplace"
       />

@@ -1,13 +1,4 @@
-import {
-  Award,
-  BadgeCheck,
-  Phone,
-  FileText,
-  ShieldCheck,
-  Compass,
-  Camera,
-  Wallet,
-} from "lucide-react";
+import { FaCamera, FaCompass, FaFileLines, FaWallet } from "react-icons/fa6";
 import { Reveal } from "../Reveal";
 
 const trustItems = [
@@ -18,7 +9,7 @@ const trustItems = [
       "Find campaigns matching your skills and audience.",
     color: "bg-orange-50",
     pin: "bg-orange-500",
-    icon: <Compass className="w-6 h-6" />,
+    icon: <FaCompass className="w-6 h-6" />,
     rotate: "-rotate-6",
     side: "left",
   },
@@ -29,7 +20,7 @@ const trustItems = [
       "Submit authentic content for brands.",
     color: "bg-blue-50",
     pin: "bg-blue-500",
-    icon: <Camera className="w-6 h-6" />,
+    icon: <FaCamera className="w-6 h-6" />,
     rotate: "rotate-6",
     side: "right",
   },
@@ -40,7 +31,7 @@ const trustItems = [
       "Earn money from successful collaborations",
     color: "bg-violet-50",
     pin: "bg-violet-500",
-    icon: <Wallet className="w-6 h-6" />,
+    icon: <FaWallet className="w-6 h-6" />,
     rotate: "-rotate-6",
     side: "left",
   },
@@ -51,7 +42,7 @@ const trustItems = [
       "Explain how you've solved real problems and highlight measurable results.",
     color: "bg-orange-50",
     pin: "bg-orange-500",
-    icon: <FileText className="w-6 h-6" />,
+    icon: <FaFileLines className="w-6 h-6" />,
     rotate: "rotate-6",
     side: "right",
   },

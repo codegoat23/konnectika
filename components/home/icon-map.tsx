@@ -17,6 +17,7 @@ import {
   UserCheck,
   type LucideIcon,
 } from "lucide-react";
+import { BiSolidMegaphone } from "react-icons/bi";
 
 const iconMap: Record<string, LucideIcon> = {
   Compass,

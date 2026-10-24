@@ -49,6 +49,7 @@ model CampaignInquiry {
   objective    String
   product      String
   description  String   @db.Text
+  requirements String?  @db.Text
   platforms    String
   creatorCount String?
   budget       String

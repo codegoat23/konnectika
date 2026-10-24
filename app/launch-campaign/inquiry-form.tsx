@@ -123,6 +123,7 @@ export default function InquiryForm() {
         <label>Product or service to promote <b>*</b><input name="product" placeholder="What should creators know about?" required maxLength={180} /></label>
       </div>
       <label className={styles.block}>Campaign description & expectations <b>*</b><textarea name="description" rows={4} placeholder="Tell us about the campaign, your audience, deliverables, and what success looks like." required minLength={20} maxLength={4000} /></label>
+      <label className={styles.block}>Campaign requirements <span className={styles.optional}>OPTIONAL</span><textarea name="requirements" rows={4} placeholder="Share required deliverables, creator qualifications, key messages, hashtags, or anything creators must include." maxLength={4000} /></label>
       <fieldset>
         <legend>Preferred social platforms <b>*</b><span className={styles.helper}>Select all that apply</span></legend><div className={styles.choices}>{platforms.map((x) => { const Icon = platformIcons[x as keyof typeof platformIcons]; return <label className={`${styles.choice} ${styles.platformChoice}`} key={x}><input type="checkbox" name="platforms" value={x} /><Icon aria-hidden="true" size={14} />{x}</label>; })}</div></fieldset>
         </div>

@@ -13,7 +13,7 @@ const schema = z.object({
   email: z.string().trim().email().max(254), whatsapp: z.string().trim().regex(/^\+?[0-9().\s-]{7,24}$/),
   website: z.string().trim().max(250).optional().default(""), industry: z.enum(industries),
   campaignTypes: z.string().min(1).max(300), objective: z.enum(objectives), product: z.string().trim().min(1).max(180),
-  description: z.string().trim().min(20).max(4000), platforms: z.string().min(1).max(100),
+  description: z.string().trim().min(20).max(4000), requirements: z.string().trim().max(4000).optional().default(""), platforms: z.string().min(1).max(100),
   creatorCount: z.enum(["1", "2–5", "6–10", "10+"]).optional().or(z.literal("")), budget: z.enum(budgets),
   startDate: z.string().max(10).optional().or(z.literal("")), additional: z.string().trim().max(2000).optional().default(""),
   websiteConfirm: z.string().max(0).optional().default(""),
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     field("Brand name", data.brandName), field("Contact person", data.contactName), field("Business email", data.email),
     field("WhatsApp", data.whatsapp), field("Industry", data.industry),
     field("Campaign types", data.campaignTypes), field("Objective", data.objective), field("Product or service", data.product),
-    field("Campaign description", data.description), field("Platforms", data.platforms), field("Creators needed", data.creatorCount || "Not specified"),
+    field("Campaign description", data.description), field("Campaign requirements", data.requirements), field("Platforms", data.platforms), field("Creators needed", data.creatorCount || "Not specified"),
     field("Budget", data.budget), field("Preferred start date", data.startDate || "Not specified"), field("Additional requirements", data.additional),
     field("Website / Instagram", data.website), field("Submitted at", `${createdAt.toISOString()} (UTC)`),
   ].join("");
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     await prisma.campaignInquiry.create({ data: {
       brandName: data.brandName, contactName: data.contactName, email: data.email, whatsapp: data.whatsapp,
       website: data.website || null, industry: data.industry, campaignTypes: data.campaignTypes,
-      objective: data.objective, product: data.product, description: data.description, platforms: data.platforms,
+      objective: data.objective, product: data.product, description: data.description, requirements: data.requirements || null, platforms: data.platforms,
       creatorCount: data.creatorCount || null, budget: data.budget, startDate: data.startDate ? new Date(`${data.startDate}T00:00:00.000Z`) : null,
       additional: data.additional || null,
     } });
