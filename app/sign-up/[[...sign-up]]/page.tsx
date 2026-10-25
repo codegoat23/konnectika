@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignUpForm } from "@/components/sign-up-form";
 import Logo from "@/public/assets/logo-plain.svg";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Create an account | Konnectika",
+  robots: { index: false, follow: false },
+};
 
 // Catch-all mount point for Clerk's path-based sign-up (`routing="path"`).
 // The legacy /signup URL redirects here and preserves its role intent.

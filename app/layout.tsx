@@ -7,6 +7,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { siteUrl } from "@/lib/seo";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -18,7 +19,8 @@ export const metadata: Metadata = {
   title: "Konnectika — Where African creativity meets opportunity",
   description:
     "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://wekonnectika.com"),
+  metadataBase: new URL(siteUrl),
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Konnectika — Where African creativity meets opportunity",
     description:
@@ -44,6 +46,29 @@ export const metadata: Metadata = {
   },
 };
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Konnectika",
+      url: siteUrl,
+      logo: `${siteUrl}/assets/logo-expanded.svg`,
+      description:
+        "Konnectika connects creators with brands looking for authentic content. Discover campaigns, create, collaborate, and get rewarded.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: "Konnectika",
+      url: siteUrl,
+      inLanguage: "en",
+      publisher: { "@id": `${siteUrl}/#organization` },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -56,6 +81,12 @@ export default function RootLayout({
       className={`${sora.variable} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

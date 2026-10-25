@@ -10,6 +10,7 @@ import { getAuthUser } from "@/lib/auth";
 export const metadata: Metadata = {
   title: "Settings | Konnectika",
   description: "Manage your account and preferences.",
+  robots: { index: false, follow: false },
 };
 
 export default async function SettingsPage() {

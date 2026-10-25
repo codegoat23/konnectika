@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignInForm } from "@/components/sign-in-form";
 import Logo from "@/public/assets/logo-plain.svg";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Sign in | Konnectika",
+  robots: { index: false, follow: false },
+};
 
 // Mount point for Clerk's path-based sign-in (`routing="path"`). /login
 // redirects here so existing links and bookmarks keep working.

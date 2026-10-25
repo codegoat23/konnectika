@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react"
 import { SiDiscord } from "react-icons/si"
+import { FiInbox } from "react-icons/fi"
 import { IoFilm } from "react-icons/io5";
 import { BiSolidMegaphone } from "react-icons/bi";
 
@@ -80,6 +81,7 @@ const roleSections: Record<DashboardRole, NavSection[]> = {
       { title: "Applicants", url: "/dashboard/applicants", icon: <Users /> },
       { title: "Payouts", url: "/dashboard/payouts", icon: <Landmark /> },
       { title: "Payments", url: "/dashboard/payments", icon: <HandCoins /> },
+      { title: "Inquiries", url: "/dashboard/inquiries", icon: <FiInbox /> },
       { title: "Revenue", url: "/dashboard/revenue", icon: <ChartNoAxesColumn /> },
     ] },
     { title: "Account", items: [
