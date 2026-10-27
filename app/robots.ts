@@ -3,7 +3,15 @@ import { siteUrl } from "@/lib/seo";
 
 const searchCrawlerRules = {
   allow: "/",
-  disallow: "/api/",
+  disallow: [
+    "/api/",
+    "/login",
+    "/signup",
+    "/sign-in",
+    "/sign-up",
+    "/logout",
+    "/sign-out",
+  ],
 };
 
 export default function robots(): MetadataRoute.Robots {

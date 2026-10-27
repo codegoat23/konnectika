@@ -224,7 +224,7 @@ export function CreatorHero() {
                     <ArrowRight data-icon="inline-end" />
                   </Button>
                 </Link>
-                <Link href="/signup?role=CREATOR">
+                <Link href="https://krietas.com/signup">
                   <Button
                     size="lg"
                     variant="outline"

@@ -54,7 +54,7 @@ export default function ApplyPage() {
 
         if (!res.ok) {
           // Not authenticated -> login
-          router.push(`/login?redirectTo=/campaign/${campaignId}/apply`);
+          window.location.assign("https://krietas.com/login");
           return;
         }
 
@@ -67,7 +67,7 @@ export default function ApplyPage() {
         setUser(data.creator);
         setCheckingAuth(false);
       } catch {
-        router.push(`/login?redirectTo=/campaign/${campaignId}/apply`);
+        window.location.assign("https://krietas.com/login");
       }
     };
 

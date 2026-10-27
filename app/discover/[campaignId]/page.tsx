@@ -109,7 +109,7 @@ export default async function CampaignDetailPage({ params }: PageProps) {
   } else if (!user) {
     cta = {
       type: "login",
-      href: `/login?redirectTo=/discover/${campaign.id}`,
+      href: "https://krietas.com/login",
     };
   } else if (user.role !== "CREATOR") {
     cta = { type: "brand" };
