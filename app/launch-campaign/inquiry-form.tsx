@@ -147,6 +147,6 @@ export default function InquiryForm() {
         <p>By submitting, you’re asking our team to contact you about this campaign. No payment is taken here.</p>
       <button className={styles.submit} disabled={status === "submitting"}>{status === "submitting" ? "Sending…" : "Submit Campaign Inquiry"}<BsSendFill size={16} /></button></div>
     </form>
-    <footer className={styles.footer}>Have a quick question? <a href="mailto:hello@konnectika.com">Talk to our team <ArrowRight size={13} /></a><small>© {new Date().getFullYear()} Konnectika</small></footer>
+    <footer className={styles.footer}>Have a quick question? <a href="mailto:support@konnectika.com">Talk to our team <ArrowRight size={13} /></a><small>© {new Date().getFullYear()} Konnectika</small></footer>
   </section>;
 }
